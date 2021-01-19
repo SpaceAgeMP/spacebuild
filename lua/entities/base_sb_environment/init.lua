@@ -1,7 +1,6 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
-local SB_AIR_EMPTY = -1
+include("shared.lua")
 local SB_AIR_O2 = 0
 local SB_AIR_CO2 = 1
 local SB_AIR_N = 2
@@ -11,8 +10,8 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
-	self:SetNetworkedInt("overlaymode", 1)
-	self:SetNetworkedInt("OOO", 0)
+	self:SetNWInt("overlaymode", 1)
+	self:SetNWInt("OOO", 0)
 	self.Active = 0
 	self.Active = 0
 	self.sbenvironment = {}
@@ -85,7 +84,7 @@ function ENT:CheckAirValues()
 
 				if percentage > 100 then
 					-- Remove all above 100%
-					local tomcuch = percentage - 100
+					local tomuch = percentage - 100
 					v = v - tomuch
 				end
 			end
@@ -103,7 +102,7 @@ end
 function ENT:ConvertResource(res1, res2, amount)
 	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 
-	if not res1 or not res2 or not amount or not type(amount) == "number" then return 0 end
+	if not res1 or not res2 or not amount or type(amount) ~= "number" then return 0 end
 
 	if type(res1) == "number" and type(res2) == "number" then
 		return self:Convert(res1, res2, amount)
@@ -218,7 +217,7 @@ function ENT:SetActive(value, caller)
 end
 
 function ENT:SetOOO(value)
-	self:SetNetworkedInt("OOO", value)
+	self:SetNWInt("OOO", value)
 end
 
 AccessorFunc(ENT, "LSMULTIPLIER", "Multiplier", FORCE_NUMBER)
@@ -250,7 +249,7 @@ end
 function ENT:Think()
 	if (self.NextOverlayTextTime) and (CurTime() >= self.NextOverlayTextTime) then
 		if (self.NextOverlayText) then
-			self:SetNetworkedString("GModOverlayText", self.NextOverlayText)
+			self:SetNWString("GModOverlayText", self.NextOverlayText)
 			self.NextOverlayText = nil
 		end
 
@@ -264,13 +263,13 @@ function ENT:OnRemove()
 		CAF.GetAddon("Resource Distribution").RemoveRDEntity(self)
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_Remove(self)
 	end
 end
 
 function ENT:OnRestore()
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_Restored(self)
 	end
 end
@@ -281,7 +280,7 @@ function ENT:PreEntityCopy()
 		RD.BuildDupeInfo(self)
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		local DupeInfo = WireLib.BuildDupeInfo(self)
 
 		if DupeInfo then
@@ -296,7 +295,7 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 		RD.ApplyDupeInfo(Ent, CreatedEntities)
 	end
 
-	if not (WireAddon == nil) and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 end

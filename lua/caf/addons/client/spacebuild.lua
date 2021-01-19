@@ -103,7 +103,7 @@ local function DrawSunEffects()
 		local entpos = Sun.Position --Sun.ent:LocalToWorld( Vector(0,0,0) )
 		local normVec = Vector(entpos - EyePos())
 		normVec:Normalize()
-		local dot = math.Clamp(EyeAngles():Forward():DotProduct(normVec), -1, 1)
+		local dot = math.Clamp(EyeAngles():Forward():Dot(normVec), -1, 1)
 		dot = math.abs(dot)
 		--local dist = Vector( entpos - EyePos() ):Length();
 		local dist = entpos:Distance(EyePos()) / 1.5
@@ -146,15 +146,15 @@ local function DrawSunEffects()
 			);]]
 			-- draw color.
 			local tab = {
-				['$pp_colour_addr'] = 0.35 * frac,
-				['$pp_colour_addg'] = 0.15 * frac,
-				['$pp_colour_addb'] = 0.05 * frac,
-				['$pp_colour_brightness'] = 0.8 * frac,
-				['$pp_colour_contrast'] = 1 + (0.15 * frac),
-				['$pp_colour_colour'] = 1,
-				['$pp_colour_mulr'] = 0,
-				['$pp_colour_mulg'] = 0,
-				['$pp_colour_mulb'] = 0,
+				["$pp_colour_addr"] = 0.35 * frac,
+				["$pp_colour_addg"] = 0.15 * frac,
+				["$pp_colour_addb"] = 0.05 * frac,
+				["$pp_colour_brightness"] = 0.8 * frac,
+				["$pp_colour_contrast"] = 1 + (0.15 * frac),
+				["$pp_colour_colour"] = 1,
+				["$pp_colour_mulr"] = 0,
+				["$pp_colour_mulg"] = 0,
+				["$pp_colour_mulb"] = 0,
 			}
 
 			-- draw colormod.
@@ -223,7 +223,6 @@ local function recvSun(msg)
 		Position = position,
 		Radius = radius, -- * 2
 		BeamRadius = radius * 1.5, --*3
-		
 	}
 end
 
@@ -303,21 +302,19 @@ end
 function SB.FindClosestPlanet(pos, starsto)
 	local closestplanet = nil
 
-	if table.Count(planets) > 0 then
-		for k, v in pairs(planets) do
-			if v then
-				if not closestplanet then
+	for k, v in pairs(planets) do
+		if v then
+			if not closestplanet then
+				closestplanet = v
+			else
+				if (v.position:Distance(pos) < closestplanet.position:Distance(pos)) then
 					closestplanet = v
-				else
-					if (v.position:Distance(pos) < closestplanet.position:Distance(pos)) then
-						closestplanet = v
-					end
 				end
 			end
 		end
 	end
 
-	if starsto and table.Count(stars) > 0 then
+	if starsto then
 		for k, v in pairs(stars) do
 			if v then
 				if not closestplanet then

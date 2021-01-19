@@ -201,28 +201,6 @@ local function liquid_nitrogen_tank_func(ent, type, sub_type, devinfo, Extra_Dat
 	return mass, maxhealth
 end
 
-local function hot_liquid_nitrogen_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
-	local volume_mul = 1
-	local base_volume = 4084
-	local base_mass = 20
-	local base_health = 200
-	local phys = ent:GetPhysicsObject()
-
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
-	end
-
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "hot liquid nitrogen", math.Round(2500 * volume_mul))
-	ent.MAXRESOURCE = math.Round(2500 * volume_mul)
-	local mass = math.Round(base_mass * volume_mul)
-	ent.mass = mass
-	local maxhealth = math.Round(base_health * volume_mul)
-
-	return mass, maxhealth
-end
-
 local function heavywater_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1
 	local base_volume = 4084
@@ -286,14 +264,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -333,14 +309,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 3,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 3,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -379,14 +353,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 2,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 2,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -425,14 +397,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 1,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 1,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -471,14 +441,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 5,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 5,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -517,14 +485,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 4,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 4,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -563,14 +529,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 6,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 6,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",
@@ -609,7 +573,6 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/battery_small.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium (Phx)",
@@ -659,14 +622,12 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/canister_small.mdl",
 				skin = 7,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			small_phx2 = {
 				Name = "Small Tank (Phx)",
 				model = "models/props_phx/life_support/tank_small.mdl",
 				skin = 7,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Canister (Phx)",

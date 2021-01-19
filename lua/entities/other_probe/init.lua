@@ -1,7 +1,7 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 util.PrecacheSound("Buttons.snd17")
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 local Energy_Increment = 4
 local BeepCount = 3
@@ -11,7 +11,7 @@ function ENT:Initialize()
 	self.Active = 0
 	self.damaged = 0
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Inputs = Wire_CreateInputs(self, {"On"})
@@ -34,7 +34,7 @@ function ENT:TurnOn()
 	self:Sense()
 	self:ShowOutput()
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "On", 1)
 	end
 end
@@ -48,7 +48,7 @@ function ENT:TurnOff(warn)
 	self:SetOOO(0)
 	self:ShowOutput()
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "On", 0)
 		Wire_TriggerOutput(self, "O2 Level", 0)
 		Wire_TriggerOutput(self, "CO2 Level", 0)
@@ -100,7 +100,7 @@ function ENT:Sense()
 		end
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		if self.environment then
 			Wire_TriggerOutput(self, "O2 Level", self.environment:GetO2Percentage())
 			Wire_TriggerOutput(self, "CO2 Level", self.environment:GetCO2Percentage())
@@ -117,15 +117,15 @@ function ENT:Sense()
 end
 
 function ENT:ShowOutput()
-	self:SetNetworkedInt(1, self.environment:GetO2Percentage() or 0)
-	self:SetNetworkedInt(2, self.environment:GetCO2Percentage() or 0)
-	self:SetNetworkedInt(3, self.environment:GetNPercentage() or 0)
-	self:SetNetworkedInt(4, self.environment:GetHPercentage() or 0)
-	self:SetNetworkedInt(5, self.environment:GetPressure() or 0)
-	self:SetNetworkedInt(6, self.environment:GetTemperature(self) or 0)
-	self:SetNetworkedInt(7, self.environment:GetGravity() or 0)
-	self:SetNetworkedString(8, self.environment:GetEnvironmentName() or "")
-	self:SetNetworkedInt(9, self.environment:GetEmptyAirPercentage() or 0)
+	self:SetNWInt(1, self.environment:GetO2Percentage() or 0)
+	self:SetNWInt(2, self.environment:GetCO2Percentage() or 0)
+	self:SetNWInt(3, self.environment:GetNPercentage() or 0)
+	self:SetNWInt(4, self.environment:GetHPercentage() or 0)
+	self:SetNWInt(5, self.environment:GetPressure() or 0)
+	self:SetNWInt(6, self.environment:GetTemperature(self) or 0)
+	self:SetNWInt(7, self.environment:GetGravity() or 0)
+	self:SetNWString(8, self.environment:GetEnvironmentName() or "")
+	self:SetNWInt(9, self.environment:GetEmptyAirPercentage() or 0)
 end
 
 function ENT:Think()

@@ -1,4 +1,4 @@
-﻿include('shared.lua')
+﻿include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 local OOO = {}
 OOO[0] = "Closed"
@@ -20,11 +20,11 @@ function ENT:DrawTranslucent(bDontDrawModel)
 end
 
 function ENT:GetOOO()
-	return self:GetNetworkedInt("OOO") or 0
+	return self:GetNWInt("OOO") or 0
 end
 
 function ENT:DoNormalDraw(bDontDrawModel)
-	local mode = self:GetNetworkedInt("overlaymode")
+	local mode = self:GetNWInt("overlaymode")
 
 	-- Don't enable it if disabled by default!
 	if RD_OverLay_Mode and mode ~= 0 then
@@ -58,8 +58,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 
 		local playername = self:GetPlayerName()
-		local netid = self:GetNetworkedInt("netid1")
-		local netid2 = self:GetNetworkedInt("netid2")
+		local netid = self:GetNWInt("netid1")
+		local netid2 = self:GetNWInt("netid2")
 
 		if playername == "" then
 			playername = "World"
@@ -98,7 +98,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
 		else
-			local rot = Vector(0, 0, 90)
 			local TempY = 0
 			--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
 			local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))

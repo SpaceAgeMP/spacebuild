@@ -2,7 +2,7 @@
 AddCSLuaFile("shared.lua")
 util.PrecacheSound("ambient.steam01")
 --Extra Resources Added by DataSchmuck for the McBuild's Community
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 
 function ENT:Initialize()
@@ -18,7 +18,7 @@ function ENT:Initialize()
 	self.ventlnit = false
 	self.ventamount = 1000
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Inputs = Wire_CreateInputs(self, {"Vent Amount", "Expel Energy", "Vent Oxygen", "Vent Co2", "Vent Hydrogen", "Vent Nitrogen", "Leak Water", "Leak Heavy Water", "Leak Liquid Nitrogen"})
@@ -341,7 +341,7 @@ function ENT:Think()
 		self:LeakLqdNitrogen()
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self:UpdateWireOutput()
 	end
 

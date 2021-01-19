@@ -1,6 +1,6 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 
 --Todo: Add Cooldown? = toWater
@@ -9,7 +9,7 @@ function ENT:Initialize()
 	self.damaged = 0
 	self.vent = false
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Inputs = Wire_CreateInputs(self, {"Vent"})
@@ -141,7 +141,7 @@ function ENT:Think()
 		self:SupplyResource("water", toremove)
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self:UpdateWireOutput()
 	end
 

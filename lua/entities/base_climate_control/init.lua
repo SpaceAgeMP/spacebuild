@@ -4,7 +4,7 @@ AddCSLuaFile("shared.lua")
 util.PrecacheSound("apc_engine_start")
 util.PrecacheSound("apc_engine_stop")
 util.PrecacheSound("common/warning.wav")
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_sb_environment")
 
 function ENT:Initialize()
@@ -16,7 +16,7 @@ function ENT:Initialize()
 	self.maxsize = 4096
 	self.maxO2Level = 100
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Inputs = Wire_CreateInputs(self, {"On", "Radius", "Gravity", "Max O2 level"})
@@ -45,23 +45,9 @@ function ENT:TurnOn()
 		self:EmitSound("apc_engine_start")
 		self.Active = 1
 		self:UpdateSize(self.sbenvironment.size, self.currentsize) --We turn the forcefield that contains the environment on
-		--[[if self.environment and not self.environment:IsSpace() then --Fill the environment with air if the surounding environment has o2, replace with CO2
-              self.sbenvironment.air.o2 = self.sbenvironment.air.o2 + self.environment:Convert(0, -1, math.Round(self.sbenvironment.air.max/18))
-              self.sbenvironment.air.empty = self.sbenvironment.air.empty - self.sbenvironment.air.o2
-          end*]]
-		local oxygen = self:GetResourceAmount("oxygen")
-		--[[if oxygen >= math.ceil(self.sbenvironment.air.max/ 18) then
-              local left = RD.ConsumeResource(self, "oxygen", math.ceil(self.sbenvironment.air.max/ 18) )
-              self.sbenvironment.air.o2 = math.ceil(self.sbenvironment.air.max/ 18) - left
-              self.sbenvironment.air.empty = self.sbenvironment.air.empty - self.sbenvironment.air.o2
-          elseif oxygen > 0 then
-              local left = RD.ConsumeResource(self, "oxygen", oxygen )
-              self.sbenvironment.air.o2 = oxygen - left
-              self.sbenvironment.air.empty = self.sbenvironment.air.empty - self.sbenvironment.air.o2
-          end]]
 		self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 200 * math.ceil(self.maxsize / 1024))
 
-		if not (WireAddon == nil) then
+		if WireAddon ~= nil then
 			Wire_TriggerOutput(self, "On", self.Active)
 		end
 
@@ -101,7 +87,7 @@ function ENT:TurnOff()
 		self.sbenvironment.temperature = 0
 		self:UpdateSize(self.sbenvironment.size, 0) --We turn the forcefield that contains the environment off!
 
-		if not (WireAddon == nil) then
+		if WireAddon ~= nil then
 			Wire_TriggerOutput(self, "On", self.Active)
 		end
 
@@ -500,7 +486,7 @@ function ENT:Climate_Control()
 		end
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "Oxygen-Level", tonumber(self:GetO2Percentage()))
 		Wire_TriggerOutput(self, "Temperature", tonumber(self.sbenvironment.temperature))
 		Wire_TriggerOutput(self, "Gravity", tonumber(self.sbenvironment.gravity))

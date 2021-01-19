@@ -197,8 +197,8 @@ local function energy_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 			volume_mul = volume / base_volume
 		end
 
-		local base_mass = 100
-		local base_health = 150
+		base_mass = 100
+		base_health = 150
 		ent:AddResource("energy", math.ceil(volume_mul * 100))
 	elseif type == "generator_energy_solar" then
 		base_volume = 1982 --2950 --1014
@@ -252,7 +252,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/OxygenCompressor/oxygencompressor.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -267,7 +266,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/OxygenCompressor/oxygencompressor.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -282,7 +280,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/CO2Comp/co2comp.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -297,7 +294,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/HydrogenCompressor/hydrogencompressor.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -312,7 +308,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/NitrogenCompressor/nitrogencompressor.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -375,7 +370,6 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/gen_water.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -390,7 +384,6 @@ TOOL.Devices = {
 				model = "models/props_wasteland/laundry_washer003.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -412,7 +405,6 @@ TOOL.Devices = {
 				model = "models/chipstiks_ls3_models/HydroGenerator/hydrogenerator.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 		},
 	},
@@ -427,7 +419,6 @@ TOOL.Devices = {
 				model = "models/props_phx/life_support/panel_small.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_phx = {
 				Name = "Medium Solar Panel (phx)",
@@ -454,7 +445,6 @@ TOOL.Devices = {
 				model = "models/ls_models/cloudstrifexiii/windmill/windmill_large.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			medium_1 = {
 				Name = "Medium",
@@ -481,14 +471,12 @@ TOOL.Devices = {
 				model = "models/LifeSupport/Generators/ramscoop.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			Other = {
 				Name = "Other",
 				model = "models/props_lab/walllight001a.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			}
 		},
 	},
@@ -503,14 +491,12 @@ TOOL.Devices = {
 				model = "models/LifeSupport/Generators/ramscoop.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			},
 			Other = {
 				Name = "Other",
 				model = "models/props_lab/walllight001a.mdl",
 				skin = 0,
 				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-				
 			}
 		},
 	},

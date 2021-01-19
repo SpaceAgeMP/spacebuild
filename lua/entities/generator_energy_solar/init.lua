@@ -1,6 +1,6 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
+include("shared.lua")
 --Was 15, reduced by popular request.
 local Energy_Increment = 8
 DEFINE_BASECLASS("base_rd3_entity")
@@ -9,7 +9,7 @@ function ENT:Initialize()
 	BaseClass.Initialize(self)
 	self.damaged = 0
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Outputs = Wire_CreateOutputs(self, {"Out"})
@@ -28,7 +28,7 @@ function ENT:TurnOff()
 		self.Active = 0
 		self:SetOOO(0)
 
-		if not (WireAddon == nil) then
+		if WireAddon ~= nil then
 			Wire_TriggerOutput(self, "Out", 0)
 		end
 	end
@@ -78,7 +78,7 @@ function ENT:Extract_Energy(mul)
 		self:SupplyResource("energy", inc)
 	end
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "Out", inc)
 	end
 end
@@ -97,9 +97,7 @@ function ENT:GenEnergy()
 	else
 		local entpos = self:GetPos()
 		local trace = {}
-		local lit = false
 		local SunAngle2 = SunAngle or Vector(0, 0, 1)
-		local SunAngle
 
 		if TrueSun and table.Count(TrueSun) > 0 then
 			local output = 0

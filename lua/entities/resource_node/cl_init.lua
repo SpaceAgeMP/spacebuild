@@ -1,4 +1,4 @@
-﻿include('shared.lua')
+﻿include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 surface.CreateFont("ConflictText", {
@@ -29,7 +29,7 @@ function ENT:DrawTranslucent(bDontDrawModel)
 end
 
 function ENT:DoNormalDraw(bDontDrawModel)
-	local mode = self:GetNetworkedInt("overlaymode")
+	local mode = self:GetNWInt("overlaymode")
 
 	-- Don't enable it if disabled by default!
 	if RD_OverLay_Mode and mode ~= 0 then
@@ -55,17 +55,16 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	end
 
 	if (EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) and ((mode ~= 1 and not string.find(self:GetModel(), "s_small_res")) or LocalPlayer():GetEyeTrace().Entity == self) then
-		local trace = LocalPlayer():GetEyeTrace()
 
 		if (not bDontDrawModel) then
 			self:DrawModel()
 		end
 
-		local netid = self:GetNetworkedInt("netid")
+		local netid = self:GetNWInt("netid")
 		local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(netid)
-		local range = self:GetNetworkedInt("range")
+		local range = self:GetNWInt("range")
 		local playername = self:GetPlayerName()
-		local nodename = self:GetNetworkedString("rd_node_name")
+		local nodename = self:GetNWString("rd_node_name")
 
 		if playername == "" then
 			playername = "World"
@@ -186,7 +185,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 				local cons = nettable.cons
 
 				if (table.Count(cons) > 0) then
-					local i = 0
 					surface.SetFont("Flavour")
 					surface.SetTextColor(200, 200, 255, 255)
 

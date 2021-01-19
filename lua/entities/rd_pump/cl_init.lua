@@ -1,4 +1,4 @@
-﻿include('shared.lua')
+﻿include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 local OOO = {}
 OOO[0] = "Off"
@@ -59,12 +59,12 @@ local function OpenMenu()
 	NameText:SetPos(20, 25)
 	NameText:SetSize(120, 20)
 	NameText:AllowInput(true)
-	NameText:SetValue(ent:GetNetworkedString("name"))
+	NameText:SetValue(ent:GetNWString("name"))
 	local nameButton = vgui.Create("DImageButton", RightPanel)
 	nameButton:SetImage("icon16/folder_go.png")
 	nameButton:SetPos(140, 25)
 	nameButton:SetSize(20, 20)
-	nameButton:SetToolTip("Update Pump Name")
+	nameButton:SetTooltip("Update Pump Name")
 
 	nameButton.DoClick = function()
 		RunConsoleCommand("SetPumpName", ent:EntIndex(), tostring(NameText:GetValue()))
@@ -100,9 +100,9 @@ local function OpenMenu()
 	RText2:SetValue("")
 	local pumps = GetPumps(ent, 768)
 
-	if pumps and table.Count(pumps) > 0 then
+	if pumps then
 		for k, v in pairs(pumps) do
-			local title = v:GetNetworkedString("name")
+			local title = v:GetNWString("name")
 			local node = RightTree:AddNode(title)
 			node.index = v:EntIndex()
 
@@ -168,10 +168,10 @@ local function OpenMenu()
 		DFrame.Think(self)
 	end
 
-	local netid = ent:GetNetworkedInt("netid")
+	local netid = ent:GetNWInt("netid")
 	local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(netid)
 
-	if nettable and table.Count(nettable) > 0 and nettable.resources and table.Count(nettable.resources) > 0 then
+	if nettable and nettable.resources then
 		for k, v in pairs(nettable.resources) do
 			local title = k
 			local node = LeftTree:AddNode(title)
@@ -222,11 +222,11 @@ function ENT:DrawTranslucent(bDontDrawModel)
 end
 
 function ENT:GetOOO()
-	return self:GetNetworkedInt("OOO") or 0
+	return self:GetNWInt("OOO") or 0
 end
 
 function ENT:DoNormalDraw(bDontDrawModel)
-	local mode = self:GetNetworkedInt("overlaymode")
+	local mode = self:GetNWInt("overlaymode")
 
 	-- Don't enable it if disabled by default!
 	if RD_OverLay_Mode and mode ~= 0 then
@@ -253,7 +253,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 	if (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
 		--overlaysettings
-		self.ConnectedPump = self:GetNetworkedInt("connectedpump")
+		self.ConnectedPump = self:GetNWInt("connectedpump")
 		local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
 		local HasOOO = OverlaySettings.HasOOO
 		--End overlaysettings
@@ -263,7 +263,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			self:DrawModel()
 		end
 
-		local netid = self:GetNetworkedInt("netid")
+		local netid = self:GetNWInt("netid")
 		local playername = self:GetPlayerName()
 
 		if playername == "" then
@@ -275,7 +275,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		-- 2 = new overlaytext
 		if not mode or mode ~= 2 then
 			local OverlayText = ""
-			OverlayText = OverlayText .. self:GetNetworkedString("name") .. " (" .. tostring(self:EntIndex()) .. ")\n"
+			OverlayText = OverlayText .. self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")\n"
 
 			if netid == 0 then
 				OverlayText = OverlayText .. "Not connected to a network\n"
@@ -311,7 +311,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
 		else
-			local rot = Vector(0, 0, 90)
 			local TempY = 0
 			--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
 			local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
@@ -332,7 +331,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			surface.SetFont("ConflictText")
 			surface.SetTextColor(255, 255, 255, 255)
 			surface.SetTextPos(textStartPos + 15, TempY)
-			surface.DrawText(self:GetNetworkedString("name") .. " (" .. tostring(self:EntIndex()) .. ")")
+			surface.DrawText(self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")")
 			TempY = TempY + 70
 			surface.SetFont("Flavour")
 			surface.SetTextColor(155, 155, 255, 255)

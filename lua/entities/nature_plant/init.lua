@@ -1,6 +1,6 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 
 function ENT:Initialize()
@@ -32,8 +32,8 @@ function ENT:Destruct()
 end
 
 function ENT:ShowOutput()
-	if self:GetNetworkedInt(1) ~= self.water then
-		self:SetNetworkedInt(1, self.water)
+	if self:GetNWInt(1) ~= self.water then
+		self:SetNWInt(1, self.water)
 	end
 end
 
@@ -128,7 +128,7 @@ function ENT:Think()
 		end
 	end
 
-	if self:GetNetworkedInt("OOO") ~= self.Active then
+	if self:GetNWInt("OOO") ~= self.Active then
 		self:SetOOO(self.Active)
 	end
 

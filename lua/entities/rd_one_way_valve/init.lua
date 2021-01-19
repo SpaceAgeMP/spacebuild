@@ -1,19 +1,19 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
+include("shared.lua")
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
-	self:SetNetworkedInt("overlaymode", 1)
-	self:SetNetworkedInt("OOO", 0)
+	self:SetNWInt("overlaymode", 1)
+	self:SetNWInt("OOO", 0)
 	self.Active = 0
 	self.connected = {}
 	self.connected.node1 = nil
 	self.connected.node2 = nil
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
 		self.Inputs = Wire_CreateInputs(self, {"Open"})
@@ -52,7 +52,7 @@ function ENT:SetNode1(node1)
 	self.connected.node1 = node1
 
 	if node1 then
-		self:SetNetworkedInt("netid1", node1.netid)
+		self:SetNWInt("netid1", node1.netid)
 
 		if self.connected.node2 and self.Active == 1 then
 			local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(self.connected.node1.netid)
@@ -60,7 +60,7 @@ function ENT:SetNode1(node1)
 			nettable.haschanged = true
 		end
 	else
-		self:SetNetworkedInt("netid1", 0)
+		self:SetNWInt("netid1", 0)
 		self:TurnOff()
 	end
 end
@@ -81,7 +81,7 @@ function ENT:SetNode2(node2)
 	self.connected.node2 = node2
 
 	if node2 then
-		self:SetNetworkedInt("netid2", node2.netid)
+		self:SetNWInt("netid2", node2.netid)
 
 		if self.connected.node1 and self.Active == 1 then
 			local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(self.connected.node1.netid)
@@ -89,7 +89,7 @@ function ENT:SetNode2(node2)
 			nettable.haschanged = true
 		end
 	else
-		self:SetNetworkedInt("netid2", 0)
+		self:SetNWInt("netid2", 0)
 		self:TurnOff()
 	end
 end
@@ -103,7 +103,7 @@ function ENT:TurnOn()
 			self.Active = 1
 			self:SetOOO(1)
 
-			if not (WireAddon == nil) then
+			if WireAddon ~= nil then
 				Wire_TriggerOutput(self, "Open", self.Active)
 			end
 		end
@@ -125,7 +125,7 @@ function ENT:TurnOff()
 			self.Active = 0
 			self:SetOOO(0)
 
-			if not (WireAddon == nil) then
+			if WireAddon ~= nil then
 				Wire_TriggerOutput(self, "Open", self.Active)
 			end
 		end
@@ -160,7 +160,7 @@ function ENT:SetActive(value, caller)
 end
 
 function ENT:SetOOO(value)
-	self:SetNetworkedInt("OOO", value)
+	self:SetNWInt("OOO", value)
 end
 
 function ENT:Repair()
@@ -192,13 +192,13 @@ function ENT:Think()
 	if self.connected.node1 and not IsValid(self.connected.node1) then
 		self:TurnOff()
 		self.connected.node1 = nil
-		self:SetNetworkedInt("netid1", 0)
+		self:SetNWInt("netid1", 0)
 	end
 
 	if self.connected.node2 and not IsValid(self.connected.node2) then
 		self:TurnOff()
 		self.connected.node2 = nil
-		self:SetNetworkedInt("netid2", 0)
+		self:SetNWInt("netid2", 0)
 	end
 
 	-- Check if they are still in range!
@@ -206,7 +206,7 @@ function ENT:Think()
 		if self:GetPos():Distance(self.connected.node1:GetPos()) > self.connected.node1.range then
 			self:TurnOff()
 			self.connected.node1 = nil
-			self:SetNetworkedInt("netid1", 0)
+			self:SetNWInt("netid1", 0)
 		end
 	end
 
@@ -214,7 +214,7 @@ function ENT:Think()
 		if self:GetPos():Distance(self.connected.node2:GetPos()) > self.connected.node2.range then
 			self:TurnOff()
 			self.connected.node2 = nil
-			self:SetNetworkedInt("netid2", 0)
+			self:SetNWInt("netid2", 0)
 		end
 	end
 
@@ -226,13 +226,13 @@ end
 function ENT:OnRemove()
 	self:TurnOff()
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_Remove(self)
 	end
 end
 
 function ENT:OnRestore()
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		Wire_Restored(self)
 	end
 end
@@ -241,7 +241,7 @@ function ENT:PreEntityCopy()
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.BuildDupeInfo(self)
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		local DupeInfo = WireLib.BuildDupeInfo(self)
 
 		if DupeInfo then
@@ -254,7 +254,7 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.ApplyDupeInfo(Ent, CreatedEntities)
 
-	if not (WireAddon == nil) and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 end

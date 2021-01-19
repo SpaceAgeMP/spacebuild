@@ -1,7 +1,7 @@
 ﻿AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 util.PrecacheSound("ambient.steam01")
-include('shared.lua')
+include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 
 function ENT:Initialize()
@@ -12,7 +12,7 @@ function ENT:Initialize()
 	self:AddResource("water", 0)
 	self:AddResource("nitrogen", 0)
 
-	if not (WireAddon == nil) then
+	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 	end
 end

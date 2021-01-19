@@ -144,20 +144,20 @@ end
 --MakeCAFEntSupFunctionList: list of functions used by MakeCAFEnt to setup an EntClass, list is indexed with EntClass (only needed if you're using MakeCAFEnt to make your ents)
 function CAF_ToolRegister(TOOL, Models_List, MakeFunc, ToolName, ToolLimit, MakeCAFEntSupFunctionList)
 	if (ToolLimit ~= nil and type(ToolLimit) == "number" and ToolLimit >= 0) then
-		local sbox = 'sbox_max' .. ToolName
-		Msg(sbox .. ' -> ' .. ToolLimit .. '\n')
+		local sbox = "sbox_max" .. ToolName
+		Msg(sbox .. " -> " .. ToolLimit .. "\n")
 		CreateConVar(sbox, ToolLimit)
 	end
 
 	cleanup.Register(ToolName)
-	TOOL.ClientConVar['AllowWorldWeld'] = '0'
-	TOOL.ClientConVar['DontWeld'] = '0'
-	TOOL.ClientConVar['Frozen'] = '0'
-	TOOL.ClientConVar['name'] = ''
-	TOOL.ClientConVar['type'] = ''
-	TOOL.ClientConVar['model'] = ''
+	TOOL.ClientConVar["AllowWorldWeld"] = "0"
+	TOOL.ClientConVar["DontWeld"] = "0"
+	TOOL.ClientConVar["Frozen"] = "0"
+	TOOL.ClientConVar["name"] = ""
+	TOOL.ClientConVar["type"] = ""
+	TOOL.ClientConVar["model"] = ""
 
-	if not (Models_List == nil) then
+	if Models_List ~= nil then
 		for k, v in pairs(Models_List) do
 			CAF_AddStoolItem(ToolName, v[1], v[2], v[3], MakeFunc, v[4]) --v[4] can be a MakeCAFEntSupFunction or nil
 		end
@@ -217,13 +217,13 @@ if (SERVER) then
 		local Pos = trace.HitPos
 		local Ang = trace.HitNormal:Angle()
 		Ang.pitch = Ang.pitch + 90
-		local type = tool:GetClientInfo('type')
-		local model = tool:GetClientInfo('model')
-		local AllowWorldWeld = tool:GetClientNumber('AllowWorldWeld') == 1
-		local DontWeld = tool:GetClientNumber('DontWeld') == 1
-		local Frozen = (tool:GetClientNumber('Frozen') == 1) or (AllowWorldWeld and not trace.Entity:IsValid())
+		local type = tool:GetClientInfo("type")
+		local model = tool:GetClientInfo("model")
+		local AllowWorldWeld = tool:GetClientNumber("AllowWorldWeld") == 1
+		local DontWeld = tool:GetClientNumber("DontWeld") == 1
+		local Frozen = (tool:GetClientNumber("Frozen") == 1) or (AllowWorldWeld and not trace.Entity:IsValid())
 
-		if (not type or type == '') then
+		if (not type or type == "") then
 			CAF.WriteToDebugFile("caf_tool_error", "CAF: GetClientInfo('type') is nil!\n")
 
 			return false
@@ -242,7 +242,7 @@ if (SERVER) then
 		local const
 
 		if (not DontWeld) and (trace.Entity:IsValid() or AllowWorldWeld) then
-			local const = constraint.Weld(ent, trace.Entity, 0, trace.PhysicsBone, 0, true) --add true to turn DOR on
+			const = constraint.Weld(ent, trace.Entity, 0, trace.PhysicsBone, 0, true) --add true to turn DOR on
 		end
 
 		undo.Create(ToolName)
@@ -259,8 +259,8 @@ end
 --server side in singleplayer, client side in multiplayer
 if (game.SinglePlayer() and SERVER) or (not game.SinglePlayer() and CLIENT) then
 	function CAF_UpdateToolGhost(tool, model, min, GetOffset, offset)
-		local model = model or tool:GetClientInfo('model')
-		if (model == '') then return end
+		local model = model or tool:GetClientInfo("model")
+		if (model == "") then return end
 
 		if (not tool.GhostEntity or not tool.GhostEntity:IsValid() or tool.GhostEntity:GetModel() ~= model) then
 			tool:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))

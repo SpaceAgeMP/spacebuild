@@ -3,10 +3,10 @@
 --dev link stool
 --TOOL			= ToolObj:Create()
 TOOL.Mode = "rd3_dev_link2"
-TOOL.Category = 'Resource Distribution'
-TOOL.Name = '#Smart Link Tool'
+TOOL.Category = "Resource Distribution"
+TOOL.Name = "#Smart Link Tool"
 TOOL.Command = nil
-TOOL.ConfigName = ''
+TOOL.ConfigName = ""
 
 if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
 	TOOL.Tab = "Custom Addon Framework"
@@ -61,11 +61,6 @@ function TOOL:RightClick(trace)
 			--local LPos1, LPos2 = self:GetLocalPos(k),	self:GetLocalPos(2)
 			local length = (WPos1 - WPos2):Length()
 			Ent1:SetColor(Color(255, 255, 255, 255))
-			-- Get client's CVars
-			--local addlength	 = self:GetClientNumber( "addlength" )
-			local material = self:GetClientInfo("material")
-			local width = self:GetClientNumber("width")
-			local color = Color(self:GetClientNumber("color_r"), self:GetClientNumber("color_g"), self:GetClientNumber("color_b"))
 
 			--Possible
 			---- Ent - Node V
