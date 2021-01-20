@@ -97,7 +97,7 @@ local function UserConnect(ply)
 	end
 end
 
-hook.Add("PlayerInitialSpawn", "LS_Screen_info_Update", UserConnect)
+hook.Add("PlayerFullLoad", "LS_Screen_info_Update", UserConnect)
 --
 local Energy_Increment = 4
 
