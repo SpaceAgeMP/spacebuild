@@ -93,20 +93,14 @@ end
 local function OnAddonConstruct(name)
 	if not name then return end
 
-	if (not CAF2.GetAddonStatus(name)) then
-		if Addons[name] then
-			local test, err = pcall(Addons[name].__Construct)
+	if not CAF2.GetAddonStatus(name) and Addons[name] then
+		local test, err = pcall(Addons[name].__Construct)
 
-			if not test then
-				CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. name .. " error: " .. err .. "\n")
-				AddPopup(CAF.GetLangVar("Error loading Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-			else
-				if err then
-					AddPopup(CAF.GetLangVar("Addon") .. ": " .. CAF.GetLangVar(name) .. " " .. CAF.GetLangVar("got enabled"), "top", CAF2.colors.green)
-				else
-					AddPopup(CAF.GetLangVar("An error occured when trying to enable Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-				end
-			end
+		if not test then
+			CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. name .. " error: " .. err .. "\n")
+			AddPopup(CAF.GetLangVar("Error loading Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
+		elseif not err then
+			AddPopup(CAF.GetLangVar("An error occured when trying to enable Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
 		end
 	end
 

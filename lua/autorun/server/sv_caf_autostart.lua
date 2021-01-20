@@ -444,11 +444,6 @@ concommand.Add("CAF_Addon_Destruct", AddonDestruct)
 	This function will update the Client with all active addons
 ]]
 function CAF2.PlayerSpawn(ply)
-	ply:ChatPrint("This server is using the Custom Addon Framework\n")
-	ply:ChatPrint("Report any bugs during the beta at https://github.com/spacebuild/spacebuild/issues\n")
-	ply:ChatPrint("\n\nIf you have any suggestions for future versions of CAF, SB, LS, RD, ... please report them at https://github.com/spacebuild/spacebuild/issues\n\n")
-	ply:ChatPrint("\n\nNOTE: If you encounter any issues with RD3.1 (alpha) report them at https://github.com/spacebuild/spacebuild/issues\n\n")
-
 	for k, v in pairs(Addons) do
 		if v.GetStatus and v.GetStatus() then
 			net.Start("CAF_Addon_Construct")
