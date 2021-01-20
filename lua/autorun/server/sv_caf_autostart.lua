@@ -624,11 +624,9 @@ for k, File in ipairs(Files) do
 	end
 end
 
-hook.Add("PlayerInitialSpawn", "FullLoadSetup", function(plyOuter)
-	hook.Add("SetupMove", plyOuter, function(self, ply, _, cmd)
-		if self == ply and not cmd:IsForced() then
-			hook.Run("PlayerFullLoad", self)
-			hook.Remove("SetupMove", self)
-		end
-	end)
+hook.Add("SetupMove", "FullLoadSetup", function(ply, _, cmd)
+	if not ply.PlayerFullLoad and not cmd:IsForced() then
+		ply.PlayerFullLoad = true
+		hook.Run("PlayerFullLoad", ply)
+	end
 end)
