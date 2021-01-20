@@ -830,3 +830,8 @@ for k, File in ipairs(Files) do
 		Msg("Loaded: Successfully\n")
 	end
 end
+
+hook.Add("InitPostEntity", "InitPostEntity_FullLoad", function()
+	net.Start("CAF_PlayerFullLoad")
+	net.SendToServer()
+end)

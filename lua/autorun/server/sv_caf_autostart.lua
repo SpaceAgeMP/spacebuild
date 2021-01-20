@@ -618,10 +618,12 @@ for k, File in ipairs(Files) do
 		Msg("Sent: Successfully\n")
 	end
 end
-
-hook.Add("SetupMove", "FullLoadSetup", function(ply, _, cmd)
-	if not ply.PlayerFullLoad and not cmd:IsForced() then
-		ply.PlayerFullLoad = true
-		hook.Run("PlayerFullLoad", ply)
+ 
+net.Receive("CAF_PlayerFullLoad", function(_, ply)
+	if ply.PlayerFullLoaded then
+		return
 	end
+	ply.PlayerFullLoaded = true
+	hook.Run("PlayerFullLoad", ply)
 end)
+util.AddNetworkString("CAF_PlayerFullLoad")
