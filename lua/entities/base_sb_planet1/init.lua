@@ -177,7 +177,8 @@ end
 
 function ENT:SendData(ply)
 	net.Start("AddPlanet")
-	net.WriteEntity(self) --planet.num
+	net.WriteInt(self:EntIndex(), 32)
+	net.WriteVector(self:GetPos())
 	net.WriteString(self:GetEnvironmentName())
 	net.WriteFloat(self.sbenvironment.size)
 

@@ -164,13 +164,12 @@ local function DrawSunEffects()
 end
 
 local function recvPlanet()
-	local entObj = net.ReadEntity()
-	if not entObj then return end
-	local ent = entObj:EntIndex()
+	local ent = net.ReadInt(32)
+	local position = net.ReadVector()
+
 	local hash = {}
-	hash.ent = entObj
 	hash.name = net.ReadString()
-	hash.position = entObj:GetPos()
+	hash.position = position
 	hash.radius = net.ReadFloat()
 
 	if net.ReadBool() then
@@ -210,15 +209,12 @@ net.Receive("AddPlanet", recvPlanet)
 
 -- receive sun information
 local function recvSun(msg)
-	local entObj = net.ReadEntity()
-	if not entObj then return end
-	local ent = entObj:EntIndex()
+	local ent = net.ReadInt(32)
+	local position = net.ReadVector()
 	local tmpname = net.ReadString()
-	local position = ent:GetPos()
 	local radius = net.ReadFloat()
 
 	stars[ent] = {
-		Ent = entObj,
 		name = tmpname,
 		Position = position,
 		Radius = radius, -- * 2

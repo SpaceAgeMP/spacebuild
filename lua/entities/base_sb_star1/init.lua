@@ -106,7 +106,8 @@ end
 
 function ENT:SendSunBeam(ply)
 	net.Start("AddStar")
-	net.WriteEntity(self)
+	net.WriteInt(self:EntIndex(), 32)
+	net.WriteVector(self:GetPos())
 	net.WriteString(self:GetEnvironmentName())
 	net.WriteFloat(self.sbenvironment.size)
 
