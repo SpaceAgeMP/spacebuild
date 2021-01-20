@@ -109,7 +109,6 @@ local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
 		vol = math.Round(vol)
-		MsgN("Ent Physics Object Volume: ", vol)
 		volume_mul = vol / base_volume
 	end
 
@@ -151,7 +150,6 @@ local function liquid_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
-		MsgN("Ent Physics Object Volume: ", vol)
 		vol = math.Round(vol)
 		volume_mul = vol / base_volume
 	end
@@ -174,7 +172,6 @@ local function energy_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
-		--MsgN("Ent Physics Object Volume: ",vol)
 		volume = math.Round(vol)
 	end
 

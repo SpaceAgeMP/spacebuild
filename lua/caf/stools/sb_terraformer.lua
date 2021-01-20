@@ -40,7 +40,6 @@ local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
 		vol = math.Round(vol)
-		MsgN("Ent Physics Object Volume: ", vol)
 		volume_mul = vol / base_volume
 	end
 

@@ -40,7 +40,6 @@ local function light_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
-		--MsgN("Ent Physics Object Volume: ",vol)
 		vol = math.Round(vol)
 		volume_mul = vol / base_volume
 	end

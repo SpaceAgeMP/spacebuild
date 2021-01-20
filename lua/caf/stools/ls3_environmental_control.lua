@@ -85,7 +85,6 @@ local function environmental_control_func(ent, type, sub_type, devinfo, Extra_Da
 
 	if phys:IsValid() and phys.GetVolume then
 		local vol = phys:GetVolume()
-		MsgN("Ent Physics Object Volume: ", vol)
 		vol = math.Round(vol)
 		volume_mul = vol / base_volume
 	end
