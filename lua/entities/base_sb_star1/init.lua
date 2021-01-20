@@ -107,7 +107,7 @@ end
 function ENT:SendSunBeam(ply)
 	net.Start("AddStar")
 	net.WriteEntity(self)
-	net.WriteString(self:GetName())
+	net.WriteString(self:GetEnvironmentName())
 	net.WriteFloat(self.sbenvironment.size)
 
 	if ply then

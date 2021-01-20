@@ -349,8 +349,6 @@ local function Register_Environments()
 	local case1, case2, case3, case4, case5, case6, case7, case8, case9, case10, case11, case12, case13, case14, case15, case16, hash, angles, pos
 
 	for _, ent in ipairs(entities) do
-		print("Planets")
-		PrintTable(Planets)
 		case1, case2, case3, case4, case5, case6, case7, case8, case9, case10, case11, case12, case13, case14, case15, case16, hash = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
 		local values = ent:GetKeyValues()
 
@@ -437,9 +435,7 @@ local function Register_Environments()
 
 						print(planet)
 						table.insert(Planets, planet)
-						print("Registered New Planet\n")
-					else
-						print("Didn't register SB2 planet\n")
+						print("Registered new SB2 planet", planet, planet:GetEnvironmentName())
 					end
 				end
 			elseif case1 == "planet2" then
@@ -488,9 +484,8 @@ local function Register_Environments()
 						Planetsbloom[case16] = planet
 					end
 
-					print(planet)
 					table.insert(Planets, planet)
-					print("Registered New Planet\n")
+					print("Registered new SB3 planet", planet, planet:GetEnvironmentName())
 				end
 			elseif case1 == "cube" then
 				SB_InSpace = 1
@@ -538,9 +533,8 @@ local function Register_Environments()
 						Planetsbloom[case16] = planet
 					end
 
-					print(planet)
 					table.insert(Planets, planet)
-					print("Registered New Planet\n")
+					print("Registered new cube planet", planet, planet:GetEnvironmentName())
 				end
 			elseif case1 == "sb_dev_tree" then
 				local tree = ents.Create("nature_dev_tree")
@@ -548,7 +542,7 @@ local function Register_Environments()
 				tree:SetAngles(angles)
 				tree:SetPos(pos)
 				tree:Spawn()
-				print("Registered New SB Tree\n")
+				print("Registered new SB tree", tree)
 			elseif case1 == "planet_color" then
 				hash = {}
 
@@ -581,7 +575,7 @@ local function Register_Environments()
 				end
 
 				Colors[case16] = hash
-				print("Registered New Planet Color\n")
+				print("Registered new planet color", case16)
 			elseif case1 == "planet_bloom" then
 				hash = {}
 
@@ -616,7 +610,7 @@ local function Register_Environments()
 				end
 
 				Blooms[case16] = hash
-				print("Registered New Planet Bloom\n")
+				print("Registered new planet bloom", case16)
 			elseif case1 == "star" then
 				SB_InSpace = 1
 
@@ -629,7 +623,7 @@ local function Register_Environments()
 					planet:Spawn()
 					planet:CreateEnvironment(tonumber(case2))
 					table.insert(TrueSun, pos)
-					print("Registered New Star\n")
+					print("Registered new SB2 star", planet, planet:GetEnvironmentName())
 				end
 			elseif case1 == "star2" then
 				SB_InSpace = 1
@@ -642,18 +636,20 @@ local function Register_Environments()
 					case5 = tonumber(case5) -- temp3
 					case6 = tostring(case6) -- name
 
-					if case6 == "" then
-						case6 = "Star"
-					end
-
 					local planet = ents.Create("base_sb_star2")
 					planet:SetModel("models/props_lab/huladoll.mdl")
 					planet:SetAngles(angles)
 					planet:SetPos(pos)
 					planet:Spawn()
+
+					if case6 == "" then
+						case6 = "Star " .. tostring(planet:GetEnvironmentID())
+					end
+
 					planet:CreateEnvironment(case2, case3, case4, case5, case6)
+
 					table.insert(TrueSun, pos)
-					print("Registered New Star\n")
+					print("Registered new SB3 star", planet, planet:GetEnvironmentName())
 				end
 			end
 		end
