@@ -55,9 +55,9 @@ local function SetColor(planet)
 	ColorModify["$pp_colour_brightness"] = planet.Brightness
 	ColorModify["$pp_colour_contrast"] = planet.Contrast
 	ColorModify["$pp_colour_colour"] = planet.CColor
-	ColorModify["$pp_colour_mulr"] = planet.AddColor_r
-	ColorModify["$pp_colour_mulg"] = planet.AddColor_g
-	ColorModify["$pp_colour_mulb"] = planet.AddColor_b
+	ColorModify["$pp_colour_mulr"] = planet.MulColor_r
+	ColorModify["$pp_colour_mulg"] = planet.MulColor_g
+	ColorModify["$pp_colour_mulb"] = planet.MulColor_b
 end
 
 -- Bloom receive message
