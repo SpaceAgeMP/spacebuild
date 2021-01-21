@@ -12,7 +12,7 @@ end
 function ENT:GetTemperature(ent)
 	if not ent then return end
 	self:TryApplyPlayerDamage(ent)
-	local dist = pos:Distance(self:GetPos())
+	local dist = ent:GetPos():Distance(self:GetPos())
 	local size = self:GetSize()
 	if dist < size / 6 then return self.sbenvironment.temperature end
 	if dist < size * 1 / 3 then return self.sbenvironment.temperature2 end
