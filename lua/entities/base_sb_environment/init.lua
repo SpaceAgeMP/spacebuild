@@ -195,7 +195,7 @@ function ENT:GetResourcePercentage(res)
 
 	if table.HasValue(ignore, res) then return 0 end
 
-	return ((self:GetResourceAmount(res) / self.sbenvironment.air.max) * 100)
+	return (self:GetResourceAmount(res) / self.sbenvironment.air.max) * 100
 end
 
 -- RD stuff begin
@@ -247,7 +247,7 @@ function ENT:OnTakeDamage(DmgInfo)
 end
 
 function ENT:Think()
-	if (self.NextOverlayTextTime) and (CurTime() >= self.NextOverlayTextTime) then
+	if self.NextOverlayTextTime and (CurTime() >= self.NextOverlayTextTime) then
 		if (self.NextOverlayText) then
 			self:SetNWString("GModOverlayText", self.NextOverlayText)
 			self.NextOverlayText = nil
@@ -295,7 +295,7 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 		RD.ApplyDupeInfo(Ent, CreatedEntities)
 	end
 
-	if WireAddon ~= nil and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 end
@@ -407,31 +407,31 @@ end
 function ENT:GetO2Percentage()
 	if self.sbenvironment.air.max == 0 then return 0 end
 
-	return ((self.sbenvironment.air.o2 / self.sbenvironment.air.max) * 100)
+	return (self.sbenvironment.air.o2 / self.sbenvironment.air.max) * 100
 end
 
 function ENT:GetEmptyAirPercentage()
 	if self.sbenvironment.air.max == 0 then return 0 end
 
-	return ((self.sbenvironment.air.empty / self.sbenvironment.air.max) * 100)
+	return (self.sbenvironment.air.empty / self.sbenvironment.air.max) * 100
 end
 
 function ENT:GetCO2Percentage()
 	if self.sbenvironment.air.max == 0 then return 0 end
 
-	return ((self.sbenvironment.air.co2 / self.sbenvironment.air.max) * 100)
+	return (self.sbenvironment.air.co2 / self.sbenvironment.air.max) * 100
 end
 
 function ENT:GetNPercentage()
 	if self.sbenvironment.air.max == 0 then return 0 end
 
-	return ((self.sbenvironment.air.n / self.sbenvironment.air.max) * 100)
+	return (self.sbenvironment.air.n / self.sbenvironment.air.max) * 100
 end
 
 function ENT:GetHPercentage()
 	if self.sbenvironment.air.max == 0 then return 0 end
 
-	return ((self.sbenvironment.air.h / self.sbenvironment.air.max) * 100)
+	return (self.sbenvironment.air.h / self.sbenvironment.air.max) * 100
 end
 
 function ENT:SetSize(size)
@@ -630,15 +630,13 @@ function ENT:UpdateGravity(ent)
 
 		local tr = util.TraceLine(trace)
 
-		if (tr.Hit) then
-			if (tr.grav_plate == 1) then
-				ent:SetGravity(1)
-				ent.gravity = 1
-				phys:EnableGravity(true)
-				phys:EnableDrag(true)
+		if (tr.Hit and tr.Entity.grav_plate == 1) then
+			ent:SetGravity(1)
+			ent.gravity = 1
+			phys:EnableGravity(true)
+			phys:EnableDrag(true)
 
-				return
-			end
+			return
 		end
 	elseif ent.gravity and ent.gravity == self.sbenvironment.gravity then
 		return
@@ -1048,29 +1046,25 @@ function ENT:OnEnvironment(ent, environment, space)
 	local pos = ent:GetPos()
 	local dist = pos:Distance(self:GetPos())
 
-	if dist < self:GetSize() then
-		if environment == space then
-			environment = self
+	if dist >= self:GetSize() then
+		return environment
+	end
+	if environment == space then
+		return self
+	end
+
+	if environment:GetPriority() < self:GetPriority() then
+		return self
+	end
+		--self:UpdateGravity(ent)
+	if environment:GetPriority() == self:GetPriority() and environment:GetSize() ~= 0 then
+		if self:GetSize() <= environment:GetSize() then
+			return self
 			--self:UpdateGravity(ent)
-		else
-			if environment:GetPriority() < self:GetPriority() then
-				environment = self
-				--self:UpdateGravity(ent)
-			elseif environment:GetPriority() == self:GetPriority() then
-				if environment:GetSize() ~= 0 then
-					if self:GetSize() <= environment:GetSize() then
-						environment = self
-						--self:UpdateGravity(ent)
-					else
-						if dist < pos:Distance(environment:GetPos()) then
-							environment = self
-						end
-					end
-				else
-					environment = self
-					--self:UpdateGravity(ent)
-				end
-			end
+		end
+
+		if dist < pos:Distance(environment:GetPos()) then
+			return self
 		end
 	end
 

@@ -504,51 +504,45 @@ function RD.ConsumeNetResource(netid, resource, amount)
 	local index = {}
 	index.network = netid
 
-	if nettable[index.network] and nettable[index.network].resources and nettable[index.network].resources[resource] then
-		if nettable[index.network].resources[resource].maxvalue > 0 then
-			if nettable[index.network].resources[resource].value >= amount then
-				nettable[index.network].resources[resource].value = nettable[index.network].resources[resource].value - amount
-				nettable[index.network].resources[resource].haschanged = true
-				nettable[index.network].haschanged = true
-			elseif nettable[index.network].resources[resource].value > 0 then
-				amount = nettable[index.network].resources[resource].value
-				nettable[index.network].resources[resource].value = 0
-				nettable[index.network].resources[resource].haschanged = true
-				nettable[index.network].haschanged = true
-			else
-				amount = 0
-			end
-
-			consumed = amount
+	if nettable[index.network] and nettable[index.network].resources and nettable[index.network].resources[resource] and nettable[index.network].resources[resource].maxvalue > 0 then
+		if nettable[index.network].resources[resource].value >= amount then
+			nettable[index.network].resources[resource].value = nettable[index.network].resources[resource].value - amount
+			nettable[index.network].resources[resource].haschanged = true
+			nettable[index.network].haschanged = true
+		elseif nettable[index.network].resources[resource].value > 0 then
+			amount = nettable[index.network].resources[resource].value
+			nettable[index.network].resources[resource].value = 0
+			nettable[index.network].resources[resource].haschanged = true
+			nettable[index.network].haschanged = true
+		else
+			amount = 0
 		end
+
+		return consumed
 	end
 
-	if consumed ~= origamount then
-		if table.Count(nettable[index.network].cons) > 0 then
-			for k, v in pairs(RD.getConnectedNets(index.network)) do
-				amount = origamount - consumed
-
-				if v ~= index.network then
-					if nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
-						if nettable[v].resources[resource].maxvalue > 0 then
-							if nettable[v].resources[resource].value >= amount then
-								nettable[v].resources[resource].value = nettable[v].resources[resource].value - amount
-								nettable[v].resources[resource].haschanged = true
-								nettable[v].haschanged = true
-							elseif nettable[v].resources[resource].value > 0 then
-								amount = nettable[v].resources[resource].value
-								nettable[v].resources[resource].value = 0
-								nettable[v].resources[resource].haschanged = true
-								nettable[v].haschanged = true
-							else
-								amount = 0
-							end
-
-							consumed = consumed + amount
-							if (consumed >= origamount) then break end
-						end
-					end
+	if consumed ~= origamount and table.Count(nettable[index.network].cons) > 0 then
+		for k, v in pairs(RD.getConnectedNets(index.network)) do
+			amount = origamount - consumed
+			if v == index.network then
+				continue
+			end
+			if nettable[v] and nettable[v].resources and nettable[v].resources[resource] and nettable[v].resources[resource].maxvalue > 0 then
+				if nettable[v].resources[resource].value >= amount then
+					nettable[v].resources[resource].value = nettable[v].resources[resource].value - amount
+					nettable[v].resources[resource].haschanged = true
+					nettable[v].haschanged = true
+				elseif nettable[v].resources[resource].value > 0 then
+					amount = nettable[v].resources[resource].value
+					nettable[v].resources[resource].value = 0
+					nettable[v].resources[resource].haschanged = true
+					nettable[v].haschanged = true
+				else
+					amount = 0
 				end
+
+				consumed = consumed + amount
+				if (consumed >= origamount) then break end
 			end
 		end
 	end
@@ -567,34 +561,27 @@ function RD.ConsumeResource(ent, resource, amount)
 	if not IsValid(ent) then return 0, "Not a valid entity" end
 	if not resource then return 0, "No resource given" end
 	if not amount then return 0, "No amount given" end
-	local consumed = 0
 
-	if ent_table[ent:EntIndex()] then
-		local index = ent_table[ent:EntIndex()]
-
-		if index.network == 0 then
-			if index.resources[resource] then
-				if index.resources[resource].maxvalue > 0 then
-					if index.resources[resource].value >= amount then
-						index.resources[resource].value = index.resources[resource].value - amount
-						index.resources[resource].haschanged = true
-						index.haschanged = true
-					elseif index.resources[resource].value > 0 then
-						amount = index.resources[resource].value
-						index.resources[resource].value = 0
-						index.resources[resource].haschanged = true
-						index.haschanged = true
-					end
-
-					consumed = amount
-				end
-			end
-		else
-			consumed = RD.ConsumeNetResource(index.network, resource, amount)
-		end
+	local index = ent_table[ent:EntIndex()]
+	if not index then
+		return 0
 	end
 
-	return consumed
+	if index.network == 0 and index.resources[resource] and index.resources[resource].maxvalue > 0 then
+		if index.resources[resource].value >= amount then
+			index.resources[resource].value = index.resources[resource].value - amount
+			index.resources[resource].haschanged = true
+			index.haschanged = true
+		elseif index.resources[resource].value > 0 then
+			amount = index.resources[resource].value
+			index.resources[resource].value = 0
+			index.resources[resource].haschanged = true
+			index.haschanged = true
+		end
+
+		return amount
+	end
+	return RD.ConsumeNetResource(index.network, resource, amount)
 end
 
 --[[
@@ -631,30 +618,27 @@ function RD.SupplyNetResource(netid, resource, amount)
 		left = amount
 	end
 
-	if left > 0 then
-		if table.Count(nettable[index.network].cons) > 0 then
-			for k, v in pairs(RD.getConnectedNets(index.network)) do
-				amount = left
+	if left == 0 or table.Count(nettable[index.network].cons) == 0 then
+		return left
+	end
+	for k, v in pairs(RD.getConnectedNets(index.network)) do
+		amount = left
 
-				if v ~= index.network then
-					if nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
-						if nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value + amount then
-							nettable[v].resources[resource].value = nettable[v].resources[resource].value + amount
-							amount = 0
-							nettable[v].haschanged = true
-							nettable[v].resources[resource].haschanged = true
-						elseif nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value then
-							amount = nettable[v].resources[resource].maxvalue - nettable[v].resources[resource].value
-							nettable[v].resources[resource].value = nettable[v].resources[resource].maxvalue
-							nettable[v].haschanged = true
-							nettable[v].resources[resource].haschanged = true
-						end
-
-						left = amount
-						if left <= 0 then break end
-					end
-				end
+		if v ~= index.network and nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
+			if nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value + amount then
+				nettable[v].resources[resource].value = nettable[v].resources[resource].value + amount
+				amount = 0
+				nettable[v].haschanged = true
+				nettable[v].resources[resource].haschanged = true
+			elseif nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value then
+				amount = nettable[v].resources[resource].maxvalue - nettable[v].resources[resource].value
+				nettable[v].resources[resource].value = nettable[v].resources[resource].maxvalue
+				nettable[v].haschanged = true
+				nettable[v].resources[resource].haschanged = true
 			end
+
+			left = amount
+			if left <= 0 then break end
 		end
 	end
 
@@ -713,35 +697,34 @@ end
 function RD.Link(ent, netid)
 	RD.Unlink(ent) --Just to be sure
 
-	if ent_table[ent:EntIndex()] then
-		if nettable[netid] then
-			local index = ent_table[ent:EntIndex()]
-			local netindex = nettable[netid]
-
-			for k, v in pairs(index.resources) do
-				local resindex = netindex.resources[k]
-
-				if not resindex then
-					netindex.resources[k] = {}
-					resindex = netindex.resources[k]
-					resindex.maxvalue = 0
-					resindex.value = 0
-				end
-
-				if index.resources[k].maxvalue > 0 then
-					resindex.maxvalue = resindex.maxvalue + index.resources[k].maxvalue
-					resindex.value = resindex.value + index.resources[k].value
-				end
-
-				resindex.haschanged = true
-			end
-
-			table.insert(netindex.entities, ent)
-			index.network = netid
-			index.haschanged = true
-			netindex.haschanged = true
-		end
+	if not ent_table[ent:EntIndex()] or not nettable[netid] then
+		return
 	end
+	local index = ent_table[ent:EntIndex()]
+	local netindex = nettable[netid]
+
+	for k, v in pairs(index.resources) do
+		local resindex = netindex.resources[k]
+
+		if not resindex then
+			netindex.resources[k] = {}
+			resindex = netindex.resources[k]
+			resindex.maxvalue = 0
+			resindex.value = 0
+		end
+
+		if index.resources[k].maxvalue > 0 then
+			resindex.maxvalue = resindex.maxvalue + index.resources[k].maxvalue
+			resindex.value = resindex.value + index.resources[k].value
+		end
+
+		resindex.haschanged = true
+	end
+
+	table.insert(netindex.entities, ent)
+	index.network = netid
+	index.haschanged = true
+	netindex.haschanged = true
 end
 
 --[[
@@ -753,38 +736,39 @@ end
 
 ]]
 function RD.Unlink(ent)
-	if ent_table[ent:EntIndex()] then
-		local index = ent_table[ent:EntIndex()]
+	if not ent_table[ent:EntIndex()] then
+		return
+	end
+	local index = ent_table[ent:EntIndex()]
 
-		if index.network ~= 0 then
-			if nettable[index.network] then
-				for k, v in pairs(index.resources) do
-					if index.resources[k].maxvalue > 0 then
-						local resindex = nettable[index.network].resources[k]
-						local percent = resindex.value / resindex.maxvalue
-						index.resources[k].value = index.resources[k].maxvalue * percent
-						resindex.maxvalue = resindex.maxvalue - index.resources[k].maxvalue
-						resindex.value = resindex.value - index.resources[k].value
-						index.resources[k].haschanged = true
-						resindex.haschanged = true
-					end
-				end
-
-				index.haschanged = true
-				nettable[index.network].haschanged = true
-
-				for k, v in pairs(nettable[index.network].entities) do
-					if v == ent then
-						table.remove(nettable[index.network].entities, k)
-						--remove beams
-						RD.Beam_clear(ent)
-						break
-					end
+	if index.network ~= 0 then
+		if nettable[index.network] then
+			for k, v in pairs(index.resources) do
+				if index.resources[k].maxvalue > 0 then
+					local resindex = nettable[index.network].resources[k]
+					local percent = resindex.value / resindex.maxvalue
+					index.resources[k].value = index.resources[k].maxvalue * percent
+					resindex.maxvalue = resindex.maxvalue - index.resources[k].maxvalue
+					resindex.value = resindex.value - index.resources[k].value
+					index.resources[k].haschanged = true
+					resindex.haschanged = true
 				end
 			end
 
-			index.network = 0
+			index.haschanged = true
+			nettable[index.network].haschanged = true
+
+			for k, v in pairs(nettable[index.network].entities) do
+				if v == ent then
+					table.remove(nettable[index.network].entities, k)
+					--remove beams
+					RD.Beam_clear(ent)
+					break
+				end
+			end
 		end
+
+		index.network = 0
 	end
 end
 
@@ -869,15 +853,13 @@ end
 function RD.linkNodes(netid, netid2)
 	if netid and netid2 and netid == netid2 then return end
 
-	if nettable[netid] and nettable[netid2] then
-		if not table.HasValue(nettable[netid].cons, netid2) then
-			table.insert(nettable[netid].cons, netid2)
-			table.insert(nettable[netid2].cons, netid)
-			nettable[netid].haschanged = true
-			nettable[netid2].haschanged = true
+	if nettable[netid] and nettable[netid2] and not table.HasValue(nettable[netid].cons, netid2) then
+		table.insert(nettable[netid].cons, netid2)
+		table.insert(nettable[netid2].cons, netid)
+		nettable[netid].haschanged = true
+		nettable[netid2].haschanged = true
 
-			return true
-		end
+		return true
 	end
 
 	return false
@@ -1053,7 +1035,7 @@ end
 
 --apply the DupeInfo
 function RD.ApplyDupeInfo(ent, CreatedEntities)
-	if (ent.EntityMods) and (ent.EntityMods.RDDupeInfo) and (ent.EntityMods.RDDupeInfo.entities) then
+	if ent.EntityMods and ent.EntityMods.RDDupeInfo and ent.EntityMods.RDDupeInfo.entities then
 		local RDDupeInfo = ent.EntityMods.RDDupeInfo
 
 		if RDDupeInfo.entities then
@@ -1340,7 +1322,7 @@ function RD.Beam_settings(ent, beamMaterial, beamSize, beamColor)
 	--get beam color
 	local beamR, beamG, beamB, beamA = beamColor.r or 255, beamColor.g or 255, beamColor.b or 255, beamColor.a or 255
 	--send beam info to ent/clientside
-	ent:SetNWString("BeamInfo", ((beamMaterial or "cable/cable2") .. ";" .. tostring(beamSize or 2) .. ";" .. tostring(beamR or 255) .. ";" .. tostring(beamG or 255) .. ";" .. tostring(beamB or 255) .. ";" .. tostring(beamA or 255)))
+	ent:SetNWString("BeamInfo", (beamMaterial or "cable/cable2") .. ";" .. tostring(beamSize or 2) .. ";" .. tostring(beamR or 255) .. ";" .. tostring(beamG or 255) .. ";" .. tostring(beamB or 255) .. ";" .. tostring(beamA or 255))
 end
 
 --Name: RD.Beam_add

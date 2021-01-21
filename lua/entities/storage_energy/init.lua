@@ -60,44 +60,43 @@ function ENT:Leak()
 		zapme = CAF.GetAddon("Life Support").ZapMe
 	end
 
-	if energy > 0 then
-		local waterlevel = 0
+	if energy == 0 then
+		return
+	end
+	local waterlevel = 0
 
-		if CAF then
-			waterlevel = self:WaterLevel2()
-		else
-			waterlevel = self:WaterLevel()
+	if CAF then
+		waterlevel = self:WaterLevel2()
+	else
+		waterlevel = self:WaterLevel()
+	end
+
+	if (waterlevel > 0) then
+		if zapme then
+			zapme(self:GetPos(), 1)
 		end
 
-		if (waterlevel > 0) then
+		local tmp = ents.FindInSphere(self:GetPos(), 600) --Better check in next version
+
+		for _, ply in ipairs(tmp) do
+			if ply:IsPlayer() and ply:WaterLevel() > 0 then
+				if zapme then
+					zapme(ply:GetPos(), 1)
+				end
+
+				ply:TakeDamage(energy / 100, 0)
+			end
+		end
+
+		self:ConsumeResource("energy", energy)
+	else
+		if (math.random(1, 10) < 2) then
 			if zapme then
 				zapme(self:GetPos(), 1)
 			end
 
-			local tmp = ents.FindInSphere(self:GetPos(), 600) --Better check in next version
-
-			for _, ply in ipairs(tmp) do
-				if (ply:IsPlayer()) then
-					if (ply:WaterLevel() > 0) then
-						if zapme then
-							zapme(ply:GetPos(), 1)
-						end
-
-						ply:TakeDamage((energy / 100), 0)
-					end
-				end
-			end
-
-			self:ConsumeResource("energy", energy)
-		else
-			if (math.random(1, 10) < 2) then
-				if zapme then
-					zapme(self:GetPos(), 1)
-				end
-
-				local dec = math.random(200, 2000)
-				self:ConsumeResource("energy", dec)
-			end
+			local dec = math.random(200, 2000)
+			self:ConsumeResource("energy", dec)
 		end
 	end
 end
@@ -105,7 +104,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if ((self.damaged == 1 or self.vent)) then
+	if (self.damaged == 1 or self.vent) then
 		self:Leak()
 	end
 

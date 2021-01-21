@@ -405,196 +405,261 @@ function Ply:LsResetSuit()
 end
 
 function Ply:LsCheck()
-	if self:IsValid() and self:Alive() and LS.GetStatus() then
-		local pod = self:GetParent()
-		local RD = CAF.GetAddon("Resource Distribution")
-		local SB = CAF.GetAddon("Spacebuild")
+	if not self:IsValid() or not self:Alive() or not LS.GetStatus() then
+		return
+	end
+	local pod = self:GetParent()
+	local RD = CAF.GetAddon("Resource Distribution")
+	local SB = CAF.GetAddon("Spacebuild")
 
-		if SB and SB.GetStatus() then
-			local space = SB.GetSpace()
-			local environment = space --restore to default before doing the Environment checks
-			local oldenvironment = self.environment
+	if SB and SB.GetStatus() then
+		local space = SB.GetSpace()
+		local environment = space --restore to default before doing the Environment checks
+		local oldenvironment = self.environment
 
-			for k, v in pairs(SB.GetPlanets()) do
-				if v and v:IsValid() then
-					--Msg("Checking planet\n")
-					environment = v:OnEnvironment(self, environment, space) or environment
-				end
+		for k, v in pairs(SB.GetPlanets()) do
+			if v and v:IsValid() then
+				--Msg("Checking planet\n")
+				environment = v:OnEnvironment(self, environment, space) or environment
 			end
+		end
 
-			if environment == space then
-				for k, v in pairs(SB.GetStars()) do
-					if v and v:IsValid() then
-						environment = v:OnEnvironment(self, environment, space) or environment
-					end
-				end
-			end
-
-			for k, v in pairs(SB.GetEnvironments()) do
+		if environment == space then
+			for k, v in pairs(SB.GetStars()) do
 				if v and v:IsValid() then
 					environment = v:OnEnvironment(self, environment, space) or environment
 				end
 			end
+		end
 
-			if oldenvironment ~= environment then
-				self.environment = environment
-				SB.OnEnvironmentChanged(self)
-			elseif oldenvironment ~= self.environment then
-				self.environment = oldenvironment
+		for k, v in pairs(SB.GetEnvironments()) do
+			if v and v:IsValid() then
+				environment = v:OnEnvironment(self, environment, space) or environment
+			end
+		end
+
+		if oldenvironment ~= environment then
+			self.environment = environment
+			SB.OnEnvironmentChanged(self)
+		elseif oldenvironment ~= self.environment then
+			self.environment = oldenvironment
+		end
+
+		self.environment:UpdateGravity(self)
+
+		if self.environment:GetPressure() > 1.5 and not pod:IsValid() then
+			local pressure = self.environment:GetPressure() - 1.5
+
+			for k, v in pairs(LS.GetAirRegulators()) do
+				if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+					pressure = v:UsePersonPressure(pressure)
+				end
 			end
 
-			self.environment:UpdateGravity(self)
+			if pressure > 0 then
+				if self.suit.air <= 0 then
+					self:TakeDamage((pressure) * 50, 0)
+					LS.LS_Crush(self)
 
-			if self.environment:GetPressure() > 1.5 and not pod:IsValid() then
-				local pressure = self.environment:GetPressure() - 1.5
+					if self:Health() <= 0 then
+						self:LsResetSuit()
 
-				for k, v in pairs(LS.GetAirRegulators()) do
-					if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
-						pressure = v:UsePersonPressure(pressure)
+						return
 					end
+				elseif self.suit.air < math.ceil(pressure / 5) then
+					self:TakeDamage(math.Round((self.suit.air / (pressure / 5)) * ((pressure + 1) * 50)), 0)
+					self.suit.air = 0
+
+					if self:Health() <= 0 then
+						self:LsResetSuit()
+
+						return
+					end
+				else
+					self.suit.air = math.Round(self.suit.air - (pressure / 5))
 				end
+			end
+		end
 
-				if pressure > 0 then
-					if self.suit.air <= 0 then
-						self:TakeDamage((pressure) * 50, 0)
-						LS.LS_Crush(self)
+		self.caf.custom.ls.temperature = self.environment:GetTemperature(self)
 
-						if self:Health() <= 0 then
-							self:LsResetSuit()
+		if self.caf.custom.ls.temperature < 283 or self.caf.custom.ls.temperature > 308 then
+			if pod and pod:IsValid() then
+				if self.caf.custom.ls.temperature < 283 then
+					local needed = math.ceil((283 - self.caf.custom.ls.temperature) / 8)
 
-							return
-						end
-					elseif self.suit.air < math.ceil(pressure / 5) then
-						self:TakeDamage(math.Round((self.suit.air / (pressure / 5)) * ((pressure + 1) * 50)), 0)
-						self.suit.air = 0
-
-						if self:Health() <= 0 then
-							self:LsResetSuit()
-
-							return
-						end
+					if (RD.GetResourceAmount(pod, "energy") > needed) then
+						RD.ConsumeResource(pod, "energy", needed)
+						self.caf.custom.ls.temperature = 283
 					else
-						self.suit.air = math.Round(self.suit.air - (pressure / 5))
+						needed = RD.GetResourceAmount(pod, "energy")
+						RD.ConsumeResource(pod, "energy", needed)
+						self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + math.ceil(needed * 8)
 					end
-				end
-			end
+				elseif self.caf.custom.ls.temperature > 308 then
+					local needed = math.ceil((self.caf.custom.ls.temperature - 308) / 16)
 
-			self.caf.custom.ls.temperature = self.environment:GetTemperature(self)
+					if (RD.GetResourceAmount(pod, "nitrogen") > needed) then
+						RD.ConsumeResource(pod, "nitorgen", needed)
+						self.caf.custom.ls.temperature = 308
+					else
+						needed = RD.GetResourceAmount(pod, "nitrogen")
+						RD.ConsumeResource(pod, "nitrogen", needed)
+						self.caf.custom.ls.temperature = self.caf.custom.ls.temperature - math.ceil(needed * 16)
+					end
 
-			if self.caf.custom.ls.temperature < 283 or self.caf.custom.ls.temperature > 308 then
-				if pod and pod:IsValid() then
-					if self.caf.custom.ls.temperature < 283 then
-						local needed = math.ceil((283 - self.caf.custom.ls.temperature) / 8)
+					if self.caf.custom.ls.temperature > 308 then
+						needed = math.ceil((self.caf.custom.ls.temperature - 308) / 8)
 
-						if (RD.GetResourceAmount(pod, "energy") > needed) then
-							RD.ConsumeResource(pod, "energy", needed)
-							self.caf.custom.ls.temperature = 283
-						else
-							needed = RD.GetResourceAmount(pod, "energy")
-							RD.ConsumeResource(pod, "energy", needed)
-							self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + math.ceil(needed * 8)
-						end
-					elseif self.caf.custom.ls.temperature > 308 then
-						local needed = math.ceil((self.caf.custom.ls.temperature - 308) / 16)
-
-						if (RD.GetResourceAmount(pod, "nitrogen") > needed) then
-							RD.ConsumeResource(pod, "nitorgen", needed)
+						if (RD.GetResourceAmount(pod, "water") > needed) then
+							RD.ConsumeResource(pod, "water", needed)
 							self.caf.custom.ls.temperature = 308
 						else
-							needed = RD.GetResourceAmount(pod, "nitrogen")
-							RD.ConsumeResource(pod, "nitrogen", needed)
-							self.caf.custom.ls.temperature = self.caf.custom.ls.temperature - math.ceil(needed * 16)
-						end
-
-						if self.caf.custom.ls.temperature > 308 then
-							needed = math.ceil((self.caf.custom.ls.temperature - 308) / 8)
-
-							if (RD.GetResourceAmount(pod, "water") > needed) then
-								RD.ConsumeResource(pod, "water", needed)
-								self.caf.custom.ls.temperature = 308
-							else
-								needed = RD.GetResourceAmount(pod, "water")
-								RD.ConsumeResource(pod, "water", needed)
-								self.caf.custom.ls.temperature = self.caf.custom.ls.temperature - math.ceil(needed * 8)
-							end
+							needed = RD.GetResourceAmount(pod, "water")
+							RD.ConsumeResource(pod, "water", needed)
+							self.caf.custom.ls.temperature = self.caf.custom.ls.temperature - math.ceil(needed * 8)
 						end
 					end
 				end
+			end
 
-				for k, v in pairs(LS.GetTemperatureRegulators()) do
-					if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
-						self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + v:CoolDown(self.caf.custom.ls.temperature)
-					end
+			for k, v in pairs(LS.GetTemperatureRegulators()) do
+				if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+					self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + v:CoolDown(self.caf.custom.ls.temperature)
 				end
+			end
 
-				if not LS_Core_Override_Heat then
-					local dec = 0
+			if not LS_Core_Override_Heat then
+				local dec = 0
 
-					if self.caf.custom.ls.temperature < 283 then
-						dam = (283 - self.caf.custom.ls.temperature) / 5
+				if self.caf.custom.ls.temperature < 283 then
+					dam = (283 - self.caf.custom.ls.temperature) / 5
+
+					if (self.environment:GetPressure() > 0) then
+						dec = math.ceil(5 * (4 - (self.caf.custom.ls.temperature / 72)))
+					else
+						dec = 5
+					end
+
+					if (self.suit.energy > dec) then
+						self.suit.energy = self.suit.energy - dec
+					else
+						self.suit.energy = 0
 
 						if (self.environment:GetPressure() > 0) then
-							dec = math.ceil(5 * (4 - (self.caf.custom.ls.temperature / 72)))
-						else
-							dec = 5
-						end
-
-						if (self.suit.energy > dec) then
-							self.suit.energy = self.suit.energy - dec
-						else
-							self.suit.energy = 0
-
-							if (self.environment:GetPressure() > 0) then
-								if (self:Health() <= dam) then
-									if self:Health() > 0 then
-										self:TakeDamage(dam, 0)
-										LS.LS_Frosty(self)
-										self:LsResetSuit()
-
-										return
-									end
-								else
+							if (self:Health() <= dam) then
+								if self:Health() > 0 then
 									self:TakeDamage(dam, 0)
-									self.suit.recover = self.suit.recover + dam
-								end
-							else
-								if (self:Health() <= 7) and (self:Health() > 0) then
-									self:TakeDamage(7, 0)
 									LS.LS_Frosty(self)
 									self:LsResetSuit()
 
 									return
-								else
-									self:TakeDamage(7, 0)
-									self.suit.recover = self.suit.recover + 7
 								end
-							end
-						end
-					elseif self.caf.custom.ls.temperature > 308 then
-						dam = (self.caf.custom.ls.temperature - 308) / 5
-						dec = math.ceil(5 * ((self.caf.custom.ls.temperature - 308) / 72))
-
-						if (self.suit.coolant > dec) then
-							self.suit.coolant = self.suit.coolant - dec
-						else
-							self.suit.coolant = 0
-
-							if (self:Health() <= dam) and (self:Health() > 0) then
-								LS.LS_Immolate(self)
-								self:TakeDamage(dam, 0)
-								self:LsResetSuit()
-
-								return
 							else
 								self:TakeDamage(dam, 0)
 								self.suit.recover = self.suit.recover + dam
 							end
+						else
+							if (self:Health() <= 7) and (self:Health() > 0) then
+								self:TakeDamage(7, 0)
+								LS.LS_Frosty(self)
+								self:LsResetSuit()
+
+								return
+							else
+								self:TakeDamage(7, 0)
+								self.suit.recover = self.suit.recover + 7
+							end
+						end
+					end
+				elseif self.caf.custom.ls.temperature > 308 then
+					dam = (self.caf.custom.ls.temperature - 308) / 5
+					dec = math.ceil(5 * ((self.caf.custom.ls.temperature - 308) / 72))
+
+					if (self.suit.coolant > dec) then
+						self.suit.coolant = self.suit.coolant - dec
+					else
+						self.suit.coolant = 0
+
+						if (self:Health() <= dam) and (self:Health() > 0) then
+							LS.LS_Immolate(self)
+							self:TakeDamage(dam, 0)
+							self:LsResetSuit()
+
+							return
+						else
+							self:TakeDamage(dam, 0)
+							self.suit.recover = self.suit.recover + dam
 						end
 					end
 				end
 			end
+		end
 
-			if self.environment:GetO2Percentage() * self.environment:GetAtmosphere() < 5 then
+		if self.environment:GetO2Percentage() * self.environment:GetAtmosphere() < 5 then
+			self.caf.custom.ls.air = false
+			self.caf.custom.ls.airused = false
+
+			if pod and pod:IsValid() then
+				local air = RD.GetResourceAmount(pod, "oxygen")
+
+				if (air >= 5) then
+					RD.ConsumeResource(pod, "oxygen", 5)
+					self.caf.custom.ls.airused = true
+				end
+			end
+
+			if not self.caf.custom.ls.airused then
+				for k, v in pairs(LS.GetAirRegulators()) do
+					if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+						self.suit.air = self.suit.air + v:UsePerson()
+						self.caf.custom.ls.airused = true
+						break
+					end
+				end
+			end
+
+			if not self.caf.custom.ls.airused then
+				if (self.suit.air <= 0) then
+					if (self:Health() > 10) then
+						self:TakeDamage(10, 0)
+						self.suit.recover = self.suit.recover + 10
+						self:EmitSound("Player.DrownStart")
+					else
+						if (self:Health() > 0) then
+							self:TakeDamage(10, 0)
+							self:LsResetSuit()
+							self:EmitSound("streetwar.slimegurgle04")
+							self:EmitSound("streetwar.slimegurgle04")
+							self:EmitSound("streetwar.slimegurgle04")
+
+							return
+						end
+					end
+				else
+					self.suit.air = self.suit.air - 5
+
+					if self.suit.air < 0 then
+						self.suit.air = 0
+					end
+				end
+			end
+		else
+			self.caf.custom.ls.air = true
+
+			if self:WaterLevel() <= 2 then
+				if self.suit.air < 100 then
+					self.suit.air = self.suit.air + self.environment:Convert(SB_AIR_O2, SB_AIR_CO2, 100 - self.suit.air)
+				end
+
+				self.environment:Convert(SB_AIR_O2, SB_AIR_CO2, 5)
+			end
+		end
+	end
+
+	if not self.caf.custom.ls.airused then
+		if self:WaterLevel() > 2 then
+			if self.caf.custom.ls.air then
 				self.caf.custom.ls.air = false
 				self.caf.custom.ls.airused = false
 
@@ -642,91 +707,27 @@ function Ply:LsCheck()
 						end
 					end
 				end
-			else
-				self.caf.custom.ls.air = true
-
-				if self:WaterLevel() <= 2 then
-					if self.suit.air < 100 then
-						self.suit.air = self.suit.air + self.environment:Convert(SB_AIR_O2, SB_AIR_CO2, 100 - self.suit.air)
-					end
-
-					self.environment:Convert(SB_AIR_O2, SB_AIR_CO2, 5)
-				end
+			end
+		elseif self.caf.custom.ls.air then
+			if self.suit.air < 100 then
+				self.suit.air = 100
 			end
 		end
-
-		if not self.caf.custom.ls.airused then
-			if self:WaterLevel() > 2 then
-				if self.caf.custom.ls.air then
-					self.caf.custom.ls.air = false
-					self.caf.custom.ls.airused = false
-
-					if pod and pod:IsValid() then
-						local air = RD.GetResourceAmount(pod, "oxygen")
-
-						if (air >= 5) then
-							RD.ConsumeResource(pod, "oxygen", 5)
-							self.caf.custom.ls.airused = true
-						end
-					end
-
-					if not self.caf.custom.ls.airused then
-						for k, v in pairs(LS.GetAirRegulators()) do
-							if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
-								self.suit.air = self.suit.air + v:UsePerson()
-								self.caf.custom.ls.airused = true
-								break
-							end
-						end
-					end
-
-					if not self.caf.custom.ls.airused then
-						if (self.suit.air <= 0) then
-							if (self:Health() > 10) then
-								self:TakeDamage(10, 0)
-								self.suit.recover = self.suit.recover + 10
-								self:EmitSound("Player.DrownStart")
-							else
-								if (self:Health() > 0) then
-									self:TakeDamage(10, 0)
-									self:LsResetSuit()
-									self:EmitSound("streetwar.slimegurgle04")
-									self:EmitSound("streetwar.slimegurgle04")
-									self:EmitSound("streetwar.slimegurgle04")
-
-									return
-								end
-							end
-						else
-							self.suit.air = self.suit.air - 5
-
-							if self.suit.air < 0 then
-								self.suit.air = 0
-							end
-						end
-					end
-				end
-			elseif self.caf.custom.ls.air then
-				if self.suit.air < 100 then
-					self.suit.air = 100
-				end
-			end
-		end
-
-		if self.caf.custom.ls.temperature >= 283 and self.caf.custom.ls.temperature <= 308 and self.caf.custom.ls.air and self.suit.recover > 0 then
-			if ((self:Health() + 5) >= 100) then
-				self:SetHealth(100)
-				self.suit.recover = 0
-			else
-				self:SetHealth(self:Health() + 5)
-				self.suit.recover = self.suit.recover - 5
-			end
-		end
-
-		self.caf.custom.ls.airused = false
-		self.caf.custom.ls.air = true
-		self:UpdateLSClient()
 	end
+
+	if self.caf.custom.ls.temperature >= 283 and self.caf.custom.ls.temperature <= 308 and self.caf.custom.ls.air and self.suit.recover > 0 then
+		if ((self:Health() + 5) >= 100) then
+			self:SetHealth(100)
+			self.suit.recover = 0
+		else
+			self:SetHealth(self:Health() + 5)
+			self.suit.recover = self.suit.recover - 5
+		end
+	end
+
+	self.caf.custom.ls.airused = false
+	self.caf.custom.ls.air = true
+	self:UpdateLSClient()
 end
 
 function Ply:UpdateLSClient()

@@ -90,7 +90,7 @@ local function SaveAddonStatus(addon, status)
 	local data = sql.Query("INSERT INTO CAF_AddonStatus(id, status) VALUES(" .. id .. ", " .. stat .. ");")
 
 	if data then
-		Msg("Error making a profile for " .. ply:Nick() .. "\n" .. data .. "\n")
+		MsgN("Error saving addon status " .. addon .. ":" .. status)
 	end
 end
 
@@ -267,50 +267,53 @@ function CAF2.Start()
 		print("Loading Level " .. tostring(level) .. " Addons\n")
 
 		for k, v in pairs(tab) do
-			if Addons[v] then
-				print("-->", "Loading addon " .. tostring(v) .. "\n")
+			if not Addons[v] then
+				continue
+			end
+			print("-->", "Loading addon " .. tostring(v) .. "\n")
 
-				if Addons[v].AddResourcesToSend then
-					local ok, err = pcall(Addons[v].AddResourcesToSend)
+			if Addons[v].AddResourcesToSend then
+				local ok, err = pcall(Addons[v].AddResourcesToSend)
 
-					if not ok then
-						CAF2.WriteToDebugFile("CAF_ResourceSend", "AddResourcesToSend Error: " .. err .. "\n")
+				if not ok then
+					CAF2.WriteToDebugFile("CAF_ResourceSend", "AddResourcesToSend Error: " .. err .. "\n")
+				end
+			end
+
+			if Addons[v].GetStatus and not Addons[v].GetStatus() then
+				local ok = true
+
+				if Addons[v].GetRequiredAddons and Addons[v].GetRequiredAddons() then
+					for l, w in pairs(Addons[v].GetRequiredAddons()) do
+						if Addons[w] then
+							continue
+						end
+						ok = false
 					end
 				end
+				if not ok then
+					continue
+				end
 
-				if Addons[v].GetStatus and not Addons[v].GetStatus() then
-					local ok = true
+				local state = CAF2.GetSavedAddonStatus(v, Addons[v].DEFAULTSTATUS)
 
-					if Addons[v].GetRequiredAddons and Addons[v].GetRequiredAddons() then
-						for l, w in pairs(Addons[v].GetRequiredAddons()) do
-							if not Addons[w] then
-								ok = false
-							end
-						end
+				if Addons[v].__AutoStart then
+					local ok2, err = pcall(Addons[v].__AutoStart, state)
+
+					if not ok2 then
+						CAF2.WriteToDebugFile("CAF_AutoStart", "Couldn't call AutoStart for " .. v .. ": " .. err .. "\n")
+					else
+						OnAddonConstruct(v)
+						print("-->", "Auto Started Addon: " .. v .. "\n")
 					end
+				elseif state then
+					local ok2, err = pcall(Addons[v].__Construct)
 
-					if ok then
-						local state = CAF2.GetSavedAddonStatus(v, Addons[v].DEFAULTSTATUS)
-
-						if Addons[v].__AutoStart then
-							local ok2, err = pcall(Addons[v].__AutoStart, state)
-
-							if not ok2 then
-								CAF2.WriteToDebugFile("CAF_AutoStart", "Couldn't call AutoStart for " .. v .. ": " .. err .. "\n")
-							else
-								OnAddonConstruct(v)
-								print("-->", "Auto Started Addon: " .. v .. "\n")
-							end
-						elseif state then
-							local ok2, err = pcall(Addons[v].__Construct)
-
-							if not ok2 then
-								CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. v .. ": " .. err .. "\n")
-							else
-								OnAddonConstruct(v)
-								print("-->", "Loaded addon: " .. v .. "\n")
-							end
-						end
+					if not ok2 then
+						CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. v .. ": " .. err .. "\n")
+					else
+						OnAddonConstruct(v)
+						print("-->", "Loaded addon: " .. v .. "\n")
 					end
 				end
 			end
@@ -618,7 +621,7 @@ for k, File in ipairs(Files) do
 		Msg("Sent: Successfully\n")
 	end
 end
- 
+
 net.Receive("CAF_PlayerFullLoad", function(_, ply)
 	if ply.PlayerFullLoaded then
 		return

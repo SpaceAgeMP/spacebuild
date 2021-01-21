@@ -254,15 +254,13 @@ function sb_space.Get()
 
 		local tr = util.TraceLine(trace)
 
-		if (tr.Hit) then
-			if (tr.Entity.grav_plate == 1 and (not ent.grav_plate or ent.grav_plate ~= 1)) then
-				ent:SetGravity(1)
-				ent.gravity = 1
-				phys:EnableGravity(true)
-				phys:EnableDrag(true)
+		if tr.Hit and tr.Entity.grav_plate == 1 and (not ent.grav_plate or ent.grav_plate ~= 1) then
+			ent:SetGravity(1)
+			ent.gravity = 1
+			phys:EnableGravity(true)
+			phys:EnableDrag(true)
 
-				return
-			end
+			return
 		end
 
 		if ent.gravity and ent.gravity == 0 then return end
@@ -581,15 +579,15 @@ local function Register_Environments()
 
 				if string.len(case2) > 0 then
 					hash.Col_r = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.Col_g = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.Col_b = tonumber(case2)
 				end
 
 				if string.len(case3) > 0 then
 					hash.SizeX = tonumber(string.Left(case3, string.find(case3, " ") - 1))
-					case3 = string.Right(case3, (string.len(case3) - string.find(case3, " ")))
+					case3 = string.Right(case3, string.len(case3) - string.find(case3, " "))
 					hash.SizeY = tonumber(case3)
 				end
 
@@ -939,25 +937,17 @@ function SB.PerformEnvironmentCheckOnEnt(ent)
 	end
 
 	if ent:IsPlayer() then
-		if SB_InSpace == 1 and (ent.environment == sb_space.Get() or (ent.environment and (not ent.environment:IsPlanet()) and ent.environment.environment and ent.environment.environment == sb_space.Get())) then
-			if not ent:InVehicle() or not game.SinglePlayer() then
-				if not AllowAdminNoclip(ent) then
-					if ent:GetMoveType() == MOVETYPE_NOCLIP then
-						ent:SetMoveType(MOVETYPE_WALK)
-					end
-				end
-			end
+		if SB_InSpace == 1 and (ent.environment == sb_space.Get() or (ent.environment and (not ent.environment:IsPlanet()) and ent.environment.environment and ent.environment.environment == sb_space.Get())) and not ent:InVehicle() or not game.SinglePlayer() and not AllowAdminNoclip(ent) and ent:GetMoveType() == MOVETYPE_NOCLIP then
+			ent:SetMoveType(MOVETYPE_WALK)
 		end
 
-		if SB.PlayerOverride == 0 and SB.Override_PlayerHeatDestroy == 0 then
-			if ent.environment:GetTemperature(ent) > 10000 then
-				ent:SilentKill()
-			end
+		if SB.PlayerOverride == 0 and SB.Override_PlayerHeatDestroy == 0 and ent.environment:GetTemperature(ent) > 10000 then
+			ent:SilentKill()
 		end
-	else
-		if (not ent.IsEnvironment or not ent:IsEnvironment() or (ent:GetVolume() == 0 and not ent:IsPlanet() and not ent:IsStar())) and ent.environment:GetTemperature(ent) > 10000 then
-			ent:Remove()
-		end
+		return
+	end
+	if (not ent.IsEnvironment or not ent:IsEnvironment() or (ent:GetVolume() == 0 and not ent:IsPlanet() and not ent:IsStar())) and ent.environment:GetTemperature(ent) > 10000 then
+		ent:Remove()
 	end
 end
 
@@ -1172,63 +1162,66 @@ function SB.FindVolume(name, radius)
 		radius = 0
 	end
 
-	if not volumes[name] then
-		volumes[name] = {}
-		volumes[name].radius = radius
-		volumes[name].pos = Vector(0, 0, 0)
-		local tries = VolCheckIterations:GetInt()
-		local found = 0
+	if volumes[name] then
+		return volumes[name]
+	end
 
-		while ((found == 0) and (tries > 0)) do
-			tries = tries - 1
-			pos = VectorRand() * 16384
+	volumes[name] = {
+		radius = radiusradius = radius,
+		pos = Vector(0, 0, 0)
+	}
+	local tries = VolCheckIterations:GetInt()
+	local found = 0
 
-			if (util.IsInWorld(pos) == true) then
-				found = 1
+	while ((found == 0) and (tries > 0)) do
+		tries = tries - 1
+		pos = VectorRand() * 16384
 
-				for k, v in pairs(volumes) do
-					--if v and v.pos and (v.pos == pos or v.pos:Distance(pos) < v.radius) then -- Hur hur. This is why i had planetary collisions.
-					if v and v.pos and (v.pos == pos or v.pos:Distance(pos) < v.radius + radius) then
+		if (util.IsInWorld(pos) == true) then
+			found = 1
+
+			for k, v in pairs(volumes) do
+				--if v and v.pos and (v.pos == pos or v.pos:Distance(pos) < v.radius) then -- Hur hur. This is why i had planetary collisions.
+				if v and v.pos and (v.pos == pos or v.pos:Distance(pos) < v.radius + radius) then
+					found = 0
+				end
+			end
+
+			if found == 1 then
+				for k, v in pairs(Environments) do
+					if v and IsValid(v) and ((v.IsPlanet and v.IsPlanet()) or (v.IsStar and v.IsStar())) and (v:GetPos() == pos or v:GetPos():Distance(pos) < v:GetSize()) then
 						found = 0
 					end
 				end
+			end
 
-				if found == 1 then
-					for k, v in pairs(Environments) do
-						if v and IsValid(v) and ((v.IsPlanet and v.IsPlanet()) or (v.IsStar and v.IsStar())) and (v:GetPos() == pos or v:GetPos():Distance(pos) < v:GetSize()) then
-							found = 0
-						end
+			if (found == 1) and radius > 0 then
+				local edges = {pos + (Vector(1, 0, 0) * radius), pos + (Vector(0, 1, 0) * radius), pos + (Vector(0, 0, 1) * radius), pos + (Vector(-1, 0, 0) * radius), pos + (Vector(0, -1, 0) * radius), pos + (Vector(0, 0, -1) * radius)}
+
+				local trace = {}
+				trace.start = pos
+
+				for _, edge in pairs(edges) do
+					trace.endpos = edge
+					trace.filter = {}
+					local tr = util.TraceLine(trace)
+
+					if (tr.Hit) then
+						found = 0
+						break
 					end
-				end
-
-				if (found == 1) and radius > 0 then
-					local edges = {pos + (Vector(1, 0, 0) * radius), pos + (Vector(0, 1, 0) * radius), pos + (Vector(0, 0, 1) * radius), pos + (Vector(-1, 0, 0) * radius), pos + (Vector(0, -1, 0) * radius), pos + (Vector(0, 0, -1) * radius)}
-
-					local trace = {}
-					trace.start = pos
-
-					for _, edge in pairs(edges) do
-						trace.endpos = edge
-						trace.filter = {}
-						local tr = util.TraceLine(trace)
-
-						if (tr.Hit) then
-							found = 0
-							break
-						end
-					end
-				end
-
-				if (found == 0) then
-					Msg("Rejected Volume.\n")
 				end
 			end
 
-			if (found == 1) then
-				volumes[name].pos = pos
-			elseif tries <= 0 then
-				volumes[name] = nil
+			if (found == 0) then
+				Msg("Rejected Volume.\n")
 			end
+		end
+
+		if (found == 1) then
+			volumes[name].pos = pos
+		elseif tries <= 0 then
+			volumes[name] = nil
 		end
 	end
 

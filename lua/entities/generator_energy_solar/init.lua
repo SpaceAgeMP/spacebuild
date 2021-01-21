@@ -94,108 +94,108 @@ function ENT:GenEnergy()
 
 	if (waterlevel > 1) then
 		self:TurnOff()
-	else
-		local entpos = self:GetPos()
-		local trace = {}
-		local SunAngle2 = SunAngle or Vector(0, 0, 1)
+		return
+	end
+	local entpos = self:GetPos()
+	local trace = {}
+	local SunAngle2 = SunAngle or Vector(0, 0, 1)
 
-		if TrueSun and table.Count(TrueSun) > 0 then
-			local output = 0
+	if TrueSun and table.Count(TrueSun) > 0 then
+		local output = 0
 
-			for k, SUN_POS in pairs(TrueSun) do
-				--[[SunAngle = (entpos - v)
-                    SunAngle:Normalize()
-                    local startpos = (entpos - (SunAngle * 4096))
-                    trace.start = startpos
-                    trace.endpos = entpos --+ Vector(0,0,30)
-                    local tr = util.TraceLine( trace )
-                    if (tr.Hit) then
-                        if (tr.Entity == self) then
-                            self:TurnOn()
-                            self:Extract_Energy()
-                            return
-                        end
-                    else
-                        self:TurnOn()
-                        self:Extract_Energy()
-                        return
-                    end]]
-				trace = util.QuickTrace(SUN_POS, entpos - SUN_POS, nil)
-
-				if trace.Hit then
-					if trace.Entity == self then
-						local v = self:GetUp() + trace.HitNormal
-						local n = v.x * v.y * v.z
-
-						if n > 0 then
-							output = output + n
-							--solar panel produces energy
-						end
-					else
-						local n = math.Clamp(1 - SUN_POS:Distance(trace.HitPos) / SUN_POS:Distance(entpos), 0, 1)
-						output = output + n
-						--solar panel is being blocked
+		for k, SUN_POS in pairs(TrueSun) do
+			--[[SunAngle = (entpos - v)
+				SunAngle:Normalize()
+				local startpos = (entpos - (SunAngle * 4096))
+				trace.start = startpos
+				trace.endpos = entpos --+ Vector(0,0,30)
+				local tr = util.TraceLine( trace )
+				if (tr.Hit) then
+					if (tr.Entity == self) then
+						self:TurnOn()
+						self:Extract_Energy()
+						return
 					end
+				else
+					self:TurnOn()
+					self:Extract_Energy()
+					return
+				end]]
+			trace = util.QuickTrace(SUN_POS, entpos - SUN_POS, nil)
+
+			if trace.Hit then
+				if trace.Entity == self then
+					local v = self:GetUp() + trace.HitNormal
+					local n = v.x * v.y * v.z
+
+					if n > 0 then
+						output = output + n
+						--solar panel produces energy
+					end
+				else
+					local n = math.Clamp(1 - SUN_POS:Distance(trace.HitPos) / SUN_POS:Distance(entpos), 0, 1)
+					output = output + n
+					--solar panel is being blocked
 				end
-
-				if output >= 1 then break end
 			end
 
-			if output > 1 then
-				output = 1
-			end
+			if output >= 1 then break end
+		end
 
-			if output > 0 then
+		if output > 1 then
+			output = 1
+		end
+
+		if output > 0 then
+			self:TurnOn()
+			self:Extract_Energy(output)
+
+			return
+		end
+	end
+
+	local SUN_POS = (entpos - (SunAngle2 * 4096))
+	--[[trace.start = startpos
+		trace.endpos = entpos --+ Vector(0,0,30)
+		local tr = util.TraceLine( trace )
+		if (tr.Hit) then
+			if (tr.Entity == self) then
 				self:TurnOn()
-				self:Extract_Energy(output)
+				self:Extract_Energy(1)
+				return
+			end
+		else
+			self:TurnOn()
+			self:Extract_Energy()
+			return
+		end]]
+	trace = util.QuickTrace(SUN_POS, entpos - SUN_POS, nil)
+
+	if trace.Hit then
+		if trace.Entity == self then
+			local v = self:GetUp() + trace.HitNormal
+			local n = v.x * v.y * v.z
+
+			if n > 0 then
+				self:TurnOn()
+				self:Extract_Energy(n)
 
 				return
 			end
-		end
+		else
+			local n = math.Clamp(1 - SUN_POS:Distance(trace.HitPos) / SUN_POS:Distance(entpos), 0, 1)
 
-		local SUN_POS = (entpos - (SunAngle2 * 4096))
-		--[[trace.start = startpos
-          trace.endpos = entpos --+ Vector(0,0,30)
-          local tr = util.TraceLine( trace )
-          if (tr.Hit) then
-              if (tr.Entity == self) then
-                  self:TurnOn()
-                  self:Extract_Energy(1)
-                  return
-              end
-          else
-              self:TurnOn()
-              self:Extract_Energy()
-              return
-          end]]
-		trace = util.QuickTrace(SUN_POS, entpos - SUN_POS, nil)
+			if n > 0 then
+				self:TurnOn()
+				self:Extract_Energy(n)
 
-		if trace.Hit then
-			if trace.Entity == self then
-				local v = self:GetUp() + trace.HitNormal
-				local n = v.x * v.y * v.z
-
-				if n > 0 then
-					self:TurnOn()
-					self:Extract_Energy(n)
-
-					return
-				end
-			else
-				local n = math.Clamp(1 - SUN_POS:Distance(trace.HitPos) / SUN_POS:Distance(entpos), 0, 1)
-
-				if n > 0 then
-					self:TurnOn()
-					self:Extract_Energy(n)
-
-					return
-				end
-				--solar panel is being blocked
+				return
 			end
+			--solar panel is being blocked
 		end
-
-		self:TurnOff() --No Sunbeams in sight so turn Off
 	end
+
+	self:TurnOff() --No Sunbeams in sight so turn Off
 end
 
 function ENT:Think()
