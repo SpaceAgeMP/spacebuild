@@ -193,111 +193,91 @@ function CAFToolSetup.BaseCCVars()
 	end
 end
 
+local function BuildCPanel(tool, panel)
+	local function sortedByProperty(t, property_name, f)		-- takes a key,pair table and returns it sorted by v.property_name (https://www.lua.org/pil/19.3.html)
+		local a = {}
+		local keys = {}
+
+		for k,v in pairs(t) do
+			local value = v[property_name]
+			if value then
+				table.insert(a, value)
+				keys[value] = k
+			end
+		end
+
+		table.sort(a, f)
+		local i = 0
+		local iter = function ()
+			i = i + 1
+			if a[i] == nil then
+				return nil
+			else
+				local key = keys[a[i]]
+				return key, t[key]
+			end
+		end
+		return iter
+	end
+
+	panel:CheckBox("Don't Weld", tool.Mode .. "_DontWeld")
+	panel:CheckBox("Allow welding to world", tool.Mode .. "_AllowWorldWeld")
+	panel:CheckBox("Make Frozen", tool.Mode .. "_Frozen")
+
+	--custom stuff
+	if tool.ExtraCCVarsCP then
+		tool:ExtraCCVarsCP(panel)
+	end
+
+	--Devices
+	if tool.DevSelect and tool.Devices then
+		local tree = vgui.Create("DTree")
+		tree:SetTall(400)
+
+		panel:AddPanel(tree)
+		local ccv_model = tool.Mode .. "_model"
+		local ccv_type = tool.Mode .. "_type"
+		local ccv_sub_type = tool.Mode .. "_sub_type"
+		local cur_model = GetConVar(ccv_model):GetString()
+		local cur_type = GetConVar(ccv_type):GetString()
+		local cur_sub_type = GetConVar(ccv_sub_type):GetString()
+
+		for k, devlist in sortedByProperty(tool.Devices, "Name") do
+			if not devlist.hide then
+				local node = tree:AddNode(devlist.Name, devlist.icon)
+				node.caftext = devlist.Name
+				node.var_type = devlist.type
+
+				for _, dev in sortedByProperty(devlist.devices, "Name") do
+					if not dev.hide then
+						local cnode = node:AddNode(dev.Name, dev.icon or "icon16/newspaper.png")
+						cnode.caftext = dev.Name
+						cnode.var_model = dev.model
+						util.PrecacheModel(dev.model)
+						cnode.var_type = dev.type
+						cnode.var_sub_type = dev.sub_type
+
+						if cur_model == dev.model and cur_type == dev.type and cur_sub_type == dev.sub_type then
+							tree:SetSelectedItem(cnode)
+						end
+
+						function cnode.DoClick(btn)
+							RunConsoleCommand(ccv_model, btn.var_model)
+							RunConsoleCommand(ccv_type, btn.var_type)
+							RunConsoleCommand(ccv_sub_type, btn.var_sub_type)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 function CAFToolSetup.MakeCP()
 	if SERVER then return end
-	local self = TOOL
-
+	local tool = TOOL
 	TOOL.BuildCPanel = function(panel)
-		panel:CheckBox("Don't Weld", self.Mode .. "_DontWeld")
-		panel:CheckBox("Allow welding to world", self.Mode .. "_AllowWorldWeld")
-		panel:CheckBox("Make Frozen", self.Mode .. "_Frozen")
-
-		--custom stuff
-		if self.ExtraCCVarsCP then
-			self:ExtraCCVarsCP(panel)
-		end
-
-		--Devices
-		if self.DevSelect and self.Devices then
-			local tree = vgui.Create("DTree")
-			tree:SetTall(400)
-
-			function tree:CAFSort(asc)
-				if not self.RootNode or not self.RootNode:HasChildren() then return end
-
-				if not asc then
-					asc = false
-				end
-
-				table.sort(self.RootNode.ChildNodes:GetChildren(), function(a, b)
-					if (asc) then
-						local ta = a
-						local tb = b
-						a = tb
-						b = ta
-					end
-
-					if (a == nil or a.caftext == nil) then return false end
-					if (b == nil or b.caftext == nil) then return true end
-
-					return a.caftext > b.caftext
-				end)
-			end
-
-			panel:AddPanel(tree)
-			local ccv_model = self.Mode .. "_model"
-			local ccv_type = self.Mode .. "_type"
-			local ccv_sub_type = self.Mode .. "_sub_type"
-			local cur_model = GetConVarString(ccv_model)
-			local cur_type = GetConVarString(ccv_type)
-			local cur_sub_type = GetConVarString(ccv_sub_type)
-
-			for _, devlist in pairs(self.Devices) do
-				if not devlist.hide then
-					local node = tree:AddNode(devlist.Name, devlist.icon)
-					node.caftext = devlist.Name
-					node.var_type = devlist.type
-
-					function node:CAFSort(asc)
-						if not self:HasChildren() then return end
-
-						if not asc then
-							asc = false
-						end
-
-						table.sort(self.ChildNodes:GetChildren(), function(a, b)
-							if (asc) then
-								local ta = a
-								local tb = b
-								a = tb
-								b = ta
-							end
-
-							if (a == nil or a.caftext == nil) then return false end
-							if (b == nil or b.caftext == nil) then return true end
-
-							return a.caftext > b.caftext
-						end)
-					end
-
-					for _, dev in pairs(devlist.devices) do
-						if not dev.hide then
-							local cnode = node:AddNode(dev.Name, dev.icon or "icon16/newspaper.png")
-							cnode.caftext = dev.Name
-							cnode.var_model = dev.model
-							util.PrecacheModel(dev.model)
-							cnode.var_type = dev.type
-							cnode.var_sub_type = dev.sub_type
-
-							if cur_model == dev.model and cur_type == dev.type and cur_sub_type == dev.sub_type then
-								tree:SetSelectedItem(cnode)
-							end
-
-							function cnode.DoClick(btn)
-								RunConsoleCommand(ccv_model, btn.var_model)
-								RunConsoleCommand(ccv_type, btn.var_type)
-								RunConsoleCommand(ccv_sub_type, btn.var_sub_type)
-							end
-						end
-					end
-
-					node:CAFSort(true)
-					--node:ExpandRecurse(false)
-				end
-			end
-
-			tree:CAFSort(true)
-		end
+		BuildCPanel(tool, panel)
 	end
 end
 
