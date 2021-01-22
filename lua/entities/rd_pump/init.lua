@@ -327,12 +327,13 @@ function ENT:Think()
 		else
 			if self.ResourcesToSend then
 				for k, v in pairs(self.ResourcesToSend) do
-					if RD.GetNetResourceAmount(self.netid, k) > 0 then
-						if RD.GetNetResourceAmount(self.netid, k) > v then
-							self:Send(k, v)
-						else
-							self:Send(k, RD.GetNetResourceAmount(self.netid, k))
-						end
+					if RD.GetNetResourceAmount(self.netid, k) == 0 then
+						continue
+					end
+					if RD.GetNetResourceAmount(self.netid, k) > v then
+						self:Send(k, v)
+					else
+						self:Send(k, RD.GetNetResourceAmount(self.netid, k))
 					end
 				end
 			end
@@ -417,7 +418,7 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.ApplyDupeInfo(Ent, CreatedEntities)
 
-	if WireAddon ~= nil and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 end

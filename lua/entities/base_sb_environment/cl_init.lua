@@ -41,208 +41,197 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local mode = self:GetNWInt("overlaymode")
 
 	-- Don't enable it if disabled by default!
-	if RD_OverLay_Mode and mode ~= 0 then
-		if RD_OverLay_Mode.GetInt then
-			local nr = math.Round(RD_OverLay_Mode:GetInt())
+	if RD_OverLay_Mode and mode ~= 0 and RD_OverLay_Mode.GetInt then
+		local nr = math.Round(RD_OverLay_Mode:GetInt())
 
-			if nr >= 0 and nr <= 2 then
-				mode = nr
-			end
+		if nr >= 0 and nr <= 2 then
+			mode = nr
 		end
 	end
 
 	local rd_overlay_dist = 512
 
-	if RD_OverLay_Distance then
-		if RD_OverLay_Distance.GetInt then
-			local nr = RD_OverLay_Distance:GetInt()
+	if RD_OverLay_Distance and RD_OverLay_Distance.GetInt then
+		local nr = RD_OverLay_Distance:GetInt()
 
-			if nr >= 256 then
-				rd_overlay_dist = nr
-			end
+		if nr >= 256 then
+			rd_overlay_dist = nr
 		end
 	end
 
-	if RD and (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
-		--overlaysettings
-		local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
-		local HasOOO = OverlaySettings.HasOOO
-		local num = OverlaySettings.num or 0
-		local resnames = OverlaySettings.resnames
-		--End overlaysettings
-		local trace = LocalPlayer():GetEyeTrace()
+	if (not bDontDrawModel) then
+		self:DrawModel()
+	end
 
-		if (not bDontDrawModel) then
-			self:DrawModel()
-		end
+	if not (RD and (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
+		return
+	end
+	--overlaysettings
+	local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
+	local HasOOO = OverlaySettings.HasOOO
+	local num = OverlaySettings.num or 0
+	local resnames = OverlaySettings.resnames
+	--End overlaysettings
+	local trace = LocalPlayer():GetEyeTrace()
 
-		local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
-		if table.Count(nettable) <= 0 then return end
-		local playername = self:GetPlayerName()
+	if (not bDontDrawModel) then
+		self:DrawModel()
+	end
 
-		if playername == "" then
-			playername = "World"
-		end
+	local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	if table.Count(nettable) <= 0 then return end
+	local playername = self:GetPlayerName()
 
-		-- 0 = no overlay!
-		-- 1 = default overlaytext
-		-- 2 = new overlaytext
-		if not mode or mode ~= 2 then
-			local OverlayText = ""
-			OverlayText = OverlayText .. self.PrintName .. "\n"
+	if playername == "" then
+		playername = "World"
+	end
 
-			if nettable.network == 0 then
-				OverlayText = OverlayText .. "Not connected to a network\n"
-			else
-				OverlayText = OverlayText .. "Network " .. nettable.network .. "\n"
-			end
+	-- 0 = no overlay!
+	-- 1 = default overlaytext
+	-- 2 = new overlaytext
+	if not mode or mode ~= 2 then
+		local OverlayText = ""
+		OverlayText = OverlayText .. self.PrintName .. "\n"
 
-			OverlayText = OverlayText .. "Owner: " .. playername .. "\n"
-
-			if HasOOO then
-				local runmode = "UnKnown"
-
-				if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
-					runmode = OOO[self:GetOOO()]
-				end
-
-				OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
-			end
-
-			local resources = nettable.resources
-
-			if num == -1 then
-				if (table.Count(resources) > 0) then
-					for k, v in pairs(resources) do
-						OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
-					end
-				else
-					OverlayText = OverlayText .. "No Resources Connected\n"
-				end
-			else
-				if resnames and table.Count(resnames) > 0 then
-					for _, k in pairs(resnames) do
-						OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
-					end
-				end
-			end
-
-			AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
+		if nettable.network == 0 then
+			OverlayText = OverlayText .. "Not connected to a network\n"
 		else
-			local TempY = 0
-			--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
-			local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
-			local angle = (LocalPlayer():GetPos() - trace.HitPos):Angle()
-			angle.r = angle.r + 90
-			angle.y = angle.y + 90
-			angle.p = 0
-			local textStartPos = -375
-			cam.Start3D2D(pos, angle, 0.03)
-			surface.SetDrawColor(0, 0, 0, 125)
-			surface.DrawRect(textStartPos, 0, 1250, 500)
-			surface.SetDrawColor(155, 155, 155, 255)
-			surface.DrawRect(textStartPos, 0, -5, 500)
-			surface.DrawRect(textStartPos, 0, 1250, -5)
-			surface.DrawRect(textStartPos, 500, 1250, -5)
-			surface.DrawRect(textStartPos + 1250, 0, 5, 500)
-			TempY = TempY + 10
-			surface.SetFont("ConflictText")
-			surface.SetTextColor(255, 255, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
-			surface.DrawText(self.PrintName)
-			TempY = TempY + 70
-			surface.SetFont("Flavour")
-			surface.SetTextColor(155, 155, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
-			surface.DrawText("Owner: " .. playername)
-			TempY = TempY + 70
-			surface.SetFont("Flavour")
-			surface.SetTextColor(155, 155, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
+			OverlayText = OverlayText .. "Network " .. nettable.network .. "\n"
+		end
 
-			if nettable.network == 0 then
-				surface.DrawText("Not connected to a network")
-			else
-				surface.DrawText("Network " .. nettable.network)
+		OverlayText = OverlayText .. "Owner: " .. playername .. "\n"
+
+		if HasOOO then
+			local runmode = "UnKnown"
+
+			if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
+				runmode = OOO[self:GetOOO()]
 			end
 
-			TempY = TempY + 70
+			OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
+		end
 
-			if HasOOO then
-				local runmode = "UnKnown"
+		local resources = nettable.resources
 
-				if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
-					runmode = OOO[self:GetOOO()]
-				end
-
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("Mode: " .. runmode)
-				TempY = TempY + 70
-			end
-
-			-- Print the used resources
-			local stringUsage = ""
-			local resources = nettable.resources
-
+		if num == -1 then
 			if (table.Count(resources) > 0) then
-				local i = 0
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("Resources: ")
-				TempY = TempY + 70
+				for k, v in pairs(resources) do
+					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
+				end
+			else
+				OverlayText = OverlayText .. "No Resources Connected\n"
+			end
+		else
+			if resnames and table.Count(resnames) > 0 then
+				for _, k in pairs(resnames) do
+					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
+				end
+			end
+		end
 
-				if num == -1 then
-					for k, v in pairs(resources) do
-						stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
-						i = i + 1
+		AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
+		return
+	end
+	local TempY = 0
+	--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
+	local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
+	local angle = (LocalPlayer():GetPos() - trace.HitPos):Angle()
+	angle.r = angle.r + 90
+	angle.y = angle.y + 90
+	angle.p = 0
+	local textStartPos = -375
+	cam.Start3D2D(pos, angle, 0.03)
+	surface.SetDrawColor(0, 0, 0, 125)
+	surface.DrawRect(textStartPos, 0, 1250, 500)
+	surface.SetDrawColor(155, 155, 155, 255)
+	surface.DrawRect(textStartPos, 0, -5, 500)
+	surface.DrawRect(textStartPos, 0, 1250, -5)
+	surface.DrawRect(textStartPos, 500, 1250, -5)
+	surface.DrawRect(textStartPos + 1250, 0, 5, 500)
+	TempY = TempY + 10
+	surface.SetFont("ConflictText")
+	surface.SetTextColor(255, 255, 255, 255)
+	surface.SetTextPos(textStartPos + 15, TempY)
+	surface.DrawText(self.PrintName)
+	TempY = TempY + 70
+	surface.SetFont("Flavour")
+	surface.SetTextColor(155, 155, 255, 255)
+	surface.SetTextPos(textStartPos + 15, TempY)
+	surface.DrawText("Owner: " .. playername)
+	TempY = TempY + 70
+	surface.SetTextPos(textStartPos + 15, TempY)
 
-						if i == 3 then
-							surface.SetTextPos(textStartPos + 15, TempY)
-							surface.DrawText("   " .. stringUsage)
-							TempY = TempY + 70
-							stringUsage = ""
-							i = 0
-						end
-					end
-				else
-					if resnames then
-						for _, k in pairs(resnames) do
-							stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
-							i = i + 1
+	if nettable.network == 0 then
+		surface.DrawText("Not connected to a network")
+	else
+		surface.DrawText("Network " .. nettable.network)
+	end
 
-							if i == 3 then
-								surface.SetTextPos(textStartPos + 15, TempY)
-								surface.DrawText("   " .. stringUsage)
-								TempY = TempY + 70
-								stringUsage = ""
-								i = 0
-							end
-						end
+	TempY = TempY + 70
+
+	if HasOOO then
+		local runmode = "UnKnown"
+
+		if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
+			runmode = OOO[self:GetOOO()]
+		end
+
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("Mode: " .. runmode)
+		TempY = TempY + 70
+	end
+
+	-- Print the used resources
+	local stringUsage = ""
+	local resources = nettable.resources
+
+	if (table.Count(resources) > 0) then
+		local i = 0
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("Resources: ")
+		TempY = TempY + 70
+
+		if num == -1 then
+			for k, v in pairs(resources) do
+				stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
+				i = i + 1
+
+				if i == 3 then
+					surface.SetTextPos(textStartPos + 15, TempY)
+					surface.DrawText("   " .. stringUsage)
+					TempY = TempY + 70
+					stringUsage = ""
+					i = 0
+				end
+			end
+		else
+			if resnames then
+				for _, k in pairs(resnames) do
+					stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
+					i = i + 1
+
+					if i == 3 then
+						surface.SetTextPos(textStartPos + 15, TempY)
+						surface.DrawText("   " .. stringUsage)
+						TempY = TempY + 70
+						stringUsage = ""
+						i = 0
 					end
 				end
-
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("   " .. stringUsage)
-				TempY = TempY + 70
-			else
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("No resources connected")
-				TempY = TempY + 70
 			end
+		end
 
-			--Stop rendering
-			cam.End3D2D()
-		end
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("   " .. stringUsage)
+		TempY = TempY + 70
 	else
-		if (not bDontDrawModel) then
-			self:DrawModel()
-		end
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("No resources connected")
+		TempY = TempY + 70
 	end
+
+	--Stop rendering
+	cam.End3D2D()
 end
 
 if Wire_UpdateRenderBounds then

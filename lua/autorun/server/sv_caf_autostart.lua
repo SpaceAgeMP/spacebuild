@@ -240,8 +240,6 @@ function CAF2.ClearDebugFile(filename)
 	local contents = file.Read("CAF_Debug/server/" .. filename .. ".txt")
 	contents = contents or ""
 	file.Write("CAF_Debug/server/" .. filename .. ".txt", "")
-
-	return content
 end
 
 --[[

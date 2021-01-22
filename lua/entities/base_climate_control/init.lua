@@ -265,232 +265,237 @@ function ENT:Climate_Control()
 
 	--Msg("Temperature: "..tostring(temperature)..", pressure: " ..tostring(pressure).."\n")
 	--Only do something if the device is on
-	if self.Active == 1 then
-		self.energy = self:GetResourceAmount("energy")
+	if self.Active ~= 1 then
+		self:TriggerWireOutputs() -- needed?
+		return
+	end
+	self.energy = self:GetResourceAmount("energy")
 
-		--Don't have enough power to keep the controler\'s think process running, shut it all down
-		if self.energy == 0 or self.energy < math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024) then
-			self:TurnOff()
-			--Msg("Turning of\n")
+	--Don't have enough power to keep the controler\'s think process running, shut it all down
+	if self.energy == 0 or self.energy < math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024) then
+		self:TurnOff()
+		--Msg("Turning of\n")
 
-			return
+		return
+	end
+	self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024))
+	self.air = self:GetResourceAmount("oxygen")
+	self.coolant = self:GetResourceAmount("water")
+	self.coolant2 = self:GetResourceAmount("nitrogen")
+	self.energy = self:GetResourceAmount("energy")
+
+	--First let check our air supply and try to stabilize it if we got oxygen left in storage at a rate of 5 oxygen per second
+	if self.sbenvironment.air.o2 < self.sbenvironment.air.max * (self.maxO2Level / 100) then
+		--We need some energy to fire the pump!
+		local energyneeded = math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)
+		local mul = 1
+
+		if self.energy < energyneeded then
+			mul = self.energy / energyneeded
+			self:ConsumeResource("energy", self.energy)
 		else
-			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024))
-			self.air = self:GetResourceAmount("oxygen")
-			self.coolant = self:GetResourceAmount("water")
-			self.coolant2 = self:GetResourceAmount("nitrogen")
+			self:ConsumeResource("energy", energyneeded)
+		end
+
+		local air = math.ceil(5000 * mul)
+
+		if self.air < air then
+			air = self.air
+		end
+
+		if self.sbenvironment.air.empty > 0 then
+			local actual = self:Convert(-1, 0, air)
+			self:ConsumeResource("oxygen", actual)
+		elseif self.sbenvironment.air.co2 > 0 then
+			local actual = self:Convert(1, 0, air)
+			self:ConsumeResource("oxygen", actual)
+			local left = self:SupplyResource("carbon dioxide", actual)
+
+			if self.environment then
+				self.environment:Convert(-1, 1, left)
+			end
+		elseif self.sbenvironment.air.n > 0 then
+			local actual = self:Convert(2, 0, air)
+			self:ConsumeResource("oxygen", actual)
+			local left = self:SupplyResource("nitrogen", actual)
+
+			if self.environment then
+				self.environment:Convert(-1, 2, left)
+			end
+		elseif self.sbenvironment.air.h > 0 then
+			local actual = self:Convert(3, 0, air)
+			self:ConsumeResource("oxygen", actual)
+			local left = self:SupplyResource("hydrogen", actual)
+
+			if self.environment then
+				self.environment:Convert(-1, 1, left)
+			end
+		end
+	elseif self.sbenvironment.air.o2 > self.sbenvironment.air.max then
+		local tmp = self.sbenvironment.air.o2 - self.sbenvironment.air.max
+		local left = self:SupplyResource("oxygen", tmp)
+
+		if self.environment then
+			self.environment:Convert(-1, 0, left)
+		end
+	end
+
+	--Now let's check the pressure, if pressure is larger then 1 then we need some more power to keep the climate_controls environment stable. We don\' want any leaks do we?
+	if pressure > 1 then
+		self:ConsumeResource("energy", (pressure - 1) * math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
+	end
+
+	if temperature < self.sbenvironment.temperature then
+		local dif = self.sbenvironment.temperature - temperature
+		dif = math.ceil(dif / 100) --Change temperature depending on the outside temperature, 5� difference does a lot less then 10000� difference
+		self.sbenvironment.temperature = self.sbenvironment.temperature - dif
+	elseif temperature > self.sbenvironment.temperature then
+		local dif = temperature - self.sbenvironment.temperature
+		dif = math.ceil(dif / 100)
+		self.sbenvironment.temperature = self.sbenvironment.temperature + dif
+	end
+
+	--Msg("Temperature: "..tostring(self.sbenvironment.temperature).."\n")
+	if self.sbenvironment.temperature < 283 then
+		--Msg("Heating up?\n")
+		if self.sbenvironment.temperature + 60 <= 308 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 24 * math.ceil(self.maxsize / 1024))
 			self.energy = self:GetResourceAmount("energy")
 
-			--First let check our air supply and try to stabilize it if we got oxygen left in storage at a rate of 5 oxygen per second
-			if self.sbenvironment.air.o2 < self.sbenvironment.air.max * (self.maxO2Level / 100) then
-				--We need some energy to fire the pump!
-				local energyneeded = math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)
-				local mul = 1
+			if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024) then
+				--Msg("Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + 60
+				self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024))
+			else
+				--Msg("not Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024)) * 60)
+				self:ConsumeResource("energy", self.energy)
+			end
+		elseif self.sbenvironment.temperature + 30 <= 308 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
+			self.energy = self:GetResourceAmount("energy")
 
-				if self.energy < energyneeded then
-					mul = self.energy / energyneeded
-					self:ConsumeResource("energy", self.energy)
-				else
-					self:ConsumeResource("energy", energyneeded)
-				end
+			if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024) then
+				--Msg("Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + 30
+				self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024))
+			else
+				--Msg("not Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024)) * 30)
+				self:ConsumeResource("energy", self.energy)
+			end
+		elseif self.sbenvironment.temperature + 15 <= 308 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
+			self.energy = self:GetResourceAmount("energy")
 
-				local air = math.ceil(5000 * mul)
+			if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024) then
+				--Msg("Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + 15
+				self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024))
+			else
+				--Msg("not Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024)) * 15)
+				self:ConsumeResource("energy", self.energy)
+			end
+		else
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
+			self.energy = self:GetResourceAmount("energy")
 
-				if self.air < air then
-					air = self.air
-				end
+			if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024) then
+				--Msg("Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + 5
+				self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024))
+			else
+				--Msg("not Enough energy\n")
+				self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)) * 5)
+				self:ConsumeResource("energy", self.energy)
+			end
+		end
+	elseif self.sbenvironment.temperature > 308 then
+		if self.sbenvironment.temperature - 60 >= 283 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 24 * math.ceil(self.maxsize / 1024))
 
-				if self.sbenvironment.air.empty > 0 then
-					local actual = self:Convert(-1, 0, air)
-					self:ConsumeResource("oxygen", actual)
-				elseif self.sbenvironment.air.co2 > 0 then
-					local actual = self:Convert(1, 0, air)
-					self:ConsumeResource("oxygen", actual)
-					local left = self:SupplyResource("carbon dioxide", actual)
-
-					if self.environment then
-						self.environment:Convert(-1, 1, left)
-					end
-				elseif self.sbenvironment.air.n > 0 then
-					local actual = self:Convert(2, 0, air)
-					self:ConsumeResource("oxygen", actual)
-					local left = self:SupplyResource("nitrogen", actual)
-
-					if self.environment then
-						self.environment:Convert(-1, 2, left)
-					end
-				elseif self.sbenvironment.air.h > 0 then
-					local actual = self:Convert(3, 0, air)
-					self:ConsumeResource("oxygen", actual)
-					local left = self:SupplyResource("hydrogen", actual)
-
-					if self.environment then
-						self.environment:Convert(-1, 1, left)
-					end
-				end
-			elseif self.sbenvironment.air.o2 > self.sbenvironment.air.max then
-				local tmp = self.sbenvironment.air.o2 - self.sbenvironment.air.max
-				local left = self:SupplyResource("oxygen", tmp)
-
-				if self.environment then
-					self.environment:Convert(-1, 0, left)
+			if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 60
+				self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
+			elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 60
+				self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024))
+			else
+				if self.coolant2 > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024)) * 60)
+					self:ConsumeResource("nitrogen", self.coolant2)
+				elseif self.coolant > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024)) * 60)
+					self:ConsumeResource("water", self.coolant)
 				end
 			end
+		elseif self.sbenvironment.temperature - 30 >= 283 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
 
-			--Now let's check the pressure, if pressure is larger then 1 then we need some more power to keep the climate_controls environment stable. We don\' want any leaks do we?
-			if pressure > 1 then
-				self:ConsumeResource("energy", (pressure - 1) * math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
-			end
-
-			if temperature < self.sbenvironment.temperature then
-				local dif = self.sbenvironment.temperature - temperature
-				dif = math.ceil(dif / 100) --Change temperature depending on the outside temperature, 5� difference does a lot less then 10000� difference
-				self.sbenvironment.temperature = self.sbenvironment.temperature - dif
-			elseif temperature > self.sbenvironment.temperature then
-				local dif = temperature - self.sbenvironment.temperature
-				dif = math.ceil(dif / 100)
-				self.sbenvironment.temperature = self.sbenvironment.temperature + dif
-			end
-
-			--Msg("Temperature: "..tostring(self.sbenvironment.temperature).."\n")
-			if self.sbenvironment.temperature < 283 then
-				--Msg("Heating up?\n")
-				if self.sbenvironment.temperature + 60 <= 308 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 24 * math.ceil(self.maxsize / 1024))
-					self.energy = self:GetResourceAmount("energy")
-
-					if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024) then
-						--Msg("Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + 60
-						self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024))
-					else
-						--Msg("not Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024)) * 60)
-						self:ConsumeResource("energy", self.energy)
-					end
-				elseif self.sbenvironment.temperature + 30 <= 308 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
-					self.energy = self:GetResourceAmount("energy")
-
-					if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024) then
-						--Msg("Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + 30
-						self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024))
-					else
-						--Msg("not Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024)) * 30)
-						self:ConsumeResource("energy", self.energy)
-					end
-				elseif self.sbenvironment.temperature + 15 <= 308 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
-					self.energy = self:GetResourceAmount("energy")
-
-					if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024) then
-						--Msg("Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + 15
-						self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024))
-					else
-						--Msg("not Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024)) * 15)
-						self:ConsumeResource("energy", self.energy)
-					end
-				else
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
-					self.energy = self:GetResourceAmount("energy")
-
-					if self.energy > math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024) then
-						--Msg("Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + 5
-						self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024))
-					else
-						--Msg("not Enough energy\n")
-						self.sbenvironment.temperature = self.sbenvironment.temperature + math.ceil((self.energy / math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)) * 5)
-						self:ConsumeResource("energy", self.energy)
-					end
+			if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 30
+				self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
+			elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 30
+				self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024))
+			else
+				if self.coolant2 > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024)) * 30)
+					self:ConsumeResource("nitrogen", self.coolant2)
+				elseif self.coolant > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024)) * 30)
+					self:ConsumeResource("water", self.coolant)
 				end
-			elseif self.sbenvironment.temperature > 308 then
-				if self.sbenvironment.temperature - 60 >= 283 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 24 * math.ceil(self.maxsize / 1024))
+			end
+		elseif self.sbenvironment.temperature - 15 >= 283 then
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
 
-					if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 60
-						self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
-					elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 60
-						self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024))
-					else
-						if self.coolant2 > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024)) * 60)
-							self:ConsumeResource("nitrogen", self.coolant2)
-						elseif self.coolant > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 60 * math.ceil(self.maxsize / 1024)) * 60)
-							self:ConsumeResource("water", self.coolant)
-						end
-					end
-				elseif self.sbenvironment.temperature - 30 >= 283 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 12 * math.ceil(self.maxsize / 1024))
+			if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 15
+				self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024))
+			elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 15
+				self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024))
+			else
+				if self.coolant2 > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024)) * 15)
+					self:ConsumeResource("nitrogen", self.coolant2)
+				elseif self.coolant > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024)) * 15)
+					self:ConsumeResource("water", self.coolant)
+				end
+			end
+		else
+			self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
 
-					if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 30
-						self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
-					elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 30
-						self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024))
-					else
-						if self.coolant2 > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024)) * 30)
-							self:ConsumeResource("nitrogen", self.coolant2)
-						elseif self.coolant > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 30 * math.ceil(self.maxsize / 1024)) * 30)
-							self:ConsumeResource("water", self.coolant)
-						end
-					end
-				elseif self.sbenvironment.temperature - 15 >= 283 then
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 6 * math.ceil(self.maxsize / 1024))
-
-					if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 15
-						self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024))
-					elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 15
-						self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024))
-					else
-						if self.coolant2 > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024)) * 15)
-							self:ConsumeResource("nitrogen", self.coolant2)
-						elseif self.coolant > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 15 * math.ceil(self.maxsize / 1024)) * 15)
-							self:ConsumeResource("water", self.coolant)
-						end
-					end
-				else
-					self:ConsumeResource("energy", math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
-
-					if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 5
-						self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024))
-					elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024) then
-						self.sbenvironment.temperature = self.sbenvironment.temperature - 5
-						self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024))
-					else
-						if self.coolant2 > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024)) * 5)
-							self:ConsumeResource("nitrogen", self.coolant2)
-						elseif self.coolant > 0 then
-							self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)) * 5)
-							self:ConsumeResource("water", self.coolant)
-						end
-					end
+			if self.coolant2 > math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 5
+				self:ConsumeResource("nitrogen", math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024))
+			elseif self.coolant > math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024) then
+				self.sbenvironment.temperature = self.sbenvironment.temperature - 5
+				self:ConsumeResource("water", math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024))
+			else
+				if self.coolant2 > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant2 / math.ceil(self.sbenvironment.size / self.maxsize) * 1 * math.ceil(self.maxsize / 1024)) * 5)
+					self:ConsumeResource("nitrogen", self.coolant2)
+				elseif self.coolant > 0 then
+					self.sbenvironment.temperature = self.sbenvironment.temperature - math.ceil((self.coolant / math.ceil(self.sbenvironment.size / self.maxsize) * 5 * math.ceil(self.maxsize / 1024)) * 5)
+					self:ConsumeResource("water", self.coolant)
 				end
 			end
 		end
 	end
+	self:TriggerWireOutputs()
+end
 
-	if WireAddon ~= nil then
-		Wire_TriggerOutput(self, "Oxygen-Level", tonumber(self:GetO2Percentage()))
-		Wire_TriggerOutput(self, "Temperature", tonumber(self.sbenvironment.temperature))
-		Wire_TriggerOutput(self, "Gravity", tonumber(self.sbenvironment.gravity))
+function ENT:TriggerWireOutputs()
+	if WireAddon == nil then
+		return
 	end
+	Wire_TriggerOutput(self, "Oxygen-Level", tonumber(self:GetO2Percentage()))
+	Wire_TriggerOutput(self, "Temperature", tonumber(self.sbenvironment.temperature))
+	Wire_TriggerOutput(self, "Gravity", tonumber(self.sbenvironment.gravity))
 end
 
 function ENT:Think()

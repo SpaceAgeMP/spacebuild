@@ -145,15 +145,14 @@ function CAFToolSetup.MakeFunc()
 	if CLIENT then return end
 
 	if TOOL.DevSelect and not TOOL.MakeFunc then
-		local self = TOOL
 		TOOL.MakeEnt = CAFEnts.MakeEnt
 
 		TOOL.MakeFunc = function(ply, Ang, Pos, class, type, sub_type, model, Frozen, Extra_Data, Data)
-			if not ply:CheckLimit(self.LimitName) then return end
-			local ent = self:MakeEnt(ply, Ang, Pos, class, type, sub_type, model, Frozen, Extra_Data, Data)
+			if not ply:CheckLimit(TOOL.LimitName) then return end
+			local ent = TOOL:MakeEnt(ply, Ang, Pos, class, type, sub_type, model, Frozen, Extra_Data, Data)
 			if not ent or not ent:IsValid() then return end
-			ply:AddCount(self.LimitName, ent)
-			ply:AddCleanup(self.Mode, ent)
+			ply:AddCount(TOOL.LimitName, ent)
+			ply:AddCleanup(TOOL.Mode, ent)
 
 			return ent
 		end

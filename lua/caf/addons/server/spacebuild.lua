@@ -1167,7 +1167,7 @@ function SB.FindVolume(name, radius)
 	end
 
 	volumes[name] = {
-		radius = radiusradius = radius,
+		radius = radius,
 		pos = Vector(0, 0, 0)
 	}
 	local tries = VolCheckIterations:GetInt()

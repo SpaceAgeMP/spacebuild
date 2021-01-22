@@ -229,195 +229,180 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local mode = self:GetNWInt("overlaymode")
 
 	-- Don't enable it if disabled by default!
-	if RD_OverLay_Mode and mode ~= 0 then
-		if RD_OverLay_Mode.GetInt then
-			local nr = math.Round(RD_OverLay_Mode:GetInt())
+	if RD_OverLay_Mode and mode ~= 0 and RD_OverLay_Mode.GetInt then
+		local nr = math.Round(RD_OverLay_Mode:GetInt())
 
-			if nr >= 0 and nr <= 2 then
-				mode = nr
-			end
+		if nr >= 0 and nr <= 2 then
+			mode = nr
 		end
 	end
 
 	local rd_overlay_dist = 512
 
-	if RD_OverLay_Distance then
-		if RD_OverLay_Distance.GetInt then
-			local nr = RD_OverLay_Distance:GetInt()
+	if RD_OverLay_Distance and RD_OverLay_Distance.GetInt then
+		local nr = RD_OverLay_Distance:GetInt()
 
-			if nr >= 256 then
-				rd_overlay_dist = nr
-			end
+		if nr >= 256 then
+			rd_overlay_dist = nr
 		end
 	end
 
-	if (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
-		--overlaysettings
-		self.ConnectedPump = self:GetNWInt("connectedpump")
-		local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
-		local HasOOO = OverlaySettings.HasOOO
-		--End overlaysettings
-		local trace = LocalPlayer():GetEyeTrace()
+	if (not bDontDrawModel) then
+		self:DrawModel()
+	end
 
-		if (not bDontDrawModel) then
-			self:DrawModel()
-		end
+	if not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
+		return
+	end
+	--overlaysettings
+	self.ConnectedPump = self:GetNWInt("connectedpump")
+	local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
+	local HasOOO = OverlaySettings.HasOOO
+	--End overlaysettings
+	local trace = LocalPlayer():GetEyeTrace()
 
-		local netid = self:GetNWInt("netid")
-		local playername = self:GetPlayerName()
 
-		if playername == "" then
-			playername = "World"
-		end
 
-		-- 0 = no overlay!
-		-- 1 = default overlaytext
-		-- 2 = new overlaytext
-		if not mode or mode ~= 2 then
-			local OverlayText = ""
-			OverlayText = OverlayText .. self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")\n"
+	local netid = self:GetNWInt("netid")
+	local playername = self:GetPlayerName()
 
-			if netid == 0 then
-				OverlayText = OverlayText .. "Not connected to a network\n"
-			else
-				OverlayText = OverlayText .. "Network " .. netid .. "\n"
-			end
+	if playername == "" then
+		playername = "World"
+	end
 
-			if self.ConnectedPump and self.ConnectedPump > 0 then
-				OverlayText = OverlayText .. "Connect to pump " .. tostring(self.ConnectedPump) .. "\n"
-			else
-				OverlayText = OverlayText .. "Not connected to another pump\n"
-			end
+	-- 0 = no overlay!
+	-- 1 = default overlaytext
+	-- 2 = new overlaytext
+	if not mode or mode ~= 2 then
+		local OverlayText = ""
+		OverlayText = OverlayText .. self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")\n"
 
-			OverlayText = OverlayText .. "Owner: " .. playername .. "\n"
-
-			if HasOOO then
-				local runmode = "UnKnown"
-
-				if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
-					runmode = OOO[self:GetOOO()]
-				end
-
-				OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
-			end
-
-			if (table.Count(self.ResourcesToSend) > 0) then
-				for k, v in pairs(self.ResourcesToSend) do
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "\n"
-				end
-			else
-				OverlayText = OverlayText .. "No Resources Are Being Transfered\n"
-			end
-
-			AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
+		if netid == 0 then
+			OverlayText = OverlayText .. "Not connected to a network\n"
 		else
-			local TempY = 0
-			--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
-			local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
-			local angle = (LocalPlayer():GetPos() - trace.HitPos):Angle()
-			angle.r = angle.r + 90
-			angle.y = angle.y + 90
-			angle.p = 0
-			local textStartPos = -375
-			cam.Start3D2D(pos, angle, 0.03)
-			surface.SetDrawColor(0, 0, 0, 125)
-			surface.DrawRect(textStartPos, 0, 1250, 500)
-			surface.SetDrawColor(155, 155, 155, 255)
-			surface.DrawRect(textStartPos, 0, -5, 500)
-			surface.DrawRect(textStartPos, 0, 1250, -5)
-			surface.DrawRect(textStartPos, 500, 1250, -5)
-			surface.DrawRect(textStartPos + 1250, 0, 5, 500)
-			TempY = TempY + 10
-			surface.SetFont("ConflictText")
-			surface.SetTextColor(255, 255, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
-			surface.DrawText(self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")")
-			TempY = TempY + 70
-			surface.SetFont("Flavour")
-			surface.SetTextColor(155, 155, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
-			surface.DrawText("Owner: " .. playername)
-			TempY = TempY + 70
-			surface.SetFont("Flavour")
-			surface.SetTextColor(155, 155, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
+			OverlayText = OverlayText .. "Network " .. netid .. "\n"
+		end
 
-			if netid then
-				surface.DrawText("Not connected to a network")
-			else
-				surface.DrawText("Network " .. netid)
+		if self.ConnectedPump and self.ConnectedPump > 0 then
+			OverlayText = OverlayText .. "Connect to pump " .. tostring(self.ConnectedPump) .. "\n"
+		else
+			OverlayText = OverlayText .. "Not connected to another pump\n"
+		end
+
+		OverlayText = OverlayText .. "Owner: " .. playername .. "\n"
+
+		if HasOOO then
+			local runmode = "UnKnown"
+
+			if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
+				runmode = OOO[self:GetOOO()]
 			end
 
-			TempY = TempY + 70
-			surface.SetFont("Flavour")
-			surface.SetTextColor(155, 155, 255, 255)
-			surface.SetTextPos(textStartPos + 15, TempY)
+			OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
+		end
 
-			if self.ConnectedPump and self.ConnectedPump > 0 then
-				surface.DrawText("Connected to pump " .. tostring(self.ConnectedPump))
-			else
-				surface.DrawText("Not connected to another pump")
+		if (table.Count(self.ResourcesToSend) > 0) then
+			for k, v in pairs(self.ResourcesToSend) do
+				OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "\n"
 			end
+		else
+			OverlayText = OverlayText .. "No Resources Are Being Transfered\n"
+		end
 
-			TempY = TempY + 70
+		AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
+		return
+	end
+	local TempY = 0
+	--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
+	local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
+	local angle = (LocalPlayer():GetPos() - trace.HitPos):Angle()
+	angle.r = angle.r + 90
+	angle.y = angle.y + 90
+	angle.p = 0
+	local textStartPos = -375
+	cam.Start3D2D(pos, angle, 0.03)
+	surface.SetDrawColor(0, 0, 0, 125)
+	surface.DrawRect(textStartPos, 0, 1250, 500)
+	surface.SetDrawColor(155, 155, 155, 255)
+	surface.DrawRect(textStartPos, 0, -5, 500)
+	surface.DrawRect(textStartPos, 0, 1250, -5)
+	surface.DrawRect(textStartPos, 500, 1250, -5)
+	surface.DrawRect(textStartPos + 1250, 0, 5, 500)
+	TempY = TempY + 10
+	surface.SetFont("ConflictText")
+	surface.SetTextColor(255, 255, 255, 255)
+	surface.SetTextPos(textStartPos + 15, TempY)
+	surface.DrawText(self:GetNWString("name") .. " (" .. tostring(self:EntIndex()) .. ")")
+	TempY = TempY + 70
+	surface.SetFont("Flavour")
+	surface.SetTextColor(155, 155, 255, 255)
+	surface.SetTextPos(textStartPos + 15, TempY)
+	surface.DrawText("Owner: " .. playername)
+	TempY = TempY + 70
+	surface.SetTextPos(textStartPos + 15, TempY)
 
-			if HasOOO then
-				local runmode = "UnKnown"
+	if netid then
+		surface.DrawText("Not connected to a network")
+	else
+		surface.DrawText("Network " .. netid)
+	end
 
-				if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
-					runmode = OOO[self:GetOOO()]
-				end
+	TempY = TempY + 70
+	surface.SetTextPos(textStartPos + 15, TempY)
 
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("Mode: " .. runmode)
-				TempY = TempY + 70
-			end
+	if self.ConnectedPump and self.ConnectedPump > 0 then
+		surface.DrawText("Connected to pump " .. tostring(self.ConnectedPump))
+	else
+		surface.DrawText("Not connected to another pump")
+	end
 
-			-- Print the used resources
-			local stringUsage = ""
+	TempY = TempY + 70
 
-			if (table.Count(self.ResourcesToSend) > 0) then
-				local i = 0
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("Resources Being Transfered: ")
-				TempY = TempY + 70
+	if HasOOO then
+		local runmode = "UnKnown"
 
-				for k, v in pairs(self.ResourcesToSend) do
-					stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "] "
-					i = i + 1
+		if self:GetOOO() >= 0 and self:GetOOO() <= 2 then
+			runmode = OOO[self:GetOOO()]
+		end
 
-					if i == 3 then
-						surface.SetTextPos(textStartPos + 15, TempY)
-						surface.DrawText("   " .. stringUsage)
-						TempY = TempY + 70
-						stringUsage = ""
-						i = 0
-					end
-				end
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("Mode: " .. runmode)
+		TempY = TempY + 70
+	end
 
+	-- Print the used resources
+	local stringUsage = ""
+
+	if (table.Count(self.ResourcesToSend) > 0) then
+		local i = 0
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("Resources Being Transfered: ")
+		TempY = TempY + 70
+
+		for k, v in pairs(self.ResourcesToSend) do
+			stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "] "
+			i = i + 1
+
+			if i == 3 then
 				surface.SetTextPos(textStartPos + 15, TempY)
 				surface.DrawText("   " .. stringUsage)
 				TempY = TempY + 70
-			else
-				surface.SetFont("Flavour")
-				surface.SetTextColor(155, 155, 255, 255)
-				surface.SetTextPos(textStartPos + 15, TempY)
-				surface.DrawText("No resources Being Transfered")
-				TempY = TempY + 70
+				stringUsage = ""
+				i = 0
 			end
+		end
 
-			--Stop rendering
-			cam.End3D2D()
-		end
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("   " .. stringUsage)
+		TempY = TempY + 70
 	else
-		if (not bDontDrawModel) then
-			self:DrawModel()
-		end
+		surface.SetTextPos(textStartPos + 15, TempY)
+		surface.DrawText("No resources Being Transfered")
+		TempY = TempY + 70
 	end
+
+	--Stop rendering
+	cam.End3D2D()
 end
 
 if Wire_UpdateRenderBounds then

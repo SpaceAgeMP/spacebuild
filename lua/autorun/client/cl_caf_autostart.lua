@@ -136,8 +136,6 @@ function CAF2.ClearDebugFile(filename)
 	local contents = file.Read("CAF_Debug/client/" .. filename .. ".txt")
 	contents = contents or ""
 	file.Write("CAF_Debug/client/" .. filename .. ".txt", "")
-
-	return content
 end
 
 --Server-Client Synchronisation
@@ -315,12 +313,10 @@ local function GetHelpPanel(frame)
 		MainInfoMenuData = {}
 
 		for k, v in pairs(Addons) do
-			local ok, err = pcall(v.GetMenu)
+			local content = v.GetMenu()
 
-			if ok then
-				if err then
-					MainInfoMenuData[k] = err
-				end
+			if content then
+				MainInfoMenuData[k] = content
 			end
 		end
 	end

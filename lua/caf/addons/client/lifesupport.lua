@@ -114,6 +114,7 @@ local function lifesupport_HUDPaint()
 			draw.DrawText(tostring(Air) .. "% (" .. tostring(air_time_left) .. "s)", hud.Font, hud.Right, hud.H2 + 5, valcol, 2)
 		end
 		return
+	end
 	if ply:WaterLevel() > 2 or ls_environment.o2 < 5 or (ls_environment.temperature > 0 and not (ls_environment.temperature >= FairTemp_Min and ls_environment.temperature <= FairTemp_Max)) or (ply.LSHudOn and ply.LSHudOn == true) then
 		if hud_to_use == 2 then
 			local hud = huds[2]
