@@ -937,7 +937,11 @@ function SB.PerformEnvironmentCheckOnEnt(ent)
 	end
 
 	if ent:IsPlayer() then
-		if SB_InSpace == 1 and (ent.environment == sb_space.Get() or (ent.environment and (not ent.environment:IsPlanet()) and ent.environment.environment and ent.environment.environment == sb_space.Get())) and not ent:InVehicle() or not game.SinglePlayer() and not AllowAdminNoclip(ent) and ent:GetMoveType() == MOVETYPE_NOCLIP then
+		if (SB_InSpace == 1 and (ent.environment == sb_space.Get()  or (ent.environment and (not ent.environment:IsPlanet()) and ent.environment.environment and ent.environment.environment == sb_space.Get()))) and
+			(not ent:InVehicle() or not game.SinglePlayer()) and
+			not AllowAdminNoclip(ent) and
+			ent:GetMoveType() == MOVETYPE_NOCLIP
+		 then
 			ent:SetMoveType(MOVETYPE_WALK)
 		end
 
