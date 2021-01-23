@@ -52,54 +52,56 @@ function TOOL:RightClick(trace)
 
 	--local Phys = trace.Entity:GetPhysicsObjectNum( trace.PhysicsBone )
 	--self:SetObject( iNum + 1, trace.Entity, trace.HitPos, Phys, trace.PhysicsBone, trace.HitNormal )
-	if (iNum > 0 and trace.Entity.IsNode) then
-		-- Get information we're about to use
-		for k, v in pairs(self.Objects) do
-			local Ent1, Ent2 = self:GetEnt(k), trace.Entity
-			--local Bone1, Bone2 = self:GetBone(k),	trace.PhysicsBone
-			local WPos1, WPos2 = self:GetPos(k), trace.Entity:GetPos()
-			--local LPos1, LPos2 = self:GetLocalPos(k),	self:GetLocalPos(2)
-			local length = (WPos1 - WPos2):Length()
-			Ent1:SetColor(Color(255, 255, 255, 255))
-
-			--Possible
-			---- Ent - Node V
-			---- Node - Ent V
-			---- Node - Node V
-			---- Ent - Cutoff valve V
-			---- Node - Cutoff valve V
-			---- Cutoff valve - node V
-			---- Cutoff valve - ent V
-			---- pump - node
-			---- node - pump
-			if Ent1.IsNode then
-				if length <= Ent1.range or length <= Ent2.range then
-					CAF.GetAddon("Resource Distribution").linkNodes(Ent1.netid, Ent2.netid)
-				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('The two Nodes are too far apart!', NOTIFY_GENERIC, 7);")
-				end
-			elseif table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent1)) > 0 then
-				if length <= Ent2.range then
-					CAF.GetAddon("Resource Distribution").Link(Ent1, Ent2.netid)
-				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
-				end
-			elseif Ent1.IsPump then
-				if length <= Ent2.range then
-					Ent1:SetNetwork(Ent2.netid)
-					Ent1.node = Ent2
-				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
-				end
-			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
-			end
-		end
-
-		self:ClearObjects()
-	else
+	if iNum <= 0 or not trace.Entity.IsNode then
 		self:GetOwner():SendLua("GAMEMODE:AddNotify(\"You didn't click on a Resource node to link to!\", NOTIFY_GENERIC, 7);")
+		return true
 	end
+
+	local rd = CAF.GetAddon("Resource Distribution")
+		-- Get information we're about to use
+	for k, v in pairs(self.Objects) do
+		local Ent1, Ent2 = self:GetEnt(k), trace.Entity
+		--local Bone1, Bone2 = self:GetBone(k),	trace.PhysicsBone
+		local WPos1, WPos2 = self:GetPos(k), trace.Entity:GetPos()
+		--local LPos1, LPos2 = self:GetLocalPos(k),	self:GetLocalPos(2)
+		local length = (WPos1 - WPos2):Length()
+		Ent1:SetColor(Color(255, 255, 255, 255))
+
+		--Possible
+		---- Ent - Node V
+		---- Node - Ent V
+		---- Node - Node V
+		---- Ent - Cutoff valve V
+		---- Node - Cutoff valve V
+		---- Cutoff valve - node V
+		---- Cutoff valve - ent V
+		---- pump - node
+		---- node - pump
+		if Ent1.IsNode then
+			if length <= Ent1.range or length <= Ent2.range then
+				CAF.GetAddon("Resource Distribution").linkNodes(Ent1.netid, Ent2.netid)
+			else
+				self:GetOwner():SendLua("GAMEMODE:AddNotify('The two Nodes are too far apart!', NOTIFY_GENERIC, 7);")
+			end
+		elseif table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent1)) > 0 then
+			if length <= Ent2.range then
+				CAF.GetAddon("Resource Distribution").Link(Ent1, Ent2.netid)
+			else
+				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+			end
+		elseif Ent1.IsPump then
+			if length <= Ent2.range then
+				Ent1:SetNetwork(Ent2.netid)
+				Ent1.node = Ent2
+			else
+				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+			end
+		else
+			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
+		end
+	end
+
+	self:ClearObjects()
 
 	return true
 end

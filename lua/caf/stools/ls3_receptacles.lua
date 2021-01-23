@@ -236,14 +236,15 @@ local function cache_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 		volume_mul = vol / base_volume
 	end
 
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "energy", math.Round(5500 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "oxygen", math.Round(6000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "hydrogen", math.Round(3000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "carbon dioxide", math.Round(5000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "nitrogen", math.Round(7000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "liquid nitrogen", math.Round(7000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "water", math.Round(4000 * volume_mul))
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "heavy water", math.Round(360 * volume_mul))
+	local rd = CAF.GetAddon("Resource Distribution")
+	rd.AddResource(ent, "energy", math.Round(5500 * volume_mul))
+	rd.AddResource(ent, "oxygen", math.Round(6000 * volume_mul))
+	rd.AddResource(ent, "hydrogen", math.Round(3000 * volume_mul))
+	rd.AddResource(ent, "carbon dioxide", math.Round(5000 * volume_mul))
+	rd.AddResource(ent, "nitrogen", math.Round(7000 * volume_mul))
+	rd.AddResource(ent, "liquid nitrogen", math.Round(7000 * volume_mul))
+	rd.AddResource(ent, "water", math.Round(4000 * volume_mul))
+	rd.AddResource(ent, "heavy water", math.Round(360 * volume_mul))
 	local mass = math.Round(base_mass * volume_mul)
 	ent.mass = mass
 	local maxhealth = math.Round(base_health * volume_mul)

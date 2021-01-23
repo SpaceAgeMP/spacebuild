@@ -186,7 +186,9 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		return
 	end
 
-	local enttable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	local rd = CAF.GetAddon("Resource Distribution")
+
+	local enttable = rd.GetEntityTable(self)
 	local TempY = 0
 	local mul_up = 5.2
 	local mul_ri = -16.5
@@ -194,21 +196,22 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local res = 0.05
 	local mul = 1
 
-	if string.find(self:GetModel(), "s_small_screen") then
+	local mdl = self:GetModel()
+	if string.find(mdl, "s_small_screen") then
 		mul_ri = -8.25
 		mul_fr = -6.25
 		res = 0.025
 		mul = 0.5
-	elseif string.find(self:GetModel(), "small_screen") then
+	elseif string.find(mdl, "small_screen") then
 		mul_ri = -16.5
 		mul_fr = -12.5
 		res = 0.05
-	elseif string.find(self:GetModel(), "medium_screen") then
+	elseif string.find(mdl, "medium_screen") then
 		mul_ri = -33
 		mul_fr = -25
 		res = 0.1
 		mul = 1.5
-	elseif string.find(self:GetModel(), "large_screen") then
+	elseif string.find(mdl, "large_screen") then
 		mul_ri = -66
 		mul_fr = -50
 		res = 0.2
@@ -221,9 +224,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		angle.r = angle.r  + 90
 		angle.y = angle.y + 90
 		angle.p = 0]]
-	local angle = self:GetAngles()
 	local textStartPos = -375
-	cam.Start3D2D(pos, angle, res)
+	cam.Start3D2D(pos, self:GetAngles(), res)
 	surface.SetDrawColor(0, 0, 0, 255)
 	surface.DrawRect(textStartPos, 0, 1250, 675)
 	surface.SetDrawColor(155, 155, 255, 255)
@@ -238,8 +240,11 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	surface.DrawText("Resource: amount/maxamount\t[amount/maxamount in other nodes]")
 	TempY = TempY + (70 / mul)
 
+
 	if (table.Count(self.resources) > 0) then
 		local i = 0
+
+		local nettable = enttable.network and enttable.network ~= 0 and rd.GetNetTable(enttable.network)
 
 		for k, v in pairs(self.resources) do
 			surface.SetTextPos(textStartPos + 15, TempY)
@@ -248,21 +253,19 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			local otherNetworksCapacity = 0
 			local otherNetworksAmount = 0
 
-			if enttable.network and enttable.network ~= 0 then
-				local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(enttable.network)
-
+			if nettable then
 				if nettable.resources and nettable.resources[v] then
 					firstNetworkCapacity = nettable.resources[v].localmaxvalue or 0
 					firstNetworkAmount = nettable.resources[v].localvalue or 0
-					otherNetworksCapacity = CAF.GetAddon("Resource Distribution").GetNetNetworkCapacity(enttable.network, v) - firstNetworkCapacity
-					otherNetworksAmount = CAF.GetAddon("Resource Distribution").GetNetResourceAmount(enttable.network, v) - firstNetworkAmount
+					otherNetworksCapacity = rd.GetNetNetworkCapacity(enttable.network, v) - firstNetworkCapacity
+					otherNetworksAmount = rd.GetNetResourceAmount(enttable.network, v) - firstNetworkAmount
 				else
-					otherNetworksCapacity = CAF.GetAddon("Resource Distribution").GetNetNetworkCapacity(enttable.network, v)
-					otherNetworksAmount = CAF.GetAddon("Resource Distribution").GetNetResourceAmount(enttable.network, v)
+					otherNetworksCapacity = rd.GetNetNetworkCapacity(enttable.network, v)
+					otherNetworksAmount = rd.GetNetResourceAmount(enttable.network, v)
 				end
 			end
 
-			surface.DrawText(tostring(CAF.GetAddon("Resource Distribution").GetProperResourceName(v)) .. ": " .. tostring(firstNetworkAmount) .. "/" .. tostring(firstNetworkCapacity) .. "\t[" .. tostring(otherNetworksAmount) .. "/" .. tostring(otherNetworksCapacity) .. "]")
+			surface.DrawText(tostring(rd.GetProperResourceName(v)) .. ": " .. tostring(firstNetworkAmount) .. "/" .. tostring(firstNetworkCapacity) .. "\t[" .. tostring(otherNetworksAmount) .. "/" .. tostring(otherNetworksCapacity) .. "]")
 			TempY = TempY + (70 / mul)
 			i = i + 1
 			if i >= 8 * mul then break end

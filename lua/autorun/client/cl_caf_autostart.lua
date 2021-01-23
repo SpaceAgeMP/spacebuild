@@ -317,10 +317,6 @@ local function GetHelpPanel(frame)
 				end
 			end
 
-			function Node.DoRightClick(btn)
-				-- To Implement
-			end
-
 			for m, x in pairs(w) do
 				--Links in submenu
 				local cnode = Node:AddNode(m)
@@ -337,10 +333,6 @@ local function GetHelpPanel(frame)
 						HTMLTest:StretchToParent(10, 10, 10, 10)
 						HTMLTest:SetHTML(file.Read(x.localurl))
 					end
-				end
-
-				function cnode.DoRightClick(btn)
-					-- To Implement
 				end
 			end
 		end
@@ -525,92 +517,93 @@ local function GetStatusPanel(frame)
 	AddCAFInfoToStatus(List)
 
 	for k, v in pairs(Addons) do
-		if v.IsVisible == nil or v.IsVisible() then
-			local descriptiontxt = nil
+		if not v.IsVisible or not v.IsVisible() then
+			continue
+		end
+		local descriptiontxt = nil
 
-			if v.GetDescription then
-				descriptiontxt = v.GetDescription()
-				--else
-				--	descriptiontxt = {CAF.GetLangVar("No Description")};
-			end
+		if v.GetDescription then
+			descriptiontxt = v.GetDescription()
+			--else
+			--	descriptiontxt = {CAF.GetLangVar("No Description")};
+		end
 
-			local cat = vgui.Create("DCAFCollapsibleCategory")
-			cat:Setup(k, v)
-			--cat:SetExtraButtonAction(function() frame:Close()  end)
-			local contentpanel = vgui.Create("DPanelList", cat)
-			contentpanel:SetWide(List:GetWide())
-			local clientMenu = nil
+		local cat = vgui.Create("DCAFCollapsibleCategory")
+		cat:Setup(k, v)
+		--cat:SetExtraButtonAction(function() frame:Close()  end)
+		local contentpanel = vgui.Create("DPanelList", cat)
+		contentpanel:SetWide(List:GetWide())
+		local clientMenu = nil
 
-			if v.GetClientMenu then
-				clientMenu = v.GetClientMenu(contentpanel)
-			end
+		if v.GetClientMenu then
+			clientMenu = v.GetClientMenu(contentpanel)
+		end
 
-			local serverMenu = nil
+		local serverMenu = nil
 
-			if v.GetServerMenu then
-				serverMenu = v.GetServerMenu(contentpanel)
-			end
+		if v.GetServerMenu then
+			serverMenu = v.GetServerMenu(contentpanel)
+		end
 
-			--Start Add Custom Stuff
-			local x = 0
-			local y = 0
-			--Version Check
-			local versionupdatetext = vgui.Create("DLabel", contentpanel)
-			versionupdatetext:SetPos(x + 10, y)
-			versionupdatetext:SetText(CAF.GetLangVar("No Update Information Available"))
-			versionupdatetext:SetTextColor(Color(200, 200, 0, 200))
-			versionupdatetext:SizeToContents()
-			y = y + 30
+		--Start Add Custom Stuff
+		local x = 0
+		local y = 0
+		--Version Check
+		local versionupdatetext = vgui.Create("DLabel", contentpanel)
+		versionupdatetext:SetPos(x + 10, y)
+		versionupdatetext:SetText(CAF.GetLangVar("No Update Information Available"))
+		versionupdatetext:SetTextColor(Color(200, 200, 0, 200))
+		versionupdatetext:SizeToContents()
+		y = y + 30
 
-			--ServerMenu
-			if serverMenu then
-				serverMenu:SetPos(x, y)
-				y = y + serverMenu:GetTall() + 15
-			end
+		--ServerMenu
+		if serverMenu then
+			serverMenu:SetPos(x, y)
+			y = y + serverMenu:GetTall() + 15
+		end
 
-			--Clientside menu
-			if clientMenu then
-				clientMenu:SetPos(x, y)
-				y = y + clientMenu:GetTall() + 15
-			end
+		--Clientside menu
+		if clientMenu then
+			clientMenu:SetPos(x, y)
+			y = y + clientMenu:GetTall() + 15
+		end
+
+		--Description
+		if descriptiontxt ~= nil then
+			local list = vgui.Create("DPanelList", contentpanel)
+			list:SetPos(x, y)
+			local size = 1
+			list:SetPadding(10)
+			--Description Blank Line
+			lab = vgui.Create("DLabel", list)
+			lab:SetText(CAF.GetLangVar("Description") .. ":")
+			lab:SizeToContents()
+			list:AddItem(lab)
+			size = size + 1
 
 			--Description
-			if descriptiontxt ~= nil then
-				local list = vgui.Create("DPanelList", contentpanel)
-				list:SetPos(x, y)
-				local size = 1
-				list:SetPadding(10)
-				--Description Blank Line
+			for k, v in pairs(descriptiontxt) do
 				lab = vgui.Create("DLabel", list)
-				lab:SetText(CAF.GetLangVar("Description") .. ":")
+				lab:SetText(v)
 				lab:SizeToContents()
 				list:AddItem(lab)
 				size = size + 1
-
-				--Description
-				for k, v in pairs(descriptiontxt) do
-					lab = vgui.Create("DLabel", list)
-					lab:SetText(v)
-					lab:SizeToContents()
-					list:AddItem(lab)
-					size = size + 1
-				end
-
-				list:SetSize(List:GetWide() - 10, 15 * size)
-				contentpanel:SizeToContents()
-				y = y + (15 * size) + 15
 			end
 
-			contentpanel:SetTall(y)
-			--End Add Custom Stuff
-			cat:SetContents(contentpanel)
-			cat:SizeToContents()
-			cat:InvalidateLayout()
-
-			cat:SetExpanded(false)
-			--end
-			List:AddItem(cat)
+			list:SetSize(List:GetWide() - 10, 15 * size)
+			contentpanel:SizeToContents()
+			y = y + (15 * size) + 15
 		end
+
+		contentpanel:SetTall(y)
+		--End Add Custom Stuff
+		cat:SetContents(contentpanel)
+		cat:SizeToContents()
+		cat:InvalidateLayout()
+
+		cat:SetExpanded(false)
+		--end
+		List:AddItem(cat)
 	end
 
 	return panel
@@ -666,7 +659,6 @@ local function GetAboutPanel(frame)
 	mylist:AddLine("", "More info to be added")
 	mylist:AddLine("", "")
 	mylist:AddLine("", "Made By SnakeSVx")
-	mylist:AddLine("", "Official website: http://www.snakesvx.net")
 	--
 
 	return panel
@@ -750,9 +742,9 @@ net.Receive("CAF_Addon_POPUP", ProccessMessage)
 --CAF = CAF2
 --Include clientside files
 --Core
-local Files = file.Find("caf/core/client/*.lua", "LUA")
+local coreFiles = file.Find("caf/core/client/*.lua", "LUA")
 
-for k, File in ipairs(Files) do
+for k, File in ipairs(coreFiles) do
 	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/core/client/" .. File)
 
@@ -763,9 +755,9 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("caf/languagevars/*.lua", "LUA")
+local languageFiles = file.Find("caf/languagevars/*.lua", "LUA")
 
-for k, File in ipairs(Files) do
+for k, File in ipairs(languageFiles) do
 	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
 
@@ -777,9 +769,9 @@ for k, File in ipairs(Files) do
 end
 
 --Addons
-local Files = file.Find("caf/addons/client/*.lua", "LUA")
+local addonFiles = file.Find("caf/addons/client/*.lua", "LUA")
 
-for k, File in ipairs(Files) do
+for k, File in ipairs(addonFiles) do
 	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/client/" .. File)
 

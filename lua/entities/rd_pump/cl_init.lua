@@ -302,8 +302,9 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 
 		if (table.Count(self.ResourcesToSend) > 0) then
+			local rd = CAF.GetAddon("Resource Distribution")
 			for k, v in pairs(self.ResourcesToSend) do
-				OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "\n"
+				OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. tostring(v) .. "\n"
 			end
 		else
 			OverlayText = OverlayText .. "No Resources Are Being Transfered\n"
@@ -379,8 +380,10 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		surface.DrawText("Resources Being Transfered: ")
 		TempY = TempY + 70
 
+		local rd = CAF.GetAddon("Resource Distribution")
+
 		for k, v in pairs(self.ResourcesToSend) do
-			stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. tostring(v) .. "] "
+			stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. tostring(v) .. "] "
 			i = i + 1
 
 			if i == 3 then

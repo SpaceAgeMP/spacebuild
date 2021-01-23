@@ -70,8 +70,10 @@ function ENT:TurnOn()
 	if self.Active == 1 or not self.connected.ent or not self.connected.node then
 		return
 	end
-	CAF.GetAddon("Resource Distribution").Unlink(self.connected.ent)
-	CAF.GetAddon("Resource Distribution").Link(self.connected.ent, self.connected.node.netid)
+	local rd = CAF.GetAddon("Resource Distribution")
+
+	rd.Unlink(self.connected.ent)
+	rd.Link(self.connected.ent, self.connected.node.netid)
 	self.Active = 1
 	self:SetOOO(1)
 

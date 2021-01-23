@@ -8,14 +8,13 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	if not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < 256 and mode ~= 0) then
+	local trace = LocalPlayer():GetEyeTrace()
+	if not (trace.Entity == self and EyePos():Distance(self:GetPos()) < 256 and mode ~= 0) then
 		return
 	end
-	local trace = LocalPlayer():GetEyeTrace()
 
-
-
-	local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	local rd = CAF.GetAddon("Resource Distribution")
+	local nettable = rd.GetEntityTable(self)
 	if table.Count(nettable) <= 0 then return end
 	local playername = self:GetPlayerName()
 
@@ -42,8 +41,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 
 		OverlayText = OverlayText .. "Connected resources:\n"
-		OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName("carbon dioxide") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "carbon dioxide") .. "\n"
-		OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName("water") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "water") .. "\n"
+		OverlayText = OverlayText .. rd.GetProperResourceName("carbon dioxide") .. ": " .. rd.GetResourceAmount(self, "carbon dioxide") .. "\n"
+		OverlayText = OverlayText .. rd.GetProperResourceName("water") .. ": " .. rd.GetResourceAmount(self, "water") .. "\n"
 		AddWorldTip(self:EntIndex(), OverlayText, 0.5, self:GetPos(), self)
 		return
 	end
@@ -94,12 +93,12 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	TempY = TempY + 70
 	local stringUsage = ""
 	surface.SetTextPos(textStartPos + 15, TempY)
-	stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName("water") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "water") .. "] "
+	stringUsage = stringUsage .. "[" .. rd.GetProperResourceName("water") .. ": " .. rd.GetResourceAmount(self, "water") .. "] "
 	surface.DrawText(stringUsage)
 	TempY = TempY + 70
 	stringUsage = ""
 	surface.SetTextPos(textStartPos + 15, TempY)
-	stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName("carbon dioxide") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "carbon dioxide") .. "] "
+	stringUsage = stringUsage .. "[" .. rd.GetProperResourceName("carbon dioxide") .. ": " .. rd.GetResourceAmount(self, "carbon dioxide") .. "] "
 	surface.DrawText(stringUsage)
 	TempY = TempY + 70
 	cam.End3D2D()

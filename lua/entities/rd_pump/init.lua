@@ -348,15 +348,13 @@ end
 function ENT:Send(resource, amount)
 	if not self.otherpump then return end
 	local left = self.otherpump:Receive(resource, amount)
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.ConsumeNetResource(self.netid, resource, amount - left)
+	CAF.GetAddon("Resource Distribution").ConsumeNetResource(self.netid, resource, amount - left)
 end
 
 function ENT:Receive(resource, amount)
 	if not self.otherpump then return end
-	local RD = CAF.GetAddon("Resource Distribution")
 
-	return RD.SupplyNetResource(self.netid, resource, amount)
+	return CAF.GetAddon("Resource Distribution").SupplyNetResource(self.netid, resource, amount)
 end
 
 function ENT:Connect(ent)
@@ -387,8 +385,9 @@ end
 
 function ENT:OnRemove()
 	self:Disconnect()
-	CAF.GetAddon("Resource Distribution").Unlink(self)
-	CAF.GetAddon("Resource Distribution").RemoveRDEntity(self)
+	local rd = CAF.GetAddon("Resource Distribution")
+	rd.Unlink(self)
+	rd.RemoveRDEntity(self)
 
 	if WireAddon ~= nil then
 		Wire_Remove(self)
@@ -402,8 +401,7 @@ function ENT:OnRestore()
 end
 
 function ENT:PreEntityCopy()
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.BuildDupeInfo(self)
+	CAF.GetAddon("Resource Distribution").BuildDupeInfo(self)
 
 	if WireAddon ~= nil then
 		local DupeInfo = WireLib.BuildDupeInfo(self)
@@ -415,8 +413,7 @@ function ENT:PreEntityCopy()
 end
 
 function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.ApplyDupeInfo(Ent, CreatedEntities)
+	CAF.GetAddon("Resource Distribution").ApplyDupeInfo(Ent, CreatedEntities)
 
 	if WireAddon ~= nil and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)

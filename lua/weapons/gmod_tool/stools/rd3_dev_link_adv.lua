@@ -39,27 +39,29 @@ function TOOL:LeftClick(tr)
 	--save clicked postion
 	self:SetObject(iNum, tr.Entity, tr.HitPos, tr.Entity:GetPhysicsObjectNum(tr.PhysicsBone), tr.PhysicsBone, tr.HitNormal)
 
+	local rd = CAF.GetAddon("Resource Distribution")
+
 	--first clicked object
 	if iNum == 1 then
 		--remove from any LS system since we are changing its link
-		CAF.GetAddon("Resource Distribution").Unlink(self:GetEnt(1))
+		rd.Unlink(self:GetEnt(1))
 
 		if self:GetEnt(1).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 		end
 
 		--save beam settings
-		CAF.GetAddon("Resource Distribution").Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
+		rd.Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
 	if iNum == 2 then
 		if self:GetEnt(2).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
+			rd.Beam_clear(self:GetEnt(2))
 		end
 	end
 
 	--add beam point
-	CAF.GetAddon("Resource Distribution").Beam_add(self:GetEnt(1), tr.Entity, tr.Entity:WorldToLocal(tr.HitPos + tr.HitNormal))
+	rd.Beam_add(self:GetEnt(1), tr.Entity, tr.Entity:WorldToLocal(tr.HitPos + tr.HitNormal))
 
 	--if finishing, run StartTouch on Resource Node to do link
 	if (iNum > 1) then
@@ -69,35 +71,35 @@ function TOOL:LeftClick(tr)
 
 		if Ent1.IsNode and Ent2.IsNode then
 			if length <= Ent1.range or length <= Ent2.range then
-				CAF.GetAddon("Resource Distribution").linkNodes(Ent1.netid, Ent2.netid)
+				rd.linkNodes(Ent1.netid, Ent2.netid)
 			else
 				self:GetOwner():SendLua("GAMEMODE:AddNotify('These 2 Nodes are too far apart!', NOTIFY_GENERIC, 7);")
 				--clear beam points
-				CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
 				--failure
 
 				return
 			end
-		elseif Ent1.IsNode and table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent2)) > 0 then
+		elseif Ent1.IsNode and table.Count(rd.GetEntityTable(Ent2)) > 0 then
 			if length <= Ent1.range then
-				CAF.GetAddon("Resource Distribution").Link(Ent2, Ent1.netid)
+				rd.Link(Ent2, Ent1.netid)
 			else
 				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
 				--clear beam points
-				CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
 				--failure
 
 				return
 			end
-		elseif Ent2.IsNode and table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent1)) > 0 then
+		elseif Ent2.IsNode and table.Count(rd.GetEntityTable(Ent1)) > 0 then
 			if length <= Ent2.range then
-				CAF.GetAddon("Resource Distribution").Link(Ent1, Ent2.netid)
+				rd.Link(Ent1, Ent2.netid)
 			else
 				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
 				--clear beam points
-				CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
 				--failure
 
@@ -110,7 +112,7 @@ function TOOL:LeftClick(tr)
 			else
 				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
 				--clear beam points
-				CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
 				--failure
 
@@ -124,7 +126,7 @@ function TOOL:LeftClick(tr)
 			else
 				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
 				--clear beam points
-				CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
 				--failure
 
@@ -133,7 +135,7 @@ function TOOL:LeftClick(tr)
 		else
 			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
 			--clear beam points
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects
 			--failure
 
@@ -142,7 +144,7 @@ function TOOL:LeftClick(tr)
 
 		--if first ent is the node, transfer beam info to last ent
 		if Ent1.IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
+			rd.Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
 		end
 	else
 		self:SetStage(iNum)
@@ -181,8 +183,10 @@ function TOOL:Reload(trace)
 	--if client exit
 	if (CLIENT) then return true end
 
+	local rd = CAF.GetAddon("Resource Distribution")
+
 	if trace.Entity.IsNode then
-		CAF.GetAddon("Resource Distribution").UnlinkAllFromNode(trace.Entity.netid)
+		rd.UnlinkAllFromNode(trace.Entity.netid)
 	elseif trace.Entity.IsValve then
 		if trace.Entity.IsEntityValve then
 			trace.Entity:SetRDEntity(nil)
@@ -192,13 +196,13 @@ function TOOL:Reload(trace)
 			trace.Entity:SetNode2(nil)
 		end
 
-		CAF.GetAddon("Resource Distribution").Beam_clear(trace.Entity)
+		rd.Beam_clear(trace.Entity)
 	elseif trace.Entity.IsPump then
 		trace.Entity.node = nil
 		trace.Entity:SetNetwork(0)
-		CAF.GetAddon("Resource Distribution").Beam_clear(trace.Entity)
+		rd.Beam_clear(trace.Entity)
 	else
-		CAF.GetAddon("Resource Distribution").Unlink(trace.Entity)
+		rd.Unlink(trace.Entity)
 	end
 
 	self:ClearObjects() --clear objects

@@ -43,25 +43,27 @@ function TOOL:LeftClick(trace)
 	--save clicked postion
 	self:SetObject(iNum, trace.Entity, trace.HitPos, trace.Entity:GetPhysicsObjectNum(trace.PhysicsBone), trace.PhysicsBone, trace.HitNormal)
 
+	local rd = CAF.GetAddon("Resource Distribution")
+
 	--first clicked object
 	if iNum == 1 then
 		--remove from any LS system since we are changing its link
-		CAF.GetAddon("Resource Distribution").Unlink(self:GetEnt(1))
+		rd.Unlink(self:GetEnt(1))
 
 		if self:GetEnt(1).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 		end
 
 		--save beam settings
-		CAF.GetAddon("Resource Distribution").Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
+		rd.Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
 	if iNum == 2 and self:GetEnt(2).IsNode then
-		CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
+		rd.Beam_clear(self:GetEnt(2))
 	end
 
 	--add beam point
-	CAF.GetAddon("Resource Distribution").Beam_add(self:GetEnt(1), trace.Entity, trace.Entity:WorldToLocal(trace.HitPos + trace.HitNormal))
+	rd.Beam_add(self:GetEnt(1), trace.Entity, trace.Entity:WorldToLocal(trace.HitPos + trace.HitNormal))
 
 	--if finishing, run StartTouch on Resource Node to do link
 	if (iNum > 1) then
@@ -83,7 +85,7 @@ function TOOL:LeftClick(trace)
 		else
 			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
 			--clear beam points
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects
 			--failure
 
@@ -92,7 +94,7 @@ function TOOL:LeftClick(trace)
 
 		--if first ent is the node, transfer beam info to last ent
 		if Ent1.IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
+			rd.Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
 		end
 
 		self:ClearObjects() --clear objects
@@ -116,25 +118,27 @@ function TOOL:RightClick(trace)
 	--save clicked postion
 	self:SetObject(iNum, trace.Entity, trace.HitPos, trace.Entity:GetPhysicsObjectNum(trace.PhysicsBone), trace.PhysicsBone, trace.HitNormal)
 
+	local rd = CAF.GetAddon("Resource Distribution")
+
 	--first clicked object
 	if iNum == 1 then
 		--remove from any LS system since we are changing its link
-		CAF.GetAddon("Resource Distribution").Unlink(self:GetEnt(1))
+		rd.Unlink(self:GetEnt(1))
 
 		if self:GetEnt(1).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 		end
 
 		--save beam settings
-		CAF.GetAddon("Resource Distribution").Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
+		rd.Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
 	if iNum == 2 and self:GetEnt(2).IsNode then
-		CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
+		rd.Beam_clear(self:GetEnt(2))
 	end
 
 	--add beam point
-	CAF.GetAddon("Resource Distribution").Beam_add(self:GetEnt(1), trace.Entity, trace.Entity:WorldToLocal(trace.HitPos + trace.HitNormal))
+	rd.Beam_add(self:GetEnt(1), trace.Entity, trace.Entity:WorldToLocal(trace.HitPos + trace.HitNormal))
 
 	--if finishing, run StartTouch on Resource Node to do link
 	if (iNum > 1) then
@@ -156,7 +160,7 @@ function TOOL:RightClick(trace)
 		else
 			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
 			--clear beam points
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(1))
+			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects
 			--failure
 
@@ -165,7 +169,7 @@ function TOOL:RightClick(trace)
 
 		--if first ent is the node, transfer beam info to last ent
 		if Ent1.IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
+			rd.Beam_switch(self:GetEnt(1), self:GetEnt(iNum))
 		end
 
 		self:ClearObjects() --clear objects
@@ -183,8 +187,11 @@ function TOOL:Reload(trace)
 	--if client exit
 	if (CLIENT) then return true end
 
+	local rd = CAF.GetAddon("Resource Distribution")
+
+
 	if trace.Entity.IsNode then
-		CAF.GetAddon("Resource Distribution").UnlinkAllFromNode(trace.Entity.netid)
+		rd.UnlinkAllFromNode(trace.Entity.netid)
 	elseif trace.Entity.IsValve then
 		if trace.Entity.IsEntityValve then
 			trace.Entity:SetRDEntity(nil)
@@ -194,13 +201,13 @@ function TOOL:Reload(trace)
 			trace.Entity:SetNode2(nil)
 		end
 
-		CAF.GetAddon("Resource Distribution").Beam_clear(trace.Entity)
+		rd.Beam_clear(trace.Entity)
 	elseif trace.Entity.IsPump then
 		trace.Entity.node = nil
 		trace.Entity:SetNetwork(0)
-		CAF.GetAddon("Resource Distribution").Beam_clear(trace.Entity)
+		rd.Beam_clear(trace.Entity)
 	else
-		CAF.GetAddon("Resource Distribution").Unlink(trace.Entity)
+		rd.Unlink(trace.Entity)
 	end
 
 	self:ClearObjects() --clear objects

@@ -78,7 +78,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	local nettable = RD.GetEntityTable(self)
 	if table.Count(nettable) <= 0 then return end
 	local playername = self:GetPlayerName()
 
@@ -116,7 +116,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		if num == -1 then
 			if (table.Count(resources) > 0) then
 				for k, v in pairs(resources) do
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. RD.GetResourceAmount(self, k) .. "/" .. RD.GetNetworkCapacity(self, k) .. "\n"
 				end
 			else
 				OverlayText = OverlayText .. "No Resources Connected\n"
@@ -124,7 +124,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		else
 			if resnames and table.Count(resnames) > 0 then
 				for _, k in pairs(resnames) do
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. RD.GetResourceAmount(self, k) .. "/" .. RD.GetNetworkCapacity(self, k) .. "\n"
 				end
 			end
 		end
@@ -193,7 +193,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 		if num == -1 then
 			for k, v in pairs(resources) do
-				stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
+				stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. RD.GetResourceAmount(self, k) .. "/" .. RD.GetNetworkCapacity(self, k) .. "] "
 				i = i + 1
 
 				if i == 3 then
@@ -207,7 +207,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		else
 			if resnames then
 				for _, k in pairs(resnames) do
-					stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, k) .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, k) .. "] "
+					stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. RD.GetResourceAmount(self, k) .. "/" .. RD.GetNetworkCapacity(self, k) .. "] "
 					i = i + 1
 
 					if i == 3 then

@@ -50,15 +50,19 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 	end
 
+	local mdl = self:GetModel()
+
+
 	if (not bDontDrawModel) then
 		self:DrawModel()
 	end
-	if not ((EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) and ((mode ~= 1 and not string.find(self:GetModel(), "s_small_res")) or LocalPlayer():GetEyeTrace().Entity == self)) then
+	if not ((EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) and ((mode ~= 1 and not string.find(mdl, "s_small_res")) or LocalPlayer():GetEyeTrace().Entity == self)) then
 		return
 	end
 
 	local netid = self:GetNWInt("netid")
-	local nettable = CAF.GetAddon("Resource Distribution").GetNetTable(netid)
+	local rd = CAF.GetAddon("Resource Distribution")
+	local nettable = rd.GetNetTable(netid)
 	local range = self:GetNWInt("range")
 	local playername = self:GetPlayerName()
 	local nodename = self:GetNWString("rd_node_name")
@@ -70,7 +74,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	-- 0 = no overlay
 	-- 1 = default overlaytext
 	-- 2 = new overlaytext
-	if not mode or mode == 1 or string.find(self:GetModel(), "s_small_res") then
+	if not mode or mode == 1 or string.find(mdl, "s_small_res") then
 		local OverlayText = ""
 		OverlayText = OverlayText .. "Network " .. netid .. "\n"
 
@@ -100,7 +104,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			if (table.Count(resources) > 0) then
 				for k, v in pairs(resources) do
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
 			else
 				OverlayText = OverlayText .. "No Resources Connected\n"
@@ -115,11 +119,11 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local mul_ri = -16.5
 	local mul_fr = -12.5
 
-	if string.find(self:GetModel(), "small_res") then
+	if string.find(mdl, "small_res") then
 		mul_up = 5.2
-	elseif string.find(self:GetModel(), "medium_res") then
+	elseif string.find(mdl, "medium_res") then
 		mul_up = 10.2
-	elseif string.find(self:GetModel(), "large_res") then
+	elseif string.find(mdl, "large_res") then
 		mul_up = 15.2
 	end
 
@@ -201,23 +205,23 @@ function ENT:DoNormalDraw(bDontDrawModel)
 					surface.SetTextColor(200, 200, 255, 255)
 					amt = v.value / v.maxvalue
 					surface.SetTextPos(textStartPos + 15, TempY)
-					surface.DrawText("   " .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k))
-					surface.DrawOutlinedRect(-20, TempY - 5, -2 * (textStartPos) + 20, 40)
+					surface.DrawText("   " .. rd.GetProperResourceName(k))
+					surface.DrawOutlinedRect(-20, TempY - 5, -2 * textStartPos + 20, 40)
 					surface.DrawRect(-20, TempY - 5, ((-2 * textStartPos) + 20) * amt, 40)
 					TempY = TempY + 50
 					value, h = surface.GetTextSize(tostring(v.value))
 
 					if amt < 0.5 then
 						surface.SetTextColor(200, 200, 255, 255)
-						surface.SetTextPos(-2 * (textStartPos) * amt - 5, TempY - 15 - h)
+						surface.SetTextPos(-2 * textStartPos * amt - 5, TempY - 15 - h)
 						surface.DrawText(v.value)
 					else
 						surface.SetTextColor(0, 0, 0, 255)
-						surface.SetTextPos(-2 * (textStartPos) * amt - 15 - value, TempY - 15 - h)
+						surface.SetTextPos(-2 * textStartPos * amt - 15 - value, TempY - 15 - h)
 						surface.DrawText(v.value)
 					end
 				else
-					stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+					stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 					i = i + 1
 
 					if i == 3 then

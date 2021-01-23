@@ -388,7 +388,7 @@ list.Add("BeamMaterials", "cable/blue_elec")
 list.Add("BeamMaterials", "cable/physbeam")
 list.Add("BeamMaterials", "cable/hydra")
 --holds the materials
-beamMat = {}
+local beamMat = {}
 
 for _, mat in pairs(list.Get("BeamMaterials")) do
 	beamMat[mat] = Material(mat)

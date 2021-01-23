@@ -30,21 +30,22 @@ addonlevel[2] = {}
 addonlevel[3] = {}
 addonlevel[4] = {}
 addonlevel[5] = {}
-local hooks = {}
+local hooks = {
+	think = {},
+	think2 = {},
+	think3 = {},
+	OnEntitySpawn = {},
+	OnAddonDestruct = {},
+	OnAddonConstruct = {},
+	TOOL_Allow_Entity_Spawn = {}
+}
 CAF3.hooks = hooks
-hooks["think"] = {}
-hooks["think2"] = {}
-hooks["think3"] = {}
-hooks["OnEntitySpawn"] = {}
-hooks["OnAddonDestruct"] = {}
-hooks["OnAddonConstruct"] = {}
-hooks["TOOL_Allow_Entity_Spawn"] = {}
 
 function CAF2.AllowSpawn(type, sub_type, class, model)
-	for k, v in pairs(hooks["TOOL_Allow_Entity_Spawn"]) do
+	for k, v in pairs(hooks.TOOL_Allow_Entity_Spawn) do
 		local ok, err = pcall(type, sub_type, class, model)
 
-		if not (ok) then
+		if not ok then
 			CAF2.WriteToDebugFile("CAF_Hooks", "TOOL_Allow_Entity_Spawn Error: " .. err .. "\n")
 		else
 			if err == true then

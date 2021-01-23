@@ -14,7 +14,8 @@ CAFToolSetup.SetLang("Environmental Controls", "Create life support devices atta
 
 function TOOL.EnableFunc()
 	if not CAF then return false end
-	if not CAF.GetAddon("Resource Distribution") or not CAF.GetAddon("Resource Distribution").GetStatus() then return false end
+	local rd = CAF.GetAddon("Resource Distribution")
+	if not rd or not rd.GetStatus() then return false end
 
 	return true
 end

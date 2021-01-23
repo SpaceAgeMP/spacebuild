@@ -13,37 +13,38 @@ function ENT:Initialize()
 	self:SetNWInt("overlaymode", 1)
 	self:SetNWInt("OOO", 0)
 	self.Active = 0
-	self.Active = 0
-	self.sbenvironment = {}
-	self.sbenvironment.air = {}
-	self.sbenvironment.size = 0
-	self.sbenvironment.gravity = 0
-	self.sbenvironment.atmosphere = 0
-	self.sbenvironment.pressure = 0
-	self.sbenvironment.temperature = 0
-	self.sbenvironment.air.o2 = 0
-	self.sbenvironment.air.o2per = 0
-	self.sbenvironment.air.co2 = 0
-	self.sbenvironment.air.co2per = 0
-	self.sbenvironment.air.n = 0
-	self.sbenvironment.air.nper = 0
-	self.sbenvironment.air.h = 0
-	self.sbenvironment.air.hper = 0
-	self.sbenvironment.air.empty = 0
-	self.sbenvironment.air.emptyper = 0
-	self.sbenvironment.air.max = 0
-	self.sbenvironment.name = "No Name"
+	self.sbenvironment = {
+		air = {
+			o2 = 0,
+			o2per = 0,
+			co2 = 0,
+			co2per = 0,
+			n = 0,
+			nper = 0,
+			h = 0,
+			hper = 0,
+			empty = 0,
+			emptyper = 0,
+			max = 0
+		},
+		size = 0,
+		gravity = 0,
+		atmosphere = 0,
+		pressure = 0,
+		temperature = 0,
+		name = "No Name"
+	}
+
 	CAF.GetAddon("Spacebuild").AddEnvironment(self)
 end
 
+local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 --[[
 	Will add a new resource to the environment Air Supply, will try to fill up any Vacuum with the new Air if a Start value (either value or percentage)  is set
-
 ]]
 function ENT:AddExtraResource(res, start, ispercentage)
 	if not res then return false end
 
-	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 
 	if table.HasValue(ignore, res) then return false end
 
@@ -73,8 +74,6 @@ end
 function ENT:CheckAirValues()
 	local percentage = 0
 
-	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
-
 	for k, v in pairs(self.sbenvironment.air) do
 		if not table.HasValue(ignore, k) then
 			if v and v < 0 then
@@ -100,13 +99,13 @@ end
 	Will try to convert resource 1 to resource 2 for a certain amount
 ]]
 function ENT:ConvertResource(res1, res2, amount)
-	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 
 	if not res1 or not res2 or not amount or type(amount) ~= "number" then return 0 end
 
 	if type(res1) == "number" and type(res2) == "number" then
 		return self:Convert(res1, res2, amount)
-	elseif type(res1) == "number" then
+	end
+	if type(res1) == "number" then
 		if table.HasValue(ignore, res2) then return 0 end
 
 		if not self.sbenvironment.air[res2] then
@@ -126,7 +125,8 @@ function ENT:ConvertResource(res1, res2, amount)
 		end
 
 		self.sbenvironment.air[res2] = self.sbenvironment.air[res2] + amount
-	elseif type(res2) == "number" then
+	end
+	if type(res2) == "number" then
 		if table.HasValue(ignore, res1) then return 0 end
 
 		if not self.sbenvironment.air[res1] then
@@ -153,34 +153,30 @@ function ENT:ConvertResource(res1, res2, amount)
 		end
 
 		return amount
-	else
-		if table.HasValue(ignore, res2) or table.HasValue(ignore, res1) then return 0 end
-
-		if not self.sbenvironment.air[res1] then
-			self:AddExtraResource(res1)
-		end
-
-		if not self.sbenvironment.air[res2] then
-			self:AddExtraResource(res2)
-		end
-
-		if self.sbenvironment.air[res1] < amount then
-			amount = self.sbenvironment.air[res1]
-		end
-
-		self.sbenvironment.air[res1] = self.sbenvironment.air[res1] - amount
-		self.sbenvironment.air[res2] = self.sbenvironment.air[res2] + amount
-
-		return amount
 	end
 
-	return 0
+	if table.HasValue(ignore, res2) or table.HasValue(ignore, res1) then return 0 end
+
+	if not self.sbenvironment.air[res1] then
+		self:AddExtraResource(res1)
+	end
+
+	if not self.sbenvironment.air[res2] then
+		self:AddExtraResource(res2)
+	end
+
+	if self.sbenvironment.air[res1] < amount then
+		amount = self.sbenvironment.air[res1]
+	end
+
+	self.sbenvironment.air[res1] = self.sbenvironment.air[res1] - amount
+	self.sbenvironment.air[res2] = self.sbenvironment.air[res2] + amount
+
+	return amount
 end
 
 function ENT:GetResourceAmount(res)
 	if not res or type(res) == "number" then return 0 end
-
-	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 
 	if table.HasValue(ignore, res) then return 0 end
 
@@ -190,8 +186,6 @@ end
 function ENT:GetResourcePercentage(res)
 	if not res or type(res) == "number" then return 0 end
 	if self.sbenvironment.air.max == 0 then return 0 end
-
-	local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
 
 	if table.HasValue(ignore, res) then return 0 end
 
@@ -258,10 +252,9 @@ function ENT:Think()
 end
 
 function ENT:OnRemove()
-	if CAF and CAF.GetAddon("Resource Distribution") then
-		CAF.GetAddon("Resource Distribution").Unlink(self)
-		CAF.GetAddon("Resource Distribution").RemoveRDEntity(self)
-	end
+	local rd = CAF.GetAddon("Resource Distribution")
+	rd.Unlink(self)
+	rd.RemoveRDEntity(self)
 
 	if WireAddon ~= nil then
 		Wire_Remove(self)
@@ -275,10 +268,7 @@ function ENT:OnRestore()
 end
 
 function ENT:PreEntityCopy()
-	if CAF and CAF.GetAddon("Resource Distribution") then
-		local RD = CAF.GetAddon("Resource Distribution")
-		RD.BuildDupeInfo(self)
-	end
+	CAF.GetAddon("Resource Distribution").BuildDupeInfo(self)
 
 	if WireAddon ~= nil then
 		local DupeInfo = WireLib.BuildDupeInfo(self)
@@ -290,10 +280,7 @@ function ENT:PreEntityCopy()
 end
 
 function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
-	if CAF and CAF.GetAddon("Resource Distribution") then
-		local RD = CAF.GetAddon("Resource Distribution")
-		RD.ApplyDupeInfo(Ent, CreatedEntities)
-	end
+	CAF.GetAddon("Resource Distribution").ApplyDupeInfo(Ent, CreatedEntities)
 
 	if WireAddon ~= nil and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
@@ -302,60 +289,43 @@ end
 
 --NEW Functions 
 function ENT:RegisterNonStorageDevice()
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.RegisterNonStorageDevice(self)
+	CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(self)
 end
 
 function ENT:AddResource(resource, maxamount, defaultvalue)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.AddResource(self, resource, maxamount, defaultvalue)
+	return CAF.GetAddon("Resource Distribution").AddResource(self, resource, maxamount, defaultvalue)
 end
 
 function ENT:ConsumeResource(resource, amount)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.ConsumeResource(self, resource, amount)
+	return CAF.GetAddon("Resource Distribution").ConsumeResource(self, resource, amount)
 end
 
 function ENT:SupplyResource(resource, amount)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.SupplyResource(self, resource, amount)
+	return CAF.GetAddon("Resource Distribution").SupplyResource(self, resource, amount)
 end
 
 function ENT:Link(netid)
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.Link(self, netid)
+	CAF.GetAddon("Resource Distribution").Link(self, netid)
 end
 
 function ENT:Unlink()
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.Unlink(self)
+	CAF.GetAddon("Resource Distribution").Unlink(self)
 end
 
 function ENT:GetResourceAmount(resource)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.GetResourceAmount(self, resource)
+	return CAF.GetAddon("Resource Distribution").GetResourceAmount(self, resource)
 end
 
 function ENT:GetUnitCapacity(resource)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.GetUnitCapacity(self, resource)
+	return CAF.GetAddon("Resource Distribution").GetUnitCapacity(self, resource)
 end
 
 function ENT:GetNetworkCapacity(resource)
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.GetNetworkCapacity(self, resource)
+	return CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, resource)
 end
 
 function ENT:GetEntityTable()
-	local RD = CAF.GetAddon("Resource Distribution")
-
-	return RD.GetEntityTable(self)
+	return CAF.GetAddon("Resource Distribution").GetEntityTable(self)
 end
 
 --END NEW Functions

@@ -84,30 +84,35 @@ function RD.GetMenu(menutype, menuname)
 	local data = {}
 
 	if not menutype then
-		data["Info"] = {}
-		--Create Info Menu
-		local tmp = data["Info"]
-		tmp["Wiki Home"] = {}
-		tmp["Wiki Home"].localurl = "test/test.html"
-		tmp["Wiki Home"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support"
-		tmp["Generators"] = {}
-		tmp["Generators"].localurl = "test/test.html"
-		tmp["Generators"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Generators"
-		tmp["Storage Devices"] = {}
-		tmp["Storage Devices"].localurl = "test/test.html"
-		tmp["Storage Devices"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Storage_Devices"
-		tmp["Special Devices"] = {}
-		tmp["Special Devices"].localurl = "test/test.html"
-		tmp["Special Devices"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Special_Devices"
-		tmp["Environmental Controls"] = {}
-		tmp["Environmental Controls"].localurl = "test/test.html"
-		tmp["Environmental Controls"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Environment_Controls"
-		--Create Help Menu
-		data["Help"] = {}
-		tmp = data["Help"]
-		tmp["Wiki Home"] = {}
-		tmp["Wiki Home"].localurl = "test/test.html"
-		tmp["Wiki Home"].interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support"
+		data.Info = {
+			["Wiki Home"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support"
+			},
+			["Generators"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Generators"
+			},
+			["Storage Devices"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Storage_Devices"
+			},
+			["Special Devices"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Special_Devices"
+			},
+			["Environmental Controls"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support_Environment_Controls"
+			}
+		}
+
+		data.Help = {
+			["Wiki Home"] = {
+				localurl = "test/test.html",
+				interneturl = "http://www.snakesvx.net/index.php/module_Wiki/title_Garrysmod_Info_Life_Support"
+			}
+		}
 	end
 
 	return data

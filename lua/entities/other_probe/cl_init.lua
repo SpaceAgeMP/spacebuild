@@ -31,12 +31,15 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	if not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
-		return
-	end
 	local trace = LocalPlayer():GetEyeTrace()
 
-	local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+
+	if not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
+		return
+	end
+
+	local rd = CAF.GetAddon("Resource Distribution")
+	local nettable = rd.GetEntityTable(self)
 	if table.Count(nettable) <= 0 then return end
 	local playername = self:GetPlayerName()
 
@@ -65,7 +68,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 
 		OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
-		OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName("energy") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "energy") .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, "energy") .. "\n"
+		OverlayText = OverlayText .. rd.GetProperResourceName("energy") .. ": " .. rd.GetResourceAmount(self, "energy") .. "/" .. rd.GetNetworkCapacity(self, "energy") .. "\n"
 
 		if self:GetOOO() == 1 then
 			OverlayText = OverlayText .. "Environment Info:\n"
@@ -136,7 +139,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local stringUsage = ""
 
 	surface.SetTextPos(textStartPos + 15, TempY)
-	stringUsage = stringUsage .. "[" .. CAF.GetAddon("Resource Distribution").GetProperResourceName("energy") .. ": " .. CAF.GetAddon("Resource Distribution").GetResourceAmount(self, "energy") .. "/" .. CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, "energy") .. "] "
+	stringUsage = stringUsage .. "[" .. rd.GetProperResourceName("energy") .. ": " .. rd.GetResourceAmount(self, "energy") .. "/" .. rd.GetNetworkCapacity(self, "energy") .. "] "
 	surface.DrawText("Resources: " .. stringUsage)
 	TempY = TempY + 70
 	surface.SetTextPos(textStartPos + 15, TempY)

@@ -64,7 +64,9 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	--End overlaysettings
 	local trace = LocalPlayer():GetEyeTrace()
 
-	local nettable = CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	local rd = CAF.GetAddon("Resource Distribution")
+
+	local nettable = rd.GetEntityTable(self)
 	if table.Count(nettable) == 0 then return end
 	local playername = self:GetPlayerName()
 
@@ -108,7 +110,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		if num == -1 then
 			if (table.Count(resources) > 0) then
 				for k, v in pairs(resources) do
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
 			else
 				OverlayText = OverlayText .. "No Resources Connected\n"
@@ -119,7 +121,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			if resnames and table.Count(resnames) > 0 then
 				for _, k in pairs(resnames) do
 					v = resources[k] or empty_value
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
 			end
 
@@ -128,7 +130,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 				for _, k in pairs(genresnames) do
 					v = resources[k] or empty_value
-					OverlayText = OverlayText .. CAF.GetAddon("Resource Distribution").GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
 			end
 		end
@@ -192,7 +194,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		-- Print the used resources
 		local stringUsage = ""
 		local resources = nettable.resources
-		local RD = CAF.GetAddon("Resource Distribution")
 
 		if (table.Count(resources) > 0) then
 			local i = 0
@@ -202,7 +203,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			if num == -1 then
 				for k, v in pairs(resources) do
-					stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+					stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 					i = i + 1
 
 					if i == 3 then
@@ -219,7 +220,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 				if resnames and table.Count(resnames) > 0 then
 					for _, k in pairs(resnames) do
 						v = resources[k] or empty_value
-						stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+						stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 						i = i + 1
 
 						if i == 3 then
@@ -246,7 +247,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 					for _, k in pairs(genresnames) do
 						v = resources[k] or empty_value
-						stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+						stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 						i = i + 1
 
 						if i == 3 then
@@ -273,7 +274,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			for _, k in pairs(genresnames) do
 				v = resources[k] or empty_value
-				stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+				stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 				i = i + 1
 
 				if i == 3 then
