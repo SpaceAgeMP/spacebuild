@@ -51,76 +51,8 @@ function TOOL:LeftClick(trace)
 		local range = ent.range
 		link_in_range(ent, range * 2)
 	else
-		self:GetOwner():SendLua("GAMEMODE:AddNotify('You need to select a Resource Node to auto-link!', NOTIFY_GENERIC, 7);")
+		CAF.NotifyOwner(self, "You need to select a Resource Node to auto-link!")
 	end
-	--local iNum = self:NumObjects()
-	--local Phys = trace.Entity:GetPhysicsObjectNum( trace.PhysicsBone )
-	--self:SetObject( iNum + 1, trace.Entity, trace.HitPos, Phys, trace.PhysicsBone, trace.HitNormal )
-	--[[if ( iNum > 0 ) then
-		-- Get client's CVars
-		--local addlength	 = self:GetClientNumber( "addlength" )
-		local material	= self:GetClientInfo( "material" )
-		local width		= self:GetClientNumber( "width" ) 
-		local color		= Color(self:GetClientNumber("color_r"), self:GetClientNumber("color_g"), self:GetClientNumber("color_b"))
-		
-		-- Get information we're about to use
-		local Ent1,  Ent2  = self:GetEnt(1),		self:GetEnt(2)
-		local Bone1, Bone2 = self:GetBone(1),		self:GetBone(2)
-		local WPos1, WPos2 = self:GetPos(1),		self:GetPos(2)
-		local LPos1, LPos2 = self:GetLocalPos(1),	self:GetLocalPos(2)
-		local length = ( WPos1 - WPos2):Length()
-		
-		--Possible
-		---- Ent - Node V
-		---- Node - Ent V
-		---- Node - Node V
-		---- Ent - Cutoff valve V
-		---- Node - Cutoff valve V
-		---- Cutoff valve - node V
-		---- Cutoff valve - ent V
-		---- pump - node
-		---- node - pump
-		
-		if Ent1.IsNode and Ent2.IsNode then
-			if length <= Ent1.range or length <= Ent2.range then
-				CAF.GetAddon("Resource Distribution").linkNodes(Ent1.netid, Ent2.netid)
-			else
-				 self:GetOwner():SendLua( "GAMEMODE:AddNotify('These 2 Nodes are too far apart!', NOTIFY_GENERIC, 7);" )
-			end
-		elseif Ent1.IsNode and table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent2)) > 0 then
-			if length <= Ent1.range then
-				CAF.GetAddon("Resource Distribution").Link(Ent2, Ent1.netid)
-			else
-				 self:GetOwner():SendLua( "GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);" )
-			end
-		elseif Ent2.IsNode and table.Count(CAF.GetAddon("Resource Distribution").GetEntityTable(Ent1)) > 0 then
-			if length <= Ent2.range then
-				CAF.GetAddon("Resource Distribution").Link(Ent1, Ent2.netid)
-			else
-				 self:GetOwner():SendLua( "GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);" )
-			end
-		elseif Ent1.IsNode and Ent2.IsPump then
-			if length <= Ent1.range then
-				Ent2:SetNetwork(Ent1.netid)
-				Ent2.node = Ent1
-			else
-				 self:GetOwner():SendLua( "GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);" )
-			end
-		elseif Ent2.IsNode and Ent1.IsPump then
-			if length <= Ent2.range then
-				Ent1:SetNetwork(Ent2.netid)
-				Ent1.node = Ent2
-			else
-				 self:GetOwner():SendLua( "GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);" )
-			end
-		else
-	        self:GetOwner():SendLua( "GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);" )
-		end
-		-- Clear the objects so we're ready to go again
-		self:ClearObjects()	
-	else
-		self:SetStage( iNum+1 )
-	end]]
 
 	return true
 end
@@ -172,7 +104,7 @@ function TOOL:RightClick(trace)
 				if Ent1:GetNode() and Ent1:GetNode() == Ent2 then
 					Ent1:SetNode(nil)
 				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('This Entity Valve and Resource Node weren\\'t connected!', NOTIFY_GENERIC, 7);")
+					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren\\'t connected!")
 				end
 			else
 				if Ent1:GetNode() and Ent1:GetNode1() == Ent2 then
@@ -180,7 +112,7 @@ function TOOL:RightClick(trace)
 				elseif Ent1:GetNode2() and Ent1:GetNode2() == Ent2 then
 					Ent1:SetNode2(nil)
 				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('This Resource Node Valve and Resource Node weren\\'t connected!', NOTIFY_GENERIC, 7);")
+					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren\\'t connected!")
 				end
 			end
 		elseif Ent2.IsValve and Ent1.IsNode then
@@ -188,7 +120,7 @@ function TOOL:RightClick(trace)
 				if Ent2:GetNode() and Ent2:GetNode() == Ent1 then
 					Ent2:SetNode(nil)
 				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('This Entity Valve and Resource Node weren\\'t connected!', NOTIFY_GENERIC, 7);")
+					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren\\'t connected!")
 				end
 			else
 				if Ent2:GetNode() and Ent2:GetNode1() == Ent1 then
@@ -196,7 +128,7 @@ function TOOL:RightClick(trace)
 				elseif Ent2:GetNode2() and Ent2:GetNode2() == Ent1 then
 					Ent2:SetNode2(nil)
 				else
-					self:GetOwner():SendLua("GAMEMODE:AddNotify('This Resource Node Valve and Resource Node weren\\'t connected!', NOTIFY_GENERIC, 7);")
+					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren\\'t connected!")
 				end
 			end
 		elseif Ent1.IsPump and Ent2.IsNode then
@@ -211,20 +143,20 @@ function TOOL:RightClick(trace)
 			if Ent1:GetRDEntity() == Ent2 then
 				Ent1:SetRDEntity(nil)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('This Entity Valve and Entity weren\\'t connected!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\\'t connected!")
 			end
 		elseif Ent2.IsValve and Ent2.IsEntityValve and table.Count(rd.GetEntityTable(Ent1)) > 0 then
 			if Ent2:GetRDEntity() == Ent1 then
 				Ent2:SetRDEntity(nil)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('This Entity Valve and Entity weren\\'t connected!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\\'t connected!")
 			end
 		elseif Ent1.IsNode and rd.GetEntityTable(Ent2).network == Ent1.netid then
 			rd.Unlink(Ent2)
 		elseif Ent2.IsNode and rd.GetEntityTable(Ent1).network == Ent2.netid then
 			rd.Unlink(Ent1)
 		else
-			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
+			CAF.NotifyOwner(self, "Invalid Combination!")
 		end
 	end
 

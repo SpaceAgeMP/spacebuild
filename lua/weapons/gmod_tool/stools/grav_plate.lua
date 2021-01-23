@@ -47,7 +47,7 @@ function TOOL:LeftClick(trace)
 		GravPlating = gravplating
 	})
 
-	self:GetOwner():SendLua("GAMEMODE:AddNotify('Surface has received Gravity Plating.', NOTIFY_GENERIC, 7);")
+	CAF.NotifyOwner(self, "Surface has received Gravity Plating.")
 
 	return true
 end
@@ -64,7 +64,7 @@ function TOOL:RightClick(trace)
 		GravPlating = gravplating
 	})
 
-	self:GetOwner():SendLua("GAMEMODE:AddNotify('Gravity Plating removed from surface.', NOTIFY_GENERIC, 7);")
+	CAF.NotifyOwner(self, "Gravity Plating removed from surface.")
 
 	return true
 end

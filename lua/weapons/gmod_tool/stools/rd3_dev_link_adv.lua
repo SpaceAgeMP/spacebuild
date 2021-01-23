@@ -73,7 +73,7 @@ function TOOL:LeftClick(tr)
 			if length <= Ent1.range or length <= Ent2.range then
 				rd.linkNodes(Ent1.netid, Ent2.netid)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('These 2 Nodes are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "These 2 Nodes are too far apart!")
 				--clear beam points
 				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
@@ -85,7 +85,7 @@ function TOOL:LeftClick(tr)
 			if length <= Ent1.range then
 				rd.Link(Ent2, Ent1.netid)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Entity and the Node are too far apart!")
 				--clear beam points
 				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
@@ -97,7 +97,7 @@ function TOOL:LeftClick(tr)
 			if length <= Ent2.range then
 				rd.Link(Ent1, Ent2.netid)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Entity and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Entity and the Node are too far apart!")
 				--clear beam points
 				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
@@ -110,7 +110,7 @@ function TOOL:LeftClick(tr)
 				Ent2:SetNetwork(Ent1.netid)
 				Ent2.node = Ent1
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Pump and the Node are too far apart!")
 				--clear beam points
 				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
@@ -124,7 +124,7 @@ function TOOL:LeftClick(tr)
 				Ent1:SetNetwork(Ent2.netid)
 				Ent1.node = Ent2
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Pump and the Node are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Pump and the Node are too far apart!")
 				--clear beam points
 				rd.Beam_clear(self:GetEnt(1))
 				self:ClearObjects() --clear objects
@@ -133,7 +133,7 @@ function TOOL:LeftClick(tr)
 				return
 			end
 		else
-			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
+			CAF.NotifyOwner(self, "Invalid Combination!")
 			--clear beam points
 			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects

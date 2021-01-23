@@ -181,8 +181,7 @@ function CAF_ToolRegister(TOOL, Models_List, MakeFunc, ToolName, ToolLimit, Make
 		if (CLIENT) then return true end
 
 		if (not trace.Entity:GetTable().Repair) then
-			self:GetOwner():SendLua("GAMEMODE:AddNotify('Object cannot be repaired!', NOTIFY_GENERIC, 7); surface.PlaySound(\"ambient/water/drip" .. math.random(1, 4) .. ".wav\")")
-
+			CAF.NotifyOwner(self, "Object cannot be repaired!")
 			return
 		end
 

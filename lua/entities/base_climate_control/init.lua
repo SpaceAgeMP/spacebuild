@@ -271,7 +271,7 @@ function ENT:Climate_Control()
 	end
 	self.energy = self:GetResourceAmount("energy")
 
-	--Don't have enough power to keep the controler\'s think process running, shut it all down
+	--Don't have enough power to keep the controler's think process running, shut it all down
 	if self.energy == 0 or self.energy < math.ceil(self.sbenvironment.size / self.maxsize) * 3 * math.ceil(self.maxsize / 1024) then
 		self:TurnOff()
 		--Msg("Turning of\n")
@@ -340,7 +340,7 @@ function ENT:Climate_Control()
 		end
 	end
 
-	--Now let's check the pressure, if pressure is larger then 1 then we need some more power to keep the climate_controls environment stable. We don\' want any leaks do we?
+	--Now let's check the pressure, if pressure is larger then 1 then we need some more power to keep the climate_controls environment stable. We don' want any leaks do we?
 	if pressure > 1 then
 		self:ConsumeResource("energy", (pressure - 1) * math.ceil(self.sbenvironment.size / self.maxsize) * 2 * math.ceil(self.maxsize / 1024))
 	end

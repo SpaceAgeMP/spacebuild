@@ -74,16 +74,16 @@ function TOOL:LeftClick(trace)
 			if Ent1:GetPos():Distance(Ent2:GetPos()) <= Ent1.range then
 				Ent2:SetNode1(Ent1)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Resource Node and Valve are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Resource Node and Valve are too far apart!")
 			end
 		elseif Ent2.IsNode and Ent1.IsValve and not Ent1.IsEntityValve then
 			if Ent2:GetPos():Distance(Ent1:GetPos()) <= Ent2.range then
 				Ent1:SetNode1(Ent2)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Resource Node and Valve are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Resource Node and Valve are too far apart!")
 			end
 		else
-			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
+			CAF.NotifyOwner(self, "Invalid Combination!")
 			--clear beam points
 			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects
@@ -149,16 +149,16 @@ function TOOL:RightClick(trace)
 			if Ent1:GetPos():Distance(Ent2:GetPos()) <= Ent1.range then
 				Ent2:SetNode2(Ent1)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Resource Node and Valve are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Resource Node and Valve are too far apart!")
 			end
 		elseif Ent2.IsNode and Ent1.IsValve and not Ent1.IsEntityValve then
 			if Ent2:GetPos():Distance(Ent1:GetPos()) <= Ent2.range then
 				Ent1:SetNode2(Ent2)
 			else
-				self:GetOwner():SendLua("GAMEMODE:AddNotify('The Resource Node and Valve are too far apart!', NOTIFY_GENERIC, 7);")
+				CAF.NotifyOwner(self, "The Resource Node and Valve are too far apart!")
 			end
 		else
-			self:GetOwner():SendLua("GAMEMODE:AddNotify('Invalid Combination!', NOTIFY_GENERIC, 7);")
+			CAF.NotifyOwner(self, "Invalid Combination!")
 			--clear beam points
 			rd.Beam_clear(self:GetEnt(1))
 			self:ClearObjects() --clear objects
