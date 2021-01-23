@@ -56,10 +56,8 @@ function TOOL:LeftClick(trace)
 		CAF.GetAddon("Resource Distribution").Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
-	if iNum == 2 then
-		if self:GetEnt(2).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
-		end
+	if iNum == 2 and self:GetEnt(2).IsNode then
+		CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
 	end
 
 	--add beam point
@@ -131,10 +129,8 @@ function TOOL:RightClick(trace)
 		CAF.GetAddon("Resource Distribution").Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
-	if iNum == 2 then
-		if self:GetEnt(2).IsNode then
-			CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
-		end
+	if iNum == 2 and self:GetEnt(2).IsNode then
+		CAF.GetAddon("Resource Distribution").Beam_clear(self:GetEnt(2))
 	end
 
 	--add beam point

@@ -172,73 +172,51 @@ local popups = {}
 local Font = "GModCAFNotify"
 
 --End popupsettings
-local function DrawPopups()
-	if GetConVarString("cl_hudversion") == "" then
-		if displaypopups["top"] then
-			local obj = displaypopups["top"]
-			surface.SetFont(Font)
-			local width, height = surface.GetTextSize(obj.message)
-			if width == nil or height == nil then return end
-			width = width + 16
-			height = height + 16
-			local left = (ScrW() / 2) - (width / 2)
-			local top = 0
-			draw.RoundedBox(4, left - 1, top, width + 2, height + 2, obj.color)
-			draw.RoundedBox(4, left, top + 1, width, height, Color(0, 0, 0, 150))
-			draw.DrawText(obj.message, Font, left + 8, top + 9, obj.color, 0)
-		end
-
-		if displaypopups["left"] then
-			local obj = displaypopups["left"]
-			surface.SetFont(Font)
-			local width, height = surface.GetTextSize(obj.message)
-			if width == nil or height == nil then return end
-			width = width + 16
-			height = height + 16
-			local left = 0
-			local top = ScrH() * 2 / 3
-			draw.RoundedBox(4, left, top - 1, width + 2, height + 2, obj.color)
-			draw.RoundedBox(4, left + 1, top, width, height, Color(0, 0, 0, 150))
-			draw.DrawText(obj.message, Font, left + 9, top + 8, obj.color, 0)
-		end
-
-		if displaypopups["right"] then
-			local obj = displaypopups["right"]
-			surface.SetFont(Font)
-			local width, height = surface.GetTextSize(obj.message)
-			if width == nil or height == nil then return end
-			width = width + 16
-			height = height + 16
-			local left = ScrW() - width
-			local top = ScrH() * 2 / 3
-			draw.RoundedBox(4, left - 1, top - 1, width + 2, height + 2, obj.color)
-			draw.RoundedBox(4, left, top, width, height, Color(0, 0, 0, 150))
-			draw.DrawText(obj.message, Font, left + 8, top + 8, obj.color, 0)
-		end
-
-		if displaypopups["bottom"] then
-			local obj = displaypopups["bottom"]
-			surface.SetFont(Font)
-			local width, height = surface.GetTextSize(obj.message)
-			if width == nil or height == nil then return end
-			width = width + 16
-			height = height + 16
-			local left = (ScrW() / 2) - (width / 2)
-			local top = ScrH() - height
-			draw.RoundedBox(4, left - 1, top - 2, width + 2, height + 2, obj.color)
-			draw.RoundedBox(4, left, top - 1, width, height, Color(0, 0, 0, 150))
-			draw.DrawText(obj.message, Font, left + 8, top + 7, obj.color, 0)
-		end
+local function DrawPopups(w, h)
+	local obj = displaypopups.top or displaypopups.left or displaypopups.right or displaypopups.bottom
+	if GetConVarString("cl_hudversion") ~= "" or not obj then
+		return
 	end
+	surface.SetFont(Font)
+	local width, height = surface.GetTextSize(obj.message)
+	if width == nil or height == nil then return end
+	width = width + 16
+	height = height + 16
+	left = 0
+	top = 0
+	if displaypopups.top then
+		left = (w / 2) - (width / 2)
+		top = 0
+	end
+
+	if displaypopups.left then
+		left = 0
+		top = h * 2 / 3
+	end
+
+	if displaypopups.right then
+		left = w - width
+		top = h * 2 / 3
+	end
+
+	if displaypopups.bottom then
+		left = (w / 2) - (width / 2)
+		top = h - height
+	end
+
+	draw.RoundedBox(4, left - 1, top - 1, width + 2, height + 2, obj.color)
+	draw.RoundedBox(4, left + 1, top + 1, width, height, Color(0, 0, 0, 150))
+	draw.DrawText(obj.message, Font, left + 8, top + 8, obj.color, 0)
 end
 
 hook.Add("HUDPaint", "CAF_Core_POPUPS", DrawPopups)
+
+local locations = {"top", "left", "right", "bottom"}
 
 --local function ShowNextTopMessage()
 local function ShowNextPopupMessage()
 	local ply = LocalPlayer()
 
-	local locations = {"top", "left", "right", "bottom"}
 
 	for k, v in pairs(locations) do
 		if displaypopups[v] == nil and popups[v] and table.Count(popups[v]) > 0 then
@@ -275,24 +253,17 @@ local MessageLog = {}
 
 --function AddTopInfoMessage(message)
 function AddPopup(message, location, color, displaytime)
-	local obj = {}
-
-	local allowedlocations = {"top", "left", "right", "bottom"}
-
-	location = location or "top"
-
-	if not table.HasValue(allowedlocations, location) then
-		location = "top"
-	end
-
-	obj.message = message or "Corrupt Message"
-	obj.location = location or "top"
-	obj.time = displaytime or 1
-	obj.color = color or CAF2.colors.white
 
 	if not popups[location] then
 		popups[location] = {}
 	end
+
+	local obj = {
+		message = message or "Corrupt Message",
+		location = location or "top",
+		time = displaytime or 1,
+		color = color or CAF2.colors.white
+	}
 
 	table.insert(popups[location], obj)
 	table.insert(MessageLog, obj)
@@ -335,9 +306,7 @@ local function GetHelpPanel(frame)
 			local Node = node:AddNode(l)
 
 			function Node.DoClick(btn)
-				if (w.hasmenu) then
-					--To Implement
-				elseif (CAF2.HasInternet and w.interneturl) then
+				if CAF2.HasInternet and w.interneturl then
 					local HTMLTest = vgui.Create("HTML", RightPanel)
 					HTMLTest:StretchToParent(10, 10, 10, 10)
 					HTMLTest:OpenURL(w.interneturl)
@@ -357,9 +326,7 @@ local function GetHelpPanel(frame)
 				local cnode = Node:AddNode(m)
 
 				function cnode.DoClick(btn)
-					if (x.hasmenu) then
-						--To Implement
-					elseif (CAF2.HasInternet and x.interneturl) then
+					if CAF2.HasInternet and x.interneturl then
 						RightPanel:Clear()
 						local HTMLTest = vgui.Create("HTML", RightPanel)
 						HTMLTest:StretchToParent(10, 10, 10, 10)
@@ -658,11 +625,11 @@ function GetMessageLogPanel(frame)
 	mylist:SetPos(1, 1)
 	mylist:StretchToParent(2, 2, 2, 2) --SetSize(panel:GetWide()- 2, panel:GetTall()-2)
 	local colum = mylist:AddColumn("Time")
-	colum:SetFixedWidth(math.Round((mylist:GetWide() * (0.5 / 5))))
+	colum:SetFixedWidth(math.Round(mylist:GetWide() * (0.5 / 5)))
 	colum = mylist:AddColumn("Location")
-	colum:SetFixedWidth(math.Round((mylist:GetWide() * (0.5 / 5))))
+	colum:SetFixedWidth(math.Round(mylist:GetWide() * (0.5 / 5)))
 	colum = mylist:AddColumn("Message")
-	colum:SetFixedWidth(math.Round((mylist:GetWide() * (4 / 5))))
+	colum:SetFixedWidth(math.Round(mylist:GetWide() * (4 / 5)))
 
 	for k, v in pairs(MessageLog) do
 		local line = mylist:AddLine(CurTime(), v.location, v.message)
@@ -774,12 +741,8 @@ end
 local function ProccessMessage(len, client)
 	local msg = net.ReadString()
 	local location = net.ReadString()
-	local r = net.ReadUInt(8)
-	local g = net.ReadUInt(8)
-	local b = net.ReadUInt(8)
-	local a = net.ReadUInt(8)
+	local color = net.ReadColor()
 	local displaytime = net.ReadUInt(16)
-	local color = Color(r, g, b, a)
 	CAF2.POPUP(msg, location, color, displaytime)
 end
 

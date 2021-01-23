@@ -20,17 +20,13 @@ local function SaveGravPlating(Player, Entity, Data)
 	if Data.GravPlating then
 		Entity.grav_plate = 1
 
-		if (SERVER) then
-			Entity.EntityMods = Entity.EntityMods or {}
-			Entity.EntityMods.GravPlating = Data
-		end
+		Entity.EntityMods = Entity.EntityMods or {}
+		Entity.EntityMods.GravPlating = Data
 	else
 		Entity.grav_plate = nil
 
-		if (SERVER) then
-			if Entity.EntityMods then
-				Entity.EntityMods.GravPlating = nil
-			end
+		if Entity.EntityMods then
+			Entity.EntityMods.GravPlating = nil
 		end
 	end
 
@@ -40,8 +36,8 @@ end
 duplicator.RegisterEntityModifier("gravplating", SaveGravPlating)
 
 function TOOL:LeftClick(trace)
-	if trace.Entity then
-		if not trace.Entity:IsValid() or trace.Entity:IsPlayer() or trace.HitWorld or trace.Entity:IsNPC() then return false end
+	if not trace.Entity or not trace.Entity:IsValid() or trace.Entity:IsPlayer() or trace.HitWorld or trace.Entity:IsNPC() then
+		return false
 	end
 
 	if CLIENT then return true end
@@ -57,8 +53,8 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-	if trace.Entity then
-		if not trace.Entity:IsValid() or trace.Entity:IsPlayer() or trace.HitWorld or trace.Entity:IsNPC() then return false end
+	if not trace.Entity or not trace.Entity:IsValid() or trace.Entity:IsPlayer() or trace.HitWorld or trace.Entity:IsNPC() then
+		return false
 	end
 
 	if CLIENT then return true end

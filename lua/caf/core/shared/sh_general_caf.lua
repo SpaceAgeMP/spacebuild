@@ -101,7 +101,7 @@ function CAF3.Think3()
 	for k, v in pairs(hooks["think3"]) do
 		local ok, err = pcall(v)
 
-		if not (ok) then
+		if not ok then
 			CAF2.WriteToDebugFile("CAF_Hooks", "Think3 Error: " .. err .. "\n")
 		end
 	end
@@ -152,7 +152,7 @@ function CAF2.RemoveHook(HookName, func)
 		end
 	end
 
-	if (HookName == "think") then
+	if HookName == "think" then
 	elseif (HookName == "think2") then
 		if (#hooks[HookName] == 0) then
 			timer.Remove("CAF Think 2")

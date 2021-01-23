@@ -67,31 +67,29 @@ function ENT:SetNode(node)
 end
 
 function ENT:TurnOn()
-	if self.Active == 0 then
-		if self.connected.ent and self.connected.node then
-			CAF.GetAddon("Resource Distribution").Unlink(self.connected.ent)
-			CAF.GetAddon("Resource Distribution").Link(self.connected.ent, self.connected.node.netid)
-			self.Active = 1
-			self:SetOOO(1)
+	if self.Active == 1 or not self.connected.ent or not self.connected.node then
+		return
+	end
+	CAF.GetAddon("Resource Distribution").Unlink(self.connected.ent)
+	CAF.GetAddon("Resource Distribution").Link(self.connected.ent, self.connected.node.netid)
+	self.Active = 1
+	self:SetOOO(1)
 
-			if WireAddon ~= nil then
-				Wire_TriggerOutput(self, "Open", self.Active)
-			end
-		end
+	if WireAddon ~= nil then
+		Wire_TriggerOutput(self, "Open", self.Active)
 	end
 end
 
 function ENT:TurnOff()
-	if self.Active == 1 then
-		if self.connected.ent and self.connected.node then
-			CAF.GetAddon("Resource Distribution").Unlink(self.connected.ent)
-			self.Active = 0
-			self:SetOOO(0)
+	if self.Active == 0 or not self.connected.ent and not self.connected.node then
+		return
+	end
+	CAF.GetAddon("Resource Distribution").Unlink(self.connected.ent)
+	self.Active = 0
+	self:SetOOO(0)
 
-			if WireAddon ~= nil then
-				Wire_TriggerOutput(self, "Open", self.Active)
-			end
-		end
+	if WireAddon ~= nil then
+		Wire_TriggerOutput(self, "Open", self.Active)
 	end
 end
 
@@ -164,20 +162,16 @@ function ENT:Think()
 	end
 
 	-- Check if they are still in range!
-	if self.connected.ent then
-		if self.connected.ent:GetPos():Distance(self:GetPos()) > self.range then
-			self:TurnOff()
-			self.connected.ent = nil
-			self:SetNWInt("entid", 0)
-		end
+	if self.connected.ent and self.connected.ent:GetPos():Distance(self:GetPos()) > self.range then
+		self:TurnOff()
+		self.connected.ent = nil
+		self:SetNWInt("entid", 0)
 	end
 
-	if self.connected.node then
-		if self:GetPos():Distance(self.connected.node:GetPos()) > self.connected.node.range then
-			self:TurnOff()
-			self.connected.node = nil
-			self:SetNWInt("netid", 0)
-		end
+	if self.connected.node and self:GetPos():Distance(self.connected.node:GetPos()) > self.connected.node.range then
+		self:TurnOff()
+		self.connected.node = nil
+		self:SetNWInt("netid", 0)
 	end
 
 	self:NextThink(CurTime() + 1)
@@ -216,7 +210,7 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.ApplyDupeInfo(Ent, CreatedEntities)
 
-	if WireAddon ~= nil and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 end

@@ -1179,7 +1179,7 @@ function SB.FindVolume(name, radius)
 
 	while ((found == 0) and (tries > 0)) do
 		tries = tries - 1
-		pos = VectorRand() * 16384
+		local pos = VectorRand() * 16384
 
 		if (util.IsInWorld(pos) == true) then
 			found = 1

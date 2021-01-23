@@ -243,30 +243,32 @@ local function BuildCPanel(tool, panel)
 		local cur_sub_type = GetConVar(ccv_sub_type):GetString()
 
 		for k, devlist in sortedByProperty(tool.Devices, "Name") do
-			if not devlist.hide then
-				local node = tree:AddNode(devlist.Name, devlist.icon)
-				node.caftext = devlist.Name
-				node.var_type = devlist.type
+			if devlist.hide then
+				continue
+			end
+			local node = tree:AddNode(devlist.Name, devlist.icon)
+			node.caftext = devlist.Name
+			node.var_type = devlist.type
 
-				for _, dev in sortedByProperty(devlist.devices, "Name") do
-					if not dev.hide then
-						local cnode = node:AddNode(dev.Name, dev.icon or "icon16/newspaper.png")
-						cnode.caftext = dev.Name
-						cnode.var_model = dev.model
-						util.PrecacheModel(dev.model)
-						cnode.var_type = dev.type
-						cnode.var_sub_type = dev.sub_type
+			for _, dev in sortedByProperty(devlist.devices, "Name") do
+				if dev.hide then
+					continue
+				end
+				local cnode = node:AddNode(dev.Name, dev.icon or "icon16/newspaper.png")
+				cnode.caftext = dev.Name
+				cnode.var_model = dev.model
+				util.PrecacheModel(dev.model)
+				cnode.var_type = dev.type
+				cnode.var_sub_type = dev.sub_type
 
-						if cur_model == dev.model and cur_type == dev.type and cur_sub_type == dev.sub_type then
-							tree:SetSelectedItem(cnode)
-						end
+				if cur_model == dev.model and cur_type == dev.type and cur_sub_type == dev.sub_type then
+					tree:SetSelectedItem(cnode)
+				end
 
-						function cnode.DoClick(btn)
-							RunConsoleCommand(ccv_model, btn.var_model)
-							RunConsoleCommand(ccv_type, btn.var_type)
-							RunConsoleCommand(ccv_sub_type, btn.var_sub_type)
-						end
-					end
+				function cnode.DoClick(btn)
+					RunConsoleCommand(ccv_model, btn.var_model)
+					RunConsoleCommand(ccv_type, btn.var_type)
+					RunConsoleCommand(ccv_sub_type, btn.var_sub_type)
 				end
 			end
 		end
