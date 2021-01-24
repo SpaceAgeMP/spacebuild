@@ -49,12 +49,11 @@ local hud1 = {
 	Left2 = MidW - 90, --80
 	Right = MidW + 80, --70
 	H1 = ScH / 8,
-	H2 = ScH - hud1.H1,
-	H3 = hud1.H1 - 5,
 	Font = "LS3HudHeader"
 }
 
-
+hud1.H2 = ScH - hud1.H1
+hud1.H3 = hud1.H1 - 5
 hud1.TH = {hud1.H2 + 5, hud1.H2 + 20, hud1.H2 + 35, hud1.H2 + 50}
 
 huds[1] = hud1
