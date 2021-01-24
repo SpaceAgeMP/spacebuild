@@ -60,10 +60,12 @@ end
 
 function ENT:SetNode2(node2)
 	if self.connected.node2 and self.Active == 1 then
-		CAF.GetAddon("Resource Distribution").UnlinkNodes(self.connected.node1.netid, self.connected.node2.netid)
+		local rd = CAF.GetAddon("Resource Distribution")
+
+		r.UnlinkNodes(self.connected.node1.netid, self.connected.node2.netid)
 
 		if node1 then
-			CAF.GetAddon("Resource Distribution").linkNodes(self.connected.node1.netid, node2.netid)
+			rd.linkNodes(self.connected.node1.netid, node2.netid)
 		else
 			self:TurnOff()
 		end
