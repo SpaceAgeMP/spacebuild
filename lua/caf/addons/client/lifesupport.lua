@@ -374,7 +374,6 @@ net.Receive("LS_umsg2", LS_umsg_hook2)
 function LS.__Construct()
 	hook.Add("HUDPaint", "LS_Core_HUDPaint", lifesupport_HUDPaint)
 	status = true
-	CAF.AddHook("think3", lifesupport_think)
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.AddProperResourceName("energy", CAF.GetLangVar("Energy"))
 	RD.AddProperResourceName("water", CAF.GetLangVar("Water"))
@@ -393,7 +392,6 @@ end
 ]]
 function LS.__Destruct()
 	hook.Remove("HUDPaint", "LS_Core_HUDPaint")
-	CAF.RemoveHook("think3", lifesupport_think)
 	status = false
 	--return false , CAF.GetLangVar("No Implementation yet")
 

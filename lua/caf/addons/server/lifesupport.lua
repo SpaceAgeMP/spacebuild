@@ -111,8 +111,8 @@ function LS.__Construct()
 	RD.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
 	hook.Add("PlayerInitialSpawn", "LS_Core_SpawnFunc", LSSpawnFunc)
 	hook.Add("PlayerSpawn", "LS_Core_ResetSpawnFunc", LSResetSpawnFunc)
-	CAF.AddHook("think3", PlayerLSThink)
-	CAF.AddHook("OnAddonDestruct", AddonDisabled)
+	hook.Add("CAFOnAddonDestruct", "LSAddonDisable", AddonDisabled)
+	timer.Create("PlayerLSThink", 1, 0, PlayerLSThink)
 	status = true
 
 	return true
@@ -126,8 +126,8 @@ function LS.__Destruct()
 	hook.Remove("PlayerInitialSpawn", "LS_Core_SpawnFunc")
 	hook.Remove("PlayerSpawn", "LS_Core_ResetSpawnFunc")
 	hook.Remove("PlayerSpawnedVehicle", "LS_vehicle_spawn")
-	CAF.RemoveHook("think3", PlayerLSThink)
-	CAF.RemoveHook("OnAddonDestruct", AddonDisabled)
+	hook.Remove("CAFOnAddonDestruct", "LSAddonDisable")
+	timer.Remove("PlayerLSThink")
 	local SB = CAF.GetAddon("Spacebuild")
 
 	if SB then
@@ -138,7 +138,6 @@ function LS.__Destruct()
 	LS.generators = {}
 	LS.generators.air = {}
 	LS.generators.temperature = {}
-	CAF.RemoveServerTag("LSC")
 	status = false
 
 	return true

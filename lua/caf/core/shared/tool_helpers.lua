@@ -406,10 +406,6 @@ function CAFTool.LeftClick(self, trace)
 		end
 	end
 
-	--[[Msg("GetPlayer: "..tostring(ent:GetPlayer()).."\n")
-	Msg("Ply= "..tostring(ply).."\n")
-	ent:SetPlayer(ply)]]
-	--CAF.OnEntitySpawn(ent , "SENT" , ply) --Calls the CAF SentSpawn Hook
 	local const
 
 	if not DontWeld and (trace.Entity:IsValid() or AllowWorldWeld) then

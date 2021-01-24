@@ -256,7 +256,6 @@ function RD.__Construct()
 	ClearEntities()
 	nettable = {}
 	ent_table = {}
-	CAF.AddHook("think3", UpdateNetworksAndEntities)
 
 	for k, ply in pairs(player.GetAll()) do
 		SendEntireNetWorkToClient(ply)
@@ -277,8 +276,6 @@ function RD.__Destruct()
 	ClearEntities()
 	nettable = {}
 	ent_table = {}
-	CAF.RemoveHook("think3", UpdateNetworksAndEntities)
-	CAF.RemoveServerTag("RD")
 	status = false
 
 	return true

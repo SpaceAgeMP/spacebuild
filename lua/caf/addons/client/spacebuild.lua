@@ -79,20 +79,6 @@ local function SetBloom(planet)
 	Bloom.col.b = planet.Col_b
 end
 
--- render.
-local function Render()
-	if (Color_Enabled) then
-		-- draw colormod.
-		DrawColorModify(ColorModify)
-	end
-
-	if (Bloom_Enabled) then
-		-- draw bloom.
-		--DrawBloom( darken, multiply, sizex, sizey, passes, color, colr, colg, colb )
-		DrawBloom(Bloom.darken, Bloom.multiply, Bloom.sizex, Bloom.sizey, Bloom.passes, Bloom.color, Bloom.col.r, Bloom.col.g, Bloom.col.b)
-	end
-end
-
 local function DrawSunEffects()
 	-- no pixel shaders? no sun effects!
 	if (not render.SupportsPixelShaders_2_0()) then return end
@@ -146,6 +132,22 @@ local function DrawSunEffects()
 			})
 		end
 	end
+end
+
+-- render.
+local function Render()
+	if (Color_Enabled) then
+		-- draw colormod.
+		DrawColorModify(ColorModify)
+	end
+
+	if (Bloom_Enabled) then
+		-- draw bloom.
+		--DrawBloom( darken, multiply, sizex, sizey, passes, color, colr, colg, colb )
+		DrawBloom(Bloom.darken, Bloom.multiply, Bloom.sizex, Bloom.sizey, Bloom.passes, Bloom.color, Bloom.col.r, Bloom.col.g, Bloom.col.b)
+	end
+
+	DrawSunEffects()
 end
 
 local function recvPlanet()
@@ -215,9 +217,8 @@ net.Receive("AddStar", recvSun)
 	The Constructor for this Custom Addon Class
 ]]
 function SB.__Construct()
-	hook.Add("RenderScreenspaceEffects", "VFX_Render", Render)
-	hook.Add("RenderScreenspaceEffects", "SunEffects", DrawSunEffects)
-	CAF.AddHook("think2", SB.Space_Affect_Cl)
+	hook.Add("RenderScreenspaceEffects", "SB_VFX_Render", Render)
+	timer.Create("SBPlayerEnvUpdate", 0.5, 0, SB.Space_Affect_Cl)
 	status = true
 
 	return true
@@ -227,9 +228,8 @@ end
 	The Destructor for this Custom Addon Class
 ]]
 function SB.__Destruct()
-	hook.Remove("RenderScreenspaceEffects", "VFX_Render")
-	hook.Remove("RenderScreenspaceEffects", "SunEffects")
-	CAF.RemoveHook("think2", SB.Space_Affect_Cl)
+	hook.Remove("RenderScreenspaceEffects", "SB_VFX_Render")
+	timer.Remove("SBPlayerEnvUpdate")
 	status = false
 
 	return true

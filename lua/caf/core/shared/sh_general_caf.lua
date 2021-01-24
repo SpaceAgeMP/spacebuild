@@ -2,7 +2,6 @@
 local CAF3 = CAF2.CAF3
 local Addons = CAF3.Addons
 local addonlevel = CAF3.addonlevel
-local hooks = CAF3.hooks
 --Language Settings
 local DefaultLang = "english"
 
@@ -70,101 +69,6 @@ end
 
 -- END CAF Custom Status Saving
 CAF2.currentlanguage = CAF2.LoadVar("CAF_LANGUAGE", DefaultLang)
-
-function CAF3.Think()
-	if CAF ~= CAF2 then
-		CAF = CAF2
-	end
-
-	for k, v in pairs(hooks["think"]) do
-		local ok, err = pcall(v)
-
-		if not (ok) then
-			CAF2.WriteToDebugFile("CAF_Hooks", "Think Error: " .. err .. "\n")
-		end
-	end
-end
-
-hook.Add("Think", "CAF Think", CAF3.Think) --Always on!!
-
-function CAF3.Think2()
-	for k, v in pairs(hooks["think2"]) do
-		local ok, err = pcall(v)
-
-		if not (ok) then
-			CAF2.WriteToDebugFile("CAF_Hooks", "Think2 Error: " .. err .. "\n")
-		end
-	end
-end
-
-function CAF3.Think3()
-	for k, v in pairs(hooks["think3"]) do
-		local ok, err = pcall(v)
-
-		if not ok then
-			CAF2.WriteToDebugFile("CAF_Hooks", "Think3 Error: " .. err .. "\n")
-		end
-	end
-end
-
---[[
-	This function can be called to register a Hook (similar to Hook.add)
-	Possibly Hooks are:
-		think: Just like the default Think Hook
-		think2: Updates every 0.5 seconds
-		think3: Updates every Second
-		OnEntitySpawn: Get's called when an entity spawns (parameters: Entity, Type(string), Player who spawned it)
-		OnAddonDestruct: Gets called when an addon gets disabled (Parameters: Name of addon)
-		OnAddonConstruct: Get called when an addon gets Enabled (parameters: Name of addon)
-		
-]]
-function CAF2.AddHook(HookName, func)
-	if not HookName then return false, CAF.GetLangVar("No HookName given") end
-	if not func then return false, CAF.GetLangVar("No function given") end
-	if not hooks[HookName] then return false, CAF.GetLangVar("This hook doesn't exist") end
-	table.insert(hooks[HookName], func)
-
-	if (HookName == "think") then
-	elseif (HookName == "think2") then
-		if (#hooks[HookName] == 1) then
-			timer.Create("CAF Think 2", 0.5, 0, CAF3.Think2)
-		end
-	elseif (HookName == "think3") then
-		if (#hooks[HookName] == 1) then
-			timer.Create("CAF Think 3", 1, 0, CAF3.Think3)
-		end
-	end
-
-	return true
-end
-
---[[
-	Remove the functions you added to a certain hook from here
-]]
-function CAF2.RemoveHook(HookName, func)
-	if not HookName then return false, CAF.GetLangVar("No HookName given") end
-	if not func then return false, CAF.GetLangVar("No function given") end
-	if not hooks[HookName] then return false, CAF.GetLangVar("This hook doesn't exist") end
-
-	for k, v in pairs(hooks[HookName]) do
-		if (v == func) then
-			table.remove(hooks[HookName], k)
-		end
-	end
-
-	if HookName == "think" then
-	elseif (HookName == "think2") then
-		if (#hooks[HookName] == 0) then
-			timer.Remove("CAF Think 2")
-		end
-	elseif (HookName == "think3") then
-		if (#hooks[HookName] == 0) then
-			timer.Remove("CAF Think 3")
-		end
-	end
-
-	return true
-end
 
 --[[
 	Returns the boolean status of an Addon

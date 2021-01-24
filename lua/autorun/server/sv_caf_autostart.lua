@@ -9,7 +9,6 @@ local net = net
 local net_pools = {"CAF_Addon_Construct", "CAF_Addon_Destruct", "CAF_Start_true", "CAF_Start_false", "CAF_Addon_POPUP"}
 
 for _, v in pairs(net_pools) do
-	print("Pooling ", v, " for net library")
 	util.AddNetworkString(v)
 end
 
@@ -30,32 +29,12 @@ addonlevel[2] = {}
 addonlevel[3] = {}
 addonlevel[4] = {}
 addonlevel[5] = {}
-local hooks = {
-	think = {},
-	think2 = {},
-	think3 = {},
-	OnEntitySpawn = {},
-	OnAddonDestruct = {},
-	OnAddonConstruct = {},
-	TOOL_Allow_Entity_Spawn = {}
-}
-CAF3.hooks = hooks
 
 function CAF2.AllowSpawn(type, sub_type, class, model)
-	for k, v in pairs(hooks.TOOL_Allow_Entity_Spawn) do
-		local ok, err = pcall(type, sub_type, class, model)
-
-		if not ok then
-			CAF2.WriteToDebugFile("CAF_Hooks", "TOOL_Allow_Entity_Spawn Error: " .. err .. "\n")
-		else
-			if err == true then
-				return true
-			elseif err == false then
-				return false
-			end
-		end
+	local res = hook.Call("CAFTOOLAllowEntitySpawn", type, sub_type, class, model)
+	if res ~= nil then
+		return res
 	end
-
 	return true
 end
 
@@ -132,13 +111,7 @@ local function OnEntitySpawn(ent, enttype, ply)
 		ent.caf.custom.canreceiveheatdamage = true
 	end
 
-	for k, v in pairs(hooks["OnEntitySpawn"]) do
-		local ok, err = pcall(v, ent, enttype, ply)
-
-		if not (ok) then
-			CAF2.WriteToDebugFile("CAF_Hooks", "OnEntitySpawn Error: " .. err .. "\n")
-		end
-	end
+	hook.Call("CAFOnEntitySpawn", nil, ent, enttype, ply)
 end
 
 local function OnAddonDestruct(name)
@@ -148,13 +121,7 @@ local function OnAddonDestruct(name)
 	net.Broadcast()
 
 	if not CAF2.StartingUp then
-		for k, v in pairs(hooks["OnAddonDestruct"]) do
-			local ok, err = pcall(v, name)
-
-			if not (ok) then
-				CAF2.WriteToDebugFile("CAF_Hooks", "OnAddonDestruct Error: " .. err .. "\n")
-			end
-		end
+		hook.Call("CAFOnAddonDestruct", name)
 	end
 end
 
@@ -165,13 +132,7 @@ local function OnAddonConstruct(name)
 	net.Broadcast()
 
 	if not CAF2.StartingUp then
-		for k, v in pairs(hooks["OnAddonConstruct"]) do
-			local ok, err = pcall(v, name)
-
-			if not (ok) then
-				CAF2.WriteToDebugFile("CAF_Hooks", "OnAddonConstruct Error: " .. err .. "\n")
-			end
-		end
+		hook.Call("CAFOnAddonConstruct", name)
 	end
 end
 
@@ -487,7 +448,6 @@ CAF = CAF2
 local Files = file.Find("caf/core/server/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Loading: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/core/server/" .. File)
 
 	if (not ErrorCheck) then
@@ -500,7 +460,6 @@ end
 Files = file.Find("CAF/Core/client/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/client/" .. File)
 
 	if (not ErrorCheck) then
@@ -513,7 +472,6 @@ end
 Files = file.Find("CAF/Core/shared/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/shared/" .. File)
 
 	if (not ErrorCheck) then
@@ -526,7 +484,6 @@ end
 Files = file.Find("caf/languagevars/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/languagevars/" .. File)
 
 	if (not ErrorCheck) then
@@ -537,7 +494,6 @@ for k, File in ipairs(Files) do
 end
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
 
 	if (not ErrorCheck) then
@@ -551,7 +507,6 @@ end
 local Files = file.Find("caf/addons/server/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Loading: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/server/" .. File)
 
 	if (not ErrorCheck) then
@@ -564,7 +519,6 @@ end
 Files = file.Find("caf/addons/client/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/client/" .. File)
 
 	if (not ErrorCheck) then
@@ -577,7 +531,6 @@ end
 Files = file.Find("caf/addons/shared/*.lua", "LUA")
 
 for k, File in ipairs(Files) do
-	Msg("Sending: " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/shared/" .. File)
 
 	if (not ErrorCheck) then

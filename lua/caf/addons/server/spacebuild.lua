@@ -66,7 +66,7 @@ local function OnEntitySpawn(ent)
 	end
 end
 
-CAF.AddHook("OnEntitySpawn", OnEntitySpawn)
+hook.Add("CAFOnEntitySpawn", OnEntitySpawn)
 
 local function AllowAdminNoclip(ply)
 	if (ply:IsAdmin() or ply:IsSuperAdmin()) and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
@@ -752,7 +752,7 @@ function SB.__Construct()
 		hook.Add("PlayerFullLoad", "SB_PlayerInitialSpawn_Check", PlayerInitialSpawn)
 		hook.Add("PlayerSay", "SB_PlayerSay_Check", PlayerSay)
 		hook.Add("PlayerSetModel", "SB_Force_Model_Check", ForcePlyModel)
-		CAF.AddHook("think3", SB.PerformEnvironmentCheck)
+		timer.Create("SBEnvironmentCheck", 1, 0, SB.PerformEnvironmentCheck)
 		ResetGravity()
 
 		for k, v in pairs(player.GetAll()) do
@@ -779,9 +779,8 @@ function SB.__Destruct()
 	hook.Remove("PlayerFullLoad", "SB_PlayerInitialSpawn_Check")
 	hook.Remove("PlayerSay", "SB_PlayerSay_Check")
 	hook.Remove("PlayerSetModel", "SB_Force_Model_Check")
-	CAF.RemoveHook("think3", SB.PerformEnvironmentCheck)
+	timer.Remove("SBEnvironmentCheck")
 	ResetGravity()
-	CAF.RemoveServerTag("SB")
 	status = false
 
 	return true
