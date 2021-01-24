@@ -2,6 +2,8 @@
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
+local RD = CAF.GetAddon("Resource Distribution")
+
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -86,9 +88,8 @@ function ENT:OnTakeDamage(DmgInfo)
 end
 
 function ENT:OnRemove()
-	local rd = CAF.GetAddon("Resource Distribution")
-	rd.Unlink(self)
-	rd.RemoveRDEntity(self)
+	RD.Unlink(self)
+	RD.RemoveRDEntity(self)
 
 	if WireLib then
 		WireLib.Remove(self)
@@ -103,43 +104,43 @@ end
 
 --NEW Functions 
 function ENT:RegisterNonStorageDevice()
-	CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(self)
+	return RD.RegisterNonStorageDevice(self)
 end
 
 function ENT:AddResource(resource, maxamount, defaultvalue)
-	return CAF.GetAddon("Resource Distribution").AddResource(self, resource, maxamount, defaultvalue)
+	return RD.AddResource(self, resource, maxamount, defaultvalue)
 end
 
 function ENT:ConsumeResource(resource, amount)
-	return CAF.GetAddon("Resource Distribution").ConsumeResource(self, resource, amount)
+	return RD.ConsumeResource(self, resource, amount)
 end
 
 function ENT:SupplyResource(resource, amount)
-	return CAF.GetAddon("Resource Distribution").SupplyResource(self, resource, amount)
+	return RD.SupplyResource(self, resource, amount)
 end
 
 function ENT:Link(netid)
-	CAF.GetAddon("Resource Distribution").Link(self, netid)
+	return RD.Link(self, netid)
 end
 
 function ENT:Unlink()
-	CAF.GetAddon("Resource Distribution").Unlink(self)
+	return RD.Unlink(self)
 end
 
 function ENT:GetResourceAmount(resource)
-	CAF.GetAddon("Resource Distribution").GetResourceAmount(self, resource)
+	return RD.GetResourceAmount(self, resource)
 end
 
 function ENT:GetUnitCapacity(resource)
-	CAF.GetAddon("Resource Distribution").GetUnitCapacity(self, resource)
+	return RD.GetUnitCapacity(self, resource)
 end
 
 function ENT:GetNetworkCapacity(resource)
-	CAF.GetAddon("Resource Distribution").GetNetworkCapacity(self, resource)
+	return RD.GetNetworkCapacity(self, resource)
 end
 
 function ENT:GetEntityTable()
-	CAF.GetAddon("Resource Distribution").GetEntityTable(self)
+	return RD.GetEntityTable(self)
 end
 
 --END NEW Functions
@@ -150,7 +151,7 @@ function ENT:OnRestore()
 end
 
 function ENT:PreEntityCopy()
-	CAF.GetAddon("Resource Distribution").BuildDupeInfo(self)
+	RD.BuildDupeInfo(self)
 
 	if WireLib then
 		local DupeInfo = WireLib.BuildDupeInfo(self)
@@ -162,7 +163,7 @@ function ENT:PreEntityCopy()
 end
 
 function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
-	CAF.GetAddon("Resource Distribution").ApplyDupeInfo(Ent, CreatedEntities)
+	RD.ApplyDupeInfo(Ent, CreatedEntities)
 
 	if WireLib and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
