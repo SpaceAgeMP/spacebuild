@@ -15,7 +15,7 @@ CAFToolSetup.SetLang("Life Support Generators", "Create Generators attached to a
 function TOOL.EnableFunc()
 	if not CAF then return false end
 	local rd = CAF.GetAddon("Resource Distribution")
-	if not r or not rd.GetStatus() then return false end
+	if not rd or not rd.GetStatus() then return false end
 
 	return true
 end
