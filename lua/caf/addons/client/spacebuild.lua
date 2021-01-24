@@ -320,13 +320,6 @@ function SB.GetVersion()
 end
 
 --[[
-	Get any custom options this Custom Addon Class might have
-]]
-function SB.GetExtraOptions()
-	return {}
-end
-
---[[
 	Gets a menu from this Custom Addon Class
 ]]
 --Name is nil for main menu, String for others
@@ -334,13 +327,6 @@ function SB.GetMenu(menutype, menuname)
 	local data = {}
 
 	return data
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function SB.GetCustomStatus()
-	return
 end
 
 --[[

@@ -52,28 +52,6 @@ function RD.IsUpToDate(callBackfn)
 
 		return
 	end
-	--[[http.Get("http://www.snakesvx.net/versions/lsents.txt","",
-         function(html,size)
-             local version = tonumber(html);
-             if(version) then
-                 local latest = version;
-                 if(latest > RD.GetVersion()) then
-                     isuptodatecheck = false;
-                     callBackfn(false)
-                 else
-                     isuptodatecheck = true;
-                     callBackfn(true)
-                 end
-             end
-         end
-     ); ]]
-end
-
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function RD.GetExtraOptions()
-	return {}
 end
 
 --[[
@@ -116,13 +94,6 @@ function RD.GetMenu(menutype, menuname)
 	end
 
 	return data
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function RD.GetCustomStatus()
-	return
 end
 
 --[[

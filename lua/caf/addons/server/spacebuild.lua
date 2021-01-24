@@ -817,22 +817,6 @@ function SB.GetVersion()
 end
 
 --[[
-	Get any custom options this Custom Addon Class might have
-	Not implemented yet
-]]
-function SB.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-	Optional, returns a custom String status, could be used if your addon has more then 1 status based on the options activated?
-]]
-function SB.GetCustomStatus()
-	return
-end
-
---[[
 	You can send all the files from here that you want to add to send to the client
 	Optional
 ]]

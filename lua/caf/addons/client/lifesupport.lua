@@ -434,28 +434,6 @@ function LS.IsUpToDate(callBackfn)
 
 		return
 	end
-	--[[http.Get("http://www.snakesvx.net/versions/ls.txt","",
-		function(html,size)
-			local version = tonumber(html);
-			if(version) then
-				local latest = version;
-				if(latest > LS.GetVersion()) then
-					isuptodatecheck = false;
-					callBackfn(false)
-				else
-					isuptodatecheck = true;
-					callBackfn(true)
-				end
-			end
-		end
-	);]]
-end
-
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function LS.GetExtraOptions()
-	return {}
 end
 
 --[[
@@ -481,14 +459,6 @@ function LS.GetMenu(menutype, menuname)
 	end
 
 	return data
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function LS.GetCustomStatus()
-	--CAF.GetLangVar("Not Implemented Yet")
-	return
 end
 
 function LS.AddResourcesToSend()

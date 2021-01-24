@@ -165,20 +165,6 @@ function LS.GetVersion()
 	return 3.08, CAF.GetLangVar("Beta")
 end
 
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function LS.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function LS.GetCustomStatus()
-	return CAF.GetLangVar("Not Implemented Yet")
-end
-
 function LS.AddResourcesToSend()
 	--[[local list = file.Find("models/props_phx/life_support/*.mdl", "GAME")
 	PrintTable(list)

@@ -167,30 +167,6 @@ function CAF2.RemoveHook(HookName, func)
 end
 
 --[[
-	Returns the Status of an extra option of an Addon or nil when not found
-]]
-function CAF2.GetExtraOptionStatus(AddonName, OptionName)
-	if not AddonName then return nil, CAF.GetLangVar("No AddonName given") end
-	if not OptionName then return nil, CAF.GetLangVar("No OptionName given") end
-
-	if (Addons[AddonName]) then
-		if (Addons[AddonName].GetExtraOptions) then
-			local tmp = Addons[AddonName].GetExtraOptions()
-
-			if (tmp) then
-				if (tmp[OptionName]) then return tmp[OptionName].status end
-
-				return nil, CAF.GetLangVar("This option wasn't found for this Addon")
-			end
-		end
-
-		return nil, CAF.GetLangVar("No Extra options found for this Addon")
-	end
-
-	return nil, CAF.GetLangVar("Addon Not Found")
-end
-
---[[
 	Returns the boolean status of an Addon
 ]]
 function CAF2.GetAddonStatus(AddonName)
@@ -202,34 +178,6 @@ function CAF2.GetAddonStatus(AddonName)
 	end
 
 	return nil, "No Status Info Found"
-end
-
---[[
-	Returns the custom status of the addon (if available)
-]]
-function CAF2.GetAddonCustomStatus(AddonName)
-	if not AddonName then return nil, "No AddonName given" end
-
-	if (Addons[AddonName]) then
-		local ok, status = pcall(Addons[AddonName].GetCustomStatus)
-		if (ok) then return status end
-	end
-
-	return nil, "No Custom Status Info Found"
-end
-
---[[
-	Returns the Number and String version of this addon
-]]
-function CAF2.GetAddonVersion(AddonName)
-	if not AddonName then return nil, "No AddonName given" end
-
-	if (Addons[AddonName]) then
-		local ok, version, strver = pcall(Addons[AddonName].GetVersion)
-		if (ok) then return version, strver end
-	end
-
-	return nil, "No Version Info Found"
 end
 
 --[[
