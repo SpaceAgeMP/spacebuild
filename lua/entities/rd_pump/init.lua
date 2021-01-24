@@ -349,12 +349,15 @@ end
 function ENT:Send(resource, amount, temperature)
 	if not self.otherpump then return end
 	local left = self.otherpump:Receive(resource, amount, temperature)
+	if not left then
+		self:Disconnect()
+		return
+	end
 	RD.ConsumeNetResource(self.netid, resource, amount - left)
 end
 
 function ENT:Receive(resource, amount, temperature)
 	if not self.otherpump then return end
-
 	return RD.SupplyNetResource(self.netid, resource, amount, temperature)
 end
 
