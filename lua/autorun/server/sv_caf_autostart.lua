@@ -486,32 +486,6 @@ function CAF2.POPUP(ply, msg, location, color, displaytime)
 	end
 end
 
-local servertags = nil
-
-function CAF2.AddServerTag(tag)
-	if not servertags or not CAF2.StartingUp then
-		servertags = GetConVarString("sv_tags")
-	end
-
-	if servertags == nil then
-		RunConsoleCommand("sv_tags", tag)
-	elseif not string.find(servertags, tag) then
-		servertags = servertags .. "," .. tag
-		RunConsoleCommand("sv_tags", servertags)
-	end
-end
-
-function CAF2.RemoveServerTag(tag)
-	if not servertags or not CAF2.StartingUp then
-		servertags = GetConVarString("sv_tags")
-	end
-
-	if servertags then
-		servertags = string.Replace(servertags, "," .. tag, "")
-		RunConsoleCommand("sv_tags", servertags)
-	end
-end
-
 CAF = CAF2
 --[[
 	The following code sends the clientside and shared files to the client and includes CAF core code

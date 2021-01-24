@@ -761,7 +761,6 @@ function SB.__Construct()
 			PlayerInitialSpawn(v)
 		end
 
-		CAF.AddServerTag("SB")
 		status = true
 
 		return true
