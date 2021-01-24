@@ -54,7 +54,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	if (not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
+	local trace = LocalPlayer():GetEyeTrace()
+	if (not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
 		return
 	end
 	--overlaysettings
@@ -64,7 +65,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local resnames = OverlaySettings.resnames
 	local genresnames = OverlaySettings.genresnames
 	--End overlaysettings
-	local trace = LocalPlayer():GetEyeTrace()
 
 	local nettable = RD.GetEntityTable(self)
 	if table.Count(nettable) == 0 then return end
@@ -119,7 +119,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		else
 			local v
 
-			if resnames and table.Count(resnames) > 0 then
+			if resnames then
 				for _, k in pairs(resnames) do
 					v = resources[k] or empty_value
 					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. " (" .. math.floor(v.temperature) .. " K)\n"

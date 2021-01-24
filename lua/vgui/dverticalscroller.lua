@@ -1,21 +1,6 @@
-﻿--[[   _                                
-    ( )                               
-   _| |   __   _ __   ___ ___     _ _ 
- /'_` | /'__`\( '__)/' _ ` _ `\ /'_` )
-( (_| |(  ___/| |   | ( ) ( ) |( (_| |
-`\__,_)`\____)(_)   (_) (_) (_)`\__,_) 
-
-	DVerticalScroller
-	
-	Made to scroll the tabson PropertySheet, but may have other uses.
-	
-]]
-PANEL = {}
+﻿local PANEL = {}
 AccessorFunc(PANEL, "m_iOverlap", "Overlap")
 
---[[---------------------------------------------------------
-
----------------------------------------------------------]]
 function PANEL:Init()
 	self.Panels = {}
 	self.OffsetX = 0
@@ -28,17 +13,11 @@ function PANEL:Init()
 	self.btnRight:SetType("down")
 end
 
---[[---------------------------------------------------------
-
----------------------------------------------------------]]
 function PANEL:AddPanel(pnl)
 	table.insert(self.Panels, pnl)
 	pnl:SetParent(self.pnlCanvas)
 end
 
---[[---------------------------------------------------------
-   Name: OnMouseWheeled
----------------------------------------------------------]]
 function PANEL:OnMouseWheeled(dlta)
 	self.OffsetX = self.OffsetX + dlta * -30
 	self:InvalidateLayout(true)
@@ -46,9 +25,6 @@ function PANEL:OnMouseWheeled(dlta)
 	return true
 end
 
---[[---------------------------------------------------------
-
----------------------------------------------------------]]
 function PANEL:Think()
 	-- Hmm.. This needs to really just be done in one place
 	-- and made available to everyone.
@@ -66,11 +42,7 @@ function PANEL:Think()
 	end
 end
 
---[[---------------------------------------------------------
-    PerformLayout
----------------------------------------------------------]]
-function PANEL:PerformLayout()
-	local w, h = self:GetSize()
+function PANEL:PerformLayout(w, h)
 	self.pnlCanvas:SetTall(h)
 	local x = 0
 

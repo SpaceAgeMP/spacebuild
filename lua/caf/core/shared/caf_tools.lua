@@ -5,7 +5,7 @@ if (SERVER) then
 	AddCSLuaFile("vgui/caf_gui.lua")
 	AddCSLuaFile("vgui/caf_gui_button.lua")
 	-- Global list of callbacks
-	CAF_CallbackFuncs = {}
+	local CAF_CallbackFuncs = {}
 
 	--DO NOT register this function with the duplication, you MUST wrap this function in another one as to add CheckLimit (ther is a generic function to generate these functions below)
 	function CAF_MakeCAFEnt(ply, Ang, Pos, system_type, system_class, model, frozen)
@@ -97,7 +97,7 @@ if (SERVER) then
 		return MakeFunction
 	end
 
-	function CAF_SetToolMakeFunc(ToolName, EntClass, EntMakeFunct)
+	local function CAF_SetToolMakeFunc(ToolName, EntClass, EntMakeFunct)
 		if not (ToolName and EntClass) then return end
 
 		if (not EntMakeFunct) then

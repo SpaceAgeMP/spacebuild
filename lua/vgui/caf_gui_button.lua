@@ -1,39 +1,19 @@
 ﻿local PANEL = {}
 
---[[---------------------------------------------------------
-   Name: Init
----------------------------------------------------------]]
 function PANEL:Init()
 	self.SpawnButton = vgui.Create("Button", self)
 end
 
---[[---------------------------------------------------------
-   Name: ApplySchemeSettings
----------------------------------------------------------]]
-function PANEL:ApplySchemeSettings()
-end
-
---[[---------------------------------------------------------
-   Name: Setup
----------------------------------------------------------]]
-function PANEL:Setup(in_table)
-end
-
---[[---------------------------------------------------------
-   Name: PerformLayout
----------------------------------------------------------]]
-function PANEL:PerformLayout()
+function PANEL:PerformLayout(w, h)
 	local Border = 3
 	self.SpawnButton:SizeToContents()
-	self.SpawnButton:SetSize(self:GetWide() - Border * 2, self.SpawnButton:GetTall() - Border + 6)
+	self.SpawnButton:SetSize(w - Border * 2, self.SpawnButton:GetTall() - Border + 6)
 	--self.SpawnButton:SetSize( self:GetWide() - Border * 2, 24 - Border )
 	self.SpawnButton:SetPos(Border, Border)
-	self:SetSize(self:GetWide(), self.SpawnButton:GetTall() + Border * 2)
+	-- TODO: This usually triggers a perform layout, infinite loop??
+	-- self:SetSize(w, self.SpawnButton:GetTall() + Border * 2)
 end
 
---[[---------------------------------------------------------
-   Name: SetID
----------------------------------------------------------]]
 function PANEL:SetCommands(toolname, name, model, type, num)
 	self.toolname = toolname
 	self.name = name
@@ -47,13 +27,11 @@ function PANEL:SetCommands(toolname, name, model, type, num)
 	self:InvalidateLayout()
 end
 
---[[---------------------------------------------------------
-   Name: Paint
----------------------------------------------------------]]
-function PANEL:Paint()
+local bgColor = Color(50, 50, 255, 250)
+
+function PANEL:Paint(w, h)
 	if (LocalPlayer():GetInfo(self.toolname .. "_name") == self.num) then
-		local bgColor = Color(50, 50, 255, 250)
-		draw.RoundedBox(4, 0, 0, self:GetWide(), self:GetTall(), bgColor)
+		draw.RoundedBox(4, 0, 0, w, h, bgColor)
 	end
 
 	return false

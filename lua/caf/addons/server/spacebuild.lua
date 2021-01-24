@@ -11,8 +11,6 @@ util.PrecacheModel("models/player/samzanemesis/MarineOfficer.mdl")
 util.PrecacheModel("models/player/samzanemesis/MarineTech.mdl")
 local SB = {}
 local status = false
---Local stuff
-SB_DEBUG = true
 --local NextUpdateTime
 local SB_InSpace = 0
 --SetGlobalInt("InSpace", 0)

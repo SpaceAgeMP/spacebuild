@@ -251,7 +251,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	if not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
+	local trace = LocalPlayer():GetEyeTrace()
+	if not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
 		return
 	end
 	--overlaysettings
@@ -259,7 +260,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local OverlaySettings = list.Get("LSEntOverlayText")[self:GetClass()]
 	local HasOOO = OverlaySettings.HasOOO
 	--End overlaysettings
-	local trace = LocalPlayer():GetEyeTrace()
 
 
 

@@ -2,7 +2,7 @@
 local status = false
 --Stuff that can't be disabled
 CreateConVar("LS_AllowNukeEffect", "1") --Update to something changeable later on
---end 
+--end
 --Local Functions
 local SB_AIR_O2 = 0
 local SB_AIR_CO2 = 1
@@ -242,7 +242,7 @@ end
 
 function LS.ZapMe(pos, magnitude)
 	if not (pos and magnitude) then return end
-	zap = ents.Create("point_tesla")
+	local zap = ents.Create("point_tesla")
 	zap:SetKeyValue("targetname", "teslab")
 	zap:SetKeyValue("m_SoundName", "DoSpark")
 	zap:SetKeyValue("texture", "sprites/physbeam.spr")
@@ -519,8 +519,9 @@ function Ply:LsCheck()
 				end
 			end
 
+			local plyPos = self:GetPos()
 			for k, v in pairs(LS.GetTemperatureRegulators()) do
-				if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+				if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 					self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + v:CoolDown(self.caf.custom.ls.temperature)
 				end
 			end
@@ -529,7 +530,7 @@ function Ply:LsCheck()
 				local dec = 0
 
 				if self.caf.custom.ls.temperature < 283 then
-					dam = (283 - self.caf.custom.ls.temperature) / 5
+					local dam = (283 - self.caf.custom.ls.temperature) / 5
 
 					if (self.environment:GetPressure() > 0) then
 						dec = math.ceil(5 * (4 - (self.caf.custom.ls.temperature / 72)))
@@ -569,7 +570,7 @@ function Ply:LsCheck()
 						end
 					end
 				elseif self.caf.custom.ls.temperature > 308 then
-					dam = (self.caf.custom.ls.temperature - 308) / 5
+					local dam = (self.caf.custom.ls.temperature - 308) / 5
 					dec = math.ceil(5 * ((self.caf.custom.ls.temperature - 308) / 72))
 
 					if (self.suit.coolant > dec) then
@@ -606,8 +607,9 @@ function Ply:LsCheck()
 			end
 
 			if not self.caf.custom.ls.airused then
+				local plyPos = self:GetPos()
 				for k, v in pairs(LS.GetAirRegulators()) do
-					if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+					if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 						self.suit.air = self.suit.air + v:UsePerson()
 						self.caf.custom.ls.airused = true
 						break
@@ -669,8 +671,9 @@ function Ply:LsCheck()
 				end
 
 				if not self.caf.custom.ls.airused then
+					local plyPos = self:GetPos()
 					for k, v in pairs(LS.GetAirRegulators()) do
-						if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+						if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 							self.suit.air = self.suit.air + v:UsePerson()
 							self.caf.custom.ls.airused = true
 							break

@@ -96,19 +96,20 @@ end
 local function DrawSunEffects()
 	-- no pixel shaders? no sun effects!
 	if (not render.SupportsPixelShaders_2_0()) then return end
+	local eyePos = EyePos()
 
 	-- render each star.
 	for ent, Sun in pairs(stars) do
 		-- calculate brightness.
 		local entpos = Sun.Position --Sun.ent:LocalToWorld( Vector(0,0,0) )
-		local normVec = Vector(entpos - EyePos())
+		local normVec = Vector(entpos - eyePos)
 		normVec:Normalize()
 		local dot = math.Clamp(EyeAngles():Forward():Dot(normVec), -1, 1)
 		dot = math.abs(dot)
 		--local dist = Vector( entpos - EyePos() ):Length();
-		local dist = entpos:Distance(EyePos()) / 1.5
+		local dist = entpos:Distance(eyePos) / 1.5
 		-- draw sunbeams.
-		local sunpos = EyePos() + normVec * (dist * 0.5)
+		local sunpos = eyePos + normVec * (dist * 0.5)
 		local scrpos = sunpos:ToScreen()
 
 		if (dist <= Sun.BeamRadius and dot > 0) then
@@ -119,13 +120,11 @@ local function DrawSunEffects()
 		end
 
 		-- can the sun see us?
-		local trace = {
+		local tr = util.TraceLine({
 			start = entpos,
-			endpos = EyePos(),
+			endpos = eyePos,
 			filter = LocalPlayer(),
-		}
-
-		local tr = util.TraceLine(trace)
+		})
 
 		-- draw!
 		if (dist <= Sun.Radius and dot > 0 and tr.Fraction >= 1) then
@@ -133,19 +132,8 @@ local function DrawSunEffects()
 			local frac = (1 - ((1 / Sun.Radius) * dist)) * dot
 			-- draw bloom.
 			DrawBloom(0.428, 3 * frac, 15 * frac, 15 * frac, 5, 0, 1, 1, 1)
-
-			--[[DrawBloom(
-				0, 
-				0.75 * frac, 
-				3 * frac, 3 * frac, 
-				2, 
-				3, 
-				1, 
-				1, 
-				1
-			);]]
-			-- draw color.
-			local tab = {
+			-- draw colormod.
+			DrawColorModify({
 				["$pp_colour_addr"] = 0.35 * frac,
 				["$pp_colour_addg"] = 0.15 * frac,
 				["$pp_colour_addb"] = 0.05 * frac,
@@ -155,10 +143,7 @@ local function DrawSunEffects()
 				["$pp_colour_mulr"] = 0,
 				["$pp_colour_mulg"] = 0,
 				["$pp_colour_mulb"] = 0,
-			}
-
-			-- draw colormod.
-			DrawColorModify(tab)
+			})
 		end
 	end
 end

@@ -226,7 +226,7 @@ function TOOL:RightClick(trace)
 
 	-- Clear the objects so we're ready to go again
 	self:ClearObjects()
-	
+
 	return true
 end
 

@@ -438,11 +438,11 @@ function ENT:ChangeAtmosphere(newatmosphere)
 		self.sbenvironment.air.empty = tmp
 		self.sbenvironment.air.emptyper = self:GetEmptyAirPercentage()
 	else
-		self.sbenvironment.air.o2 = math.Round(GetO2Percentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
-		self.sbenvironment.air.co2 = math.Round(GetCO2Percentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
-		self.sbenvironment.air.n = math.Round(GetNPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
-		self.sbenvironment.air.h = math.Round(GetHPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
-		self.sbenvironment.air.empty = math.Round(GetEmptyAirPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
+		self.sbenvironment.air.o2 = math.Round(self:GetO2Percentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
+		self.sbenvironment.air.co2 = math.Round(self:GetCO2Percentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
+		self.sbenvironment.air.n = math.Round(self:GetNPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
+		self.sbenvironment.air.h = math.Round(self:GetHPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
+		self.sbenvironment.air.empty = math.Round(self:GetEmptyAirPercentage() * 5 * (self:GetVolume() / 1000) * newatmosphere)
 		self.sbenvironment.air.max = math.Round(100 * 5 * (self:GetVolume() / 1000) * newatmosphere)
 	end
 

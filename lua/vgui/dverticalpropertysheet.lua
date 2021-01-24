@@ -1,14 +1,4 @@
-﻿--[[   _                                
-    ( )                               
-   _| |   __   _ __   ___ ___     _ _ 
- /'_` | /'__`\( '__)/' _ ` _ `\ /'_` )
-( (_| |(  ___/| |   | ( ) ( ) |( (_| |
-`\__,_)`\____)(_)   (_) (_) (_)`\__,_) 
-
-	DPropertySheet
-
-]]
-local PANEL = {}
+﻿local PANEL = {}
 Derma_Hook(PANEL, "Paint", "Paint", "PropertySheet")
 AccessorFunc(PANEL, "m_bBackground", "DrawBackground")
 AccessorFunc(PANEL, "m_pActiveTab", "ActiveTab")
@@ -16,9 +6,6 @@ AccessorFunc(PANEL, "m_iPadding", "Padding")
 AccessorFunc(PANEL, "m_fFadeTime", "FadeTime")
 AccessorFunc(PANEL, "m_bShowIcons", "ShowIcons")
 
---[[---------------------------------------------------------
-   Name: Init
----------------------------------------------------------]]
 function PANEL:Init()
 	self:SetShowIcons(true)
 	self.leftPanel = vgui.Create("DPanel", self)
@@ -33,9 +20,6 @@ function PANEL:Init()
 	self.Items = {}
 end
 
---[[---------------------------------------------------------
-   Name: AddSheet
----------------------------------------------------------]]
 function PANEL:AddSheet(label, panel, material, NoStretchX, NoStretchY, Tooltip)
 	if (not IsValid(panel)) then return end
 	local Sheet = {}
@@ -55,9 +39,6 @@ function PANEL:AddSheet(label, panel, material, NoStretchX, NoStretchY, Tooltip)
 	self.tabScroller:AddPanel(Sheet.Tab)
 end
 
---[[---------------------------------------------------------
-   Name: SetActiveTab
----------------------------------------------------------]]
 function PANEL:SetActiveTab(active)
 	if (self.m_pActiveTab == active) then return end
 
@@ -72,16 +53,10 @@ function PANEL:SetActiveTab(active)
 	self:InvalidateLayout()
 end
 
---[[---------------------------------------------------------
-   Name: Think
----------------------------------------------------------]]
 function PANEL:Think()
 	self.animFade:Run()
 end
 
---[[---------------------------------------------------------
-   Name: CrossFade
----------------------------------------------------------]]
 function PANEL:CrossFade(anim, delta, data)
 	local old = data.OldTab:GetPanel()
 	local new = data.NewTab:GetPanel()
@@ -107,10 +82,7 @@ function PANEL:CrossFade(anim, delta, data)
 	new:SetAlpha(255 * delta)
 end
 
---[[---------------------------------------------------------
-   Name: PerformLayout
----------------------------------------------------------]]
-function PANEL:PerformLayout()
+function PANEL:PerformLayout(w, h)
 	local ActiveTab = self:GetActiveTab()
 	local Padding = self:GetPadding()
 	self.leftPanel:InvalidateLayout(true)
@@ -129,11 +101,9 @@ function PANEL:PerformLayout()
 		v.Tab:ApplySchemeSettings()
 	end
 
-	self.leftPanel:SetTall(self:GetTall())
-	self.rightPanel:SetTall(self:GetTall())
-	self.tabScroller:SetTall(self:GetTall() - 10)
-	self.leftPanel:SetWide(100)
-	self.rightPanel:SetWide(self:GetWide() - 101)
+	self.leftPanel:SetSize(100, h)
+	self.rightPanel:SetTall(w - 101, h)
+	self.tabScroller:SetTall(h - 10)
 
 	if (ActiveTab) then
 		local ActivePanel = ActiveTab:GetPanel()
@@ -160,20 +130,17 @@ function PANEL:PerformLayout()
 	self.animFade:Run()
 end
 
---[[---------------------------------------------------------
-   Name: SizeToContentWidth
----------------------------------------------------------]]
 function PANEL:SizeToContentWidth()
-	local wide = 0
+	local tall = 0
 
 	for k, v in pairs(self.Items) do
 		if (v.Panel) then
 			v.Panel:InvalidateLayout(true)
-			wide = math.max(wide, v.Panel:GetTall() + self.m_iPadding * 2) --math.max( wide, v.Panel:GetWide()  + self.m_iPadding * 2 )
+			tall = math.max(tall, v.Panel:GetTall() + self.m_iPadding * 2) --math.max( wide, v.Panel:GetWide()  + self.m_iPadding * 2 )
 		end
 	end
 
-	self:SetTall(wide) --self:SetWide( wide )
+	self:SetTall(tall)
 end
 
 derma.DefineControl("DVerticalPropertySheet", "", PANEL, "Panel")

@@ -1,8 +1,5 @@
 ﻿local PANEL = {}
 
---[[---------------------------------------------------------
-   Name: 
----------------------------------------------------------]]
 function PANEL:Init()
 	self.List = vgui.Create("DPanelList", self)
 	self.List:SetSpacing(1)
@@ -11,38 +8,23 @@ function PANEL:Init()
 	self:ApplySchemeSettings()
 end
 
---[[---------------------------------------------------------
-   Name: PerformLayout
----------------------------------------------------------]]
-function PANEL:ApplySchemeSettings()
-end
-
---[[---------------------------------------------------------
-   Name: PerformLayout
----------------------------------------------------------]]
-function PANEL:PerformLayout()
+function PANEL:PerformLayout(w, h)
 	local Border = 10
 	local Tall = 402
 	local iTop = Tall - Border
 	self.List:SetPos(Border, Border)
-	self.List:SetSize(self:GetWide() - Border * 2, iTop - Border * 2)
+	self.List:SetSize(w - Border * 2, iTop - Border * 2)
 	self.List:InvalidateLayout(true)
-	self:SetSize(self:GetWide(), Tall)
+	self:SetSize(w, Tall) -- TODO: Perform layout loop?
 end
 
---[[---------------------------------------------------------
-   Name: Paint
----------------------------------------------------------]]
-function PANEL:Paint()
+function PANEL:Paint(w, h)
 	local bgColor = Color(130, 130, 130, 255)
-	draw.RoundedBox(4, 0, 0, self:GetWide(), self:GetTall(), bgColor)
+	draw.RoundedBox(4, 0, 0, w, h, bgColor)
 
 	return true
 end
 
---[[---------------------------------------------------------
-   Name: Clear
----------------------------------------------------------]]
 function PANEL:Clear()
 	for k, panel in pairs(self.List.Items) do
 		panel:Remove()
@@ -51,9 +33,6 @@ function PANEL:Clear()
 	self.List.Items = {}
 end
 
---[[---------------------------------------------------------
-   Name: SortByName
----------------------------------------------------------]]
 function PANEL:SortByName()
 	table.sort(self.List.Items, function(a, b)
 		if (b.name == nil) then return false end
@@ -63,9 +42,6 @@ function PANEL:SortByName()
 	end)
 end
 
---[[---------------------------------------------------------
-   Name: Populate
----------------------------------------------------------]]
 function PANEL:Populate()
 	self:Clear()
 	local n = 0
@@ -80,9 +56,6 @@ function PANEL:Populate()
 	self:SortByName()
 end
 
---[[---------------------------------------------------------
-   Name: SetList
----------------------------------------------------------]]
 function PANEL:SetList(ToolName, ListName)
 	self.ToolName = ToolName
 	self.ListName = ListName

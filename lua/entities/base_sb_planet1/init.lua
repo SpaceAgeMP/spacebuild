@@ -220,15 +220,6 @@ function ENT:SendData(ply)
 end
 
 function ENT:BloomEffect(Col_r, Col_g, Col_b, SizeX, SizeY, Passes, Darken, Multiply, Color)
-	if SB_DEBUG then
-		Msg("Col_r/b/g: " .. tostring(Col_r) .. "/" .. tostring(Col_b) .. "/" .. tostring(Col_g) .. "\n")
-		Msg("SizeX/Y: " .. tostring(SizeX) .. "/" .. tostring(SizeY) .. "\n")
-		Msg("Passes: " .. tostring(Passes) .. "\n")
-		Msg("Darken: " .. tostring(Darken) .. "\n")
-		Msg("Multiply: " .. tostring(Multiply) .. "\n")
-		Msg("Color: " .. tostring(Color) .. "\n")
-	end
-
 	if Col_r then
 		self.sbenvironment.bloom.Col_r = Col_r
 	end
@@ -265,18 +256,10 @@ function ENT:BloomEffect(Col_r, Col_g, Col_b, SizeX, SizeY, Passes, Darken, Mult
 		self.sbenvironment.bloom.Color = Color
 	end
 
-	Msg("Sending bloom update\n")
 	self:SendData()
 end
 
 function ENT:ColorEffect(AddColor_r, AddColor_g, AddColor_b, MulColor_r, MulColor_g, MulColor_b, Brightness, Contrast, Color)
-	if SB_DEBUG then
-		Msg("AddColor_r/b/g: " .. tostring(AddColor_r) .. "/" .. tostring(AddColor_b) .. "/" .. tostring(AddColor_g) .. "\n")
-		Msg("AddColor_r/b/g: " .. tostring(MulColor_r) .. "/" .. tostring(MulColor_b) .. "/" .. tostring(MulColor_g) .. "\n")
-		Msg("Brightness: " .. tostring(Brightness) .. "\n")
-		Msg("Contrast: " .. tostring(Contrast) .. "\n")
-		Msg("Color: " .. tostring(Color) .. "\n")
-	end
 
 	if AddColor_r then
 		self.sbenvironment.color.AddColor_r = AddColor_r

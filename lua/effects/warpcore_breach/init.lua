@@ -11,9 +11,6 @@ for _, mat in pairs(tMats) do
 	mat:SetInt("$illumfactor", 8)
 end
 
---[[---------------------------------------------------------
-   Init( data table )
----------------------------------------------------------]]
 function EFFECT:Init(data)
 	self.Position = data:GetOrigin()
 	self.Position.z = self.Position.z + 4
@@ -77,9 +74,6 @@ function EFFECT:Init(data)
 	self.vecang = VectorRand()
 end
 
---[[---------------------------------------------------------
-   THINK
----------------------------------------------------------]]
 function EFFECT:Think()
 	local Pos = self.Position
 	local timeleft = self.TimeLeft - CurTime()
@@ -122,9 +116,6 @@ function EFFECT:Think()
 	end
 end
 
---[[---------------------------------------------------------
-   Draw the effect
----------------------------------------------------------]]
 function EFFECT:Render()
 	local startpos = self.Position
 	--Base glow
@@ -134,11 +125,12 @@ function EFFECT:Render()
 
 	--shockwave
 	if self.Size < 32768 then
-		local Distance = EyePos():Distance(self:GetPos())
-		local Pos = self:GetPos() + (EyePos() - self:GetPos()):GetNormal() * Distance * (self.Refract ^ (0.3)) * 0.8
+		local pos = self:GetPos()
+		local Distance = EyePos():Distance(pos)
+		local spritePos = pos + (EyePos() - pos):GetNormal() * (Distance * (self.Refract ^ (0.3)) * 0.8)
 		matRefraction:SetFloat("$refractamount", math.sin(self.Refract * math.pi) * 0.1)
 		render.SetMaterial(matRefraction)
 		render.UpdateRefractTexture()
-		render.DrawSprite(Pos, self.Size, self.Size)
+		render.DrawSprite(spritePos, self.Size, self.Size)
 	end
 end

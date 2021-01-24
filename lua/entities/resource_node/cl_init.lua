@@ -203,16 +203,15 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			for k, v in pairs(resources) do
 				if mode == 3 then
 					surface.SetTextColor(200, 200, 255, 255)
-					amt = v.value / v.maxvalue
+					local amt = v.value / v.maxvalue
 					surface.SetTextPos(textStartPos + 15, TempY)
 					surface.DrawText("   " .. rd.GetProperResourceName(k))
 					surface.DrawOutlinedRect(-20, TempY - 5, -2 * textStartPos + 20, 40)
 					surface.DrawRect(-20, TempY - 5, ((-2 * textStartPos) + 20) * amt, 40)
 					TempY = TempY + 50
-					value, h = surface.GetTextSize(tostring(v.value))
+					local value, h = surface.GetTextSize(tostring(v.value))
 
 					if amt < 0.5 then
-						surface.SetTextColor(200, 200, 255, 255)
 						surface.SetTextPos(-2 * textStartPos * amt - 5, TempY - 15 - h)
 						surface.DrawText(v.value)
 					else

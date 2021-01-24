@@ -133,7 +133,7 @@ local function AddNetworkToCache(nrofbytes)
 		--print("nr_of_cons", nr_of_cons)
 		for i = 1, nr_of_cons do
 			--print(i)
-			con = ReadShort()
+			local con = ReadShort()
 			table.insert(data.cons, con)
 		end
 	end
