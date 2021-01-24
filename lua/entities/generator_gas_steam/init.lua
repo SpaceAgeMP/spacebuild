@@ -197,7 +197,7 @@ function ENT:Proc_Water()
 	local winc = Water_Increment + (self.overdrive * Water_Increment)
 	winc = math.ceil(winc * self:GetMultiplier()) * self.Multiplier
 
-	local einc = RD.GetResourceEnergyContent("water", winc, STEAM_TEMPERATURE - waterTemp) * 1.2
+	local einc = math.ceil(RD.GetResourceEnergyContent("water", winc, STEAM_TEMPERATURE - waterTemp) * 1.2)
 
 	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "EnergyUsage", einc)

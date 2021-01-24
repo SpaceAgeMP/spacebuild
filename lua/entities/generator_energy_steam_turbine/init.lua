@@ -208,7 +208,7 @@ function ENT:Pump_Air()
 		return
 	end
 
-	local einc = RD.GetResourceEnergyContent("water", winc, waterTemp - targetTemperature) * 0.8
+	local einc = math.floor(RD.GetResourceEnergyContent("water", winc, waterTemp - targetTemperature) * 0.8)
 
 	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "EnergyProduction", math.Round(einc))
