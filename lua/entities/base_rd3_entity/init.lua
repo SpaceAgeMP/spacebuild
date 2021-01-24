@@ -157,8 +157,8 @@ function ENT:ConsumeResource(resource, amount)
 	return RD.ConsumeResource(self, resource, amount)
 end
 
-function ENT:SupplyResource(resource, amount)
-	return RD.SupplyResource(self, resource, amount)
+function ENT:SupplyResource(resource, amount, temperature)
+	return RD.SupplyResource(self, resource, amount, temperature)
 end
 
 function ENT:Link(netid)
