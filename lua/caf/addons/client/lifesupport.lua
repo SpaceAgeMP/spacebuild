@@ -65,7 +65,6 @@ local hud2 = {
 	Width = 224,
 	Height = 128,
 	Bottom = ScH - 32,
-	Top = ScH - 32 - hud2.Height,
 	HalfWidth = 224 / 2,
 	Left = MidW - 224 / 2,
 	Rounding = 8,
@@ -74,6 +73,7 @@ local hud2 = {
 	Font2 = "LS3HudSubtitle",
 	Font3 = "LS3HudSubSubtitle"
 }
+hud2.Top = ScH - 32 - hud2.Height
 
 huds[2] = hud2
 hud2 = nil
