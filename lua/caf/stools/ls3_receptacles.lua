@@ -42,7 +42,6 @@ TOOL.Renamed = {
 		air_tank = "storage_gas_o2",
 		coolant_tank = "storage_liquid_water",
 		energy_cell = "storage_energy",
-		steam_tank = "storage_gas_steam",
 		water_tank = "storage_liquid_water",
 		hvywater_tank = "storage_liquid_hvywater"
 	},
@@ -50,7 +49,6 @@ TOOL.Renamed = {
 		air_tank = "storage_gas_o2",
 		coolant_tank = "storage_liquid_water",
 		energy_cell = "storage_energy",
-		steam_tank = "storage_gas_steam",
 		water_tank = "storage_liquid_water",
 		hvywater_tank = "storage_liquid_hvywater",
 	},
@@ -121,8 +119,6 @@ local function gas_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extra
 		res = "nitrogen"
 	elseif type == "storage_gas_co2" then
 		res = "carbon dioxide"
-	elseif type == "storage_gas_steam" then
-		res = "steam"
 	end
 
 	ent.caf.custom.resource = res
@@ -179,28 +175,6 @@ local function liquid_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_ex
 	return mass, maxhealth
 end
 
-local function liquid_nitrogen_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
-	local volume_mul = 1
-	local base_volume = 4084
-	local base_mass = 20
-	local base_health = 200
-	local phys = ent:GetPhysicsObject()
-
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
-	end
-
-	CAF.GetAddon("Resource Distribution").AddResource(ent, "liquid nitrogen", math.Round(3000 * volume_mul))
-	ent.MAXRESOURCE = math.Round(3000 * volume_mul)
-	local mass = math.Round(base_mass * volume_mul)
-	ent.mass = mass
-	local maxhealth = math.Round(base_health * volume_mul)
-
-	return mass, maxhealth
-end
-
 local function heavywater_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1
 	local base_volume = 4084
@@ -236,15 +210,14 @@ local function cache_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 		volume_mul = vol / base_volume
 	end
 
-	local rd = CAF.GetAddon("Resource Distribution")
-	rd.AddResource(ent, "energy", math.Round(5500 * volume_mul))
-	rd.AddResource(ent, "oxygen", math.Round(6000 * volume_mul))
-	rd.AddResource(ent, "hydrogen", math.Round(3000 * volume_mul))
-	rd.AddResource(ent, "carbon dioxide", math.Round(5000 * volume_mul))
-	rd.AddResource(ent, "nitrogen", math.Round(7000 * volume_mul))
-	rd.AddResource(ent, "liquid nitrogen", math.Round(7000 * volume_mul))
-	rd.AddResource(ent, "water", math.Round(4000 * volume_mul))
-	rd.AddResource(ent, "heavy water", math.Round(360 * volume_mul))
+	local RD = CAF.GetAddon("Resource Distribution")
+	RD.AddResource(ent, "energy", math.Round(5500 * volume_mul))
+	RD.AddResource(ent, "oxygen", math.Round(6000 * volume_mul))
+	RD.AddResource(ent, "hydrogen", math.Round(3000 * volume_mul))
+	RD.AddResource(ent, "carbon dioxide", math.Round(5000 * volume_mul))
+	RD.AddResource(ent, "nitrogen", math.Round(7000 * volume_mul))
+	RD.AddResource(ent, "water", math.Round(4000 * volume_mul))
+	RD.AddResource(ent, "heavy water", math.Round(360 * volume_mul))
 	local mass = math.Round(base_mass * volume_mul)
 	ent.mass = mass
 	local maxhealth = math.Round(base_health * volume_mul)
@@ -431,50 +404,6 @@ TOOL.Devices = {
 			},
 		},
 	},
-	storage_gas_steam = {
-		Name = "Steam Tanks",
-		type = "storage_gas_steam",
-		class = "storage_gas_steam",
-		func = gas_tank_func,
-		devices = {
-			small_phx = {
-				Name = "Small Canister (Phx)",
-				model = "models/props_phx/life_support/canister_small.mdl",
-				skin = 5,
-				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-			},
-			small_phx2 = {
-				Name = "Small Tank (Phx)",
-				model = "models/props_phx/life_support/tank_small.mdl",
-				skin = 5,
-				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-			},
-			medium_phx = {
-				Name = "Medium Canister (Phx)",
-				model = "models/props_phx/life_support/canister_medium.mdl",
-				skin = 5,
-				legacy = false,
-			},
-			medium_phx2 = {
-				Name = "Medium Tank (Phx)",
-				model = "models/props_phx/life_support/tank_medium.mdl",
-				skin = 5,
-				legacy = false,
-			},
-			large_phx = {
-				Name = "Large Canister (Phx)",
-				model = "models/props_phx/life_support/canister_large.mdl",
-				skin = 5,
-				legacy = false,
-			},
-			large_phx2 = {
-				Name = "Large Tank (Phx)",
-				model = "models/props_phx/life_support/tank_large.mdl",
-				skin = 5,
-				legacy = false,
-			},
-		},
-	},
 	storage_liquid_water = {
 		Name = "Water Tanks",
 		type = "storage_liquid_water",
@@ -610,66 +539,6 @@ TOOL.Devices = {
 				Name = "Levy Canister",
 				model = "models/LifeSupport/Storage/CargoCanister.mdl",
 			},
-		},
-	},
-	storage_liquid_nitrogen = {
-		Name = "Liquid Nitrogen Tanks",
-		type = "storage_liquid_nitrogen",
-		class = "storage_liquid_nitrogen",
-		func = liquid_nitrogen_tank_func,
-		devices = {
-			small_phx = {
-				Name = "Small Canister (Phx)",
-				model = "models/props_phx/life_support/canister_small.mdl",
-				skin = 7,
-				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-			},
-			small_phx2 = {
-				Name = "Small Tank (Phx)",
-				model = "models/props_phx/life_support/tank_small.mdl",
-				skin = 7,
-				legacy = false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
-			},
-			medium_phx = {
-				Name = "Medium Canister (Phx)",
-				model = "models/props_phx/life_support/canister_medium.mdl",
-				skin = 7,
-				legacy = false,
-			},
-			medium_phx2 = {
-				Name = "Medium Tank (Phx)",
-				model = "models/props_phx/life_support/tank_medium.mdl",
-				skin = 7,
-				legacy = false,
-			},
-			large_phx = {
-				Name = "Large Canister (Phx)",
-				model = "models/props_phx/life_support/canister_large.mdl",
-				skin = 7,
-				legacy = false,
-			},
-			large_phx2 = {
-				Name = "Large Tank (Phx)",
-				model = "models/props_phx/life_support/tank_large.mdl",
-				skin = 7,
-				legacy = false,
-			},
-			small = {
-				Name = "CE Small",
-				model = "models/ce_ls3additional/resource_cache/resource_cache_small.mdl",
-			},
-			medium = {
-				Name = "CE Medium",
-				model = "models/ce_ls3additional/resource_cache/resource_cache_medium.mdl",
-			},
-			large = {
-				Name = "CE Large",
-				model = "models/ce_ls3additional/resource_cache/resource_cache_large.mdl",
-			},
-			huge = {
-				Name = "Levy Canister",
-				model = "models/LifeSupport/Storage/CargoCanister.mdl",
-			}
 		},
 	},
 }

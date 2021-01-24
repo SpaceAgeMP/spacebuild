@@ -382,9 +382,7 @@ function LS.__Construct()
 	RD.AddProperResourceName("hydrogen", CAF.GetLangVar("Hydrogen"))
 	RD.AddProperResourceName("oxygen", CAF.GetLangVar("Oxygen"))
 	RD.AddProperResourceName("carbon dioxide", CAF.GetLangVar("Carbon Dioxide"))
-	RD.AddProperResourceName("steam", CAF.GetLangVar("Steam"))
 	RD.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
-	RD.AddProperResourceName("liquid nitrogen", CAF.GetLangVar("Liquid Nitrogen"))
 	--return false , CAF.GetLangVar("No Implementation yet")
 
 	return true

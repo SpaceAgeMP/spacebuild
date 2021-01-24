@@ -184,11 +184,23 @@ function ENT:OnRemove()
 	self:StopSound("apc_engine_start")
 end
 
+local LIQUID_NITROGEN_TEMPERATURE = 113
+-- Assume 20C room temp (293K)
+local STANDARD_BALANCE = LIQUID_NITROGEN_TEMPERATURE - 293
+
 function ENT:Proc_Water()
 	local energy = self:GetResourceAmount("energy")
-	local nitrogen = self:GetResourceAmount("nitrogen")
+	-- Assume 180C default diff
+	local nitrogen, _, nitrogenTemp = self:GetResourceData("nitrogen")
+
+	if nitrogenTemp <= LIQUID_NITROGEN_TEMPERATURE then
+		return
+	end
+
+	local eTempMult = (nitrogenTemp - LIQUID_NITROGEN_TEMPERATURE) / STANDARD_BALANCE
+
 	local einc = Energy_Increment + (self.overdrive * Energy_Increment)
-	einc = (math.ceil(einc * self:GetMultiplier())) * self.Multiplier
+	einc = math.ceil(einc * self:GetMultiplier() * eTempMult) * self.Multiplier
 
 	if WireAddon ~= nil then
 		Wire_TriggerOutput(self, "EnergyUsage", math.Round(einc))
@@ -214,12 +226,14 @@ function ENT:Proc_Water()
 			end
 		end
 
+		local wprod = math.ceil((Liquid_Nitrogen_Increment + (self.overdrive * Liquid_Nitrogen_Increment)) * self:GetMultiplier()) * self.Multiplier
+
 		self:ConsumeResource("energy", einc)
 		self:ConsumeResource("nitrogen", winc)
-		self:SupplyResource("liquid nitrogen", math.ceil((Liquid_Nitrogen_Increment + (self.overdrive * Liquid_Nitrogen_Increment)) * self:GetMultiplier()) * self.Multiplier)
+		self:SupplyResource("nitrogen", wprod, LIQUID_NITROGEN_TEMPERATURE)
 
 		if WireAddon ~= nil then
-			Wire_TriggerOutput(self, "LiquidNitrogenProduction", math.ceil((Liquid_Nitrogen_Increment + (self.overdrive * Liquid_Nitrogen_Increment)) * self:GetMultiplier()) * self.Multiplier)
+			Wire_TriggerOutput(self, "LiquidNitrogenProduction", wprod)
 		end
 	else
 		self:TurnOff()

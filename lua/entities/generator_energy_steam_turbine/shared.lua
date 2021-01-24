@@ -4,6 +4,6 @@ ENT.PrintName = "Steam Turbine"
 
 list.Set("LSEntOverlayText", "generator_energy_steam_turbine", {
 	HasOOO = true,
-	resnames = {"steam"},
+	resnames = {"water"},
 	genresnames = {"energy", "water"}
 })

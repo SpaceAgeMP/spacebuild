@@ -88,15 +88,11 @@ local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_
 		base_volume = 57804 --Change to the actual base volume later on
 		base_mass = 150
 		base_health = 300
-		res = "steam"
+		res = "water"
 	elseif type == "generator_gas_o2h_water" then
 		base_volume = 49738 --Change to the actual base volume later on
 		base_mass = 120
 		base_health = 350
-	elseif type == "generator_recycler_nitrogen" then
-		base_volume = 284267 --Change to the actual base volume later on
-		base_mass = 160
-		base_health = 400
 	elseif type == "generator_n_ramscoop" then
 		res = "nitrogen"
 	elseif type == "generator_h_ramscoop" then
@@ -186,7 +182,6 @@ local function energy_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 		base_mass = 1000
 		base_health = 1000
 		ent:AddResource("energy", math.ceil(volume_mul * 5000))
-		ent:AddResource("steam", math.ceil(volume_mul * 0.92 * 45))
 		ent:AddResource("water", math.ceil(volume_mul * 0.08 * 45))
 	elseif type == "generator_energy_hydro" then
 		base_volume = 69897

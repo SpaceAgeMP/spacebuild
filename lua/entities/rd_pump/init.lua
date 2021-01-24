@@ -8,6 +8,8 @@ local pumps = {}
 util.AddNetworkString("RD_Add_ResourceRate_to_Pump")
 util.AddNetworkString("RD_Open_Pump_Menu")
 
+local RD = CAF.GetAddon("Resource Distribution")
+
 --[[
 	--SetResourceAmount
 	--PumpTurnOn
@@ -298,8 +300,6 @@ function ENT:OnTakeDamage(DmgInfo)
 end
 
 function ENT:Think()
-	local RD = CAF.GetAddon("Resource Distribution")
-
 	if self.otherpump and self.otherpump:GetPos():Distance(self:GetPos()) > 768 then
 		self:Disconnect()
 	end
@@ -327,13 +327,14 @@ function ENT:Think()
 		else
 			if self.ResourcesToSend then
 				for k, v in pairs(self.ResourcesToSend) do
-					if RD.GetNetResourceAmount(self.netid, k) == 0 then
+					local curResourceAmount, _, curResourceTemperature = RD.GetNetResourceData(self.netid, k)
+					if curResourceAmount == 0 then
 						continue
 					end
-					if RD.GetNetResourceAmount(self.netid, k) > v then
-						self:Send(k, v)
+					if curResourceAmount > v then
+						self:Send(k, v, curResourceTemperature)
 					else
-						self:Send(k, RD.GetNetResourceAmount(self.netid, k))
+						self:Send(k, curResourceAmount, curResourceTemperature)
 					end
 				end
 			end
@@ -345,16 +346,16 @@ function ENT:Think()
 	return true
 end
 
-function ENT:Send(resource, amount)
+function ENT:Send(resource, amount, temperature)
 	if not self.otherpump then return end
-	local left = self.otherpump:Receive(resource, amount)
-	CAF.GetAddon("Resource Distribution").ConsumeNetResource(self.netid, resource, amount - left)
+	local left = self.otherpump:Receive(resource, amount, temperature)
+	RD.ConsumeNetResource(self.netid, resource, amount - left)
 end
 
-function ENT:Receive(resource, amount)
+function ENT:Receive(resource, amount, temperature)
 	if not self.otherpump then return end
 
-	return CAF.GetAddon("Resource Distribution").SupplyNetResource(self.netid, resource, amount)
+	return RD.SupplyNetResource(self.netid, resource, amount, temperature)
 end
 
 function ENT:Connect(ent)
@@ -385,9 +386,8 @@ end
 
 function ENT:OnRemove()
 	self:Disconnect()
-	local rd = CAF.GetAddon("Resource Distribution")
-	rd.Unlink(self)
-	rd.RemoveRDEntity(self)
+	RD.Unlink(self)
+	RD.RemoveRDEntity(self)
 
 	if WireAddon ~= nil then
 		Wire_Remove(self)

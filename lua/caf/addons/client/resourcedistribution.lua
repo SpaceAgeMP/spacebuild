@@ -57,16 +57,19 @@ local function AddEntityToCache(nrofbytes)
 		local resource
 		local maxvalue
 		local value
+		local temperature
 
 		for i = 1, nr_of_resources do
 			--print(i)
 			resource = net.ReadString()
 			maxvalue = ReadLong()
 			value = ReadLong()
+			temperature = net.ReadFloat()
 
 			data.resources[resource] = {
 				value = value,
-				maxvalue = maxvalue
+				maxvalue = maxvalue,
+				temperature = temperature
 			}
 		end
 	end
@@ -97,22 +100,28 @@ local function AddNetworkToCache(nrofbytes)
 		local resource
 		local maxvalue
 		local value
+		local temperature
 		local localmaxvalue
 		local localvalue
+		local localtemperature
 
 		for _ = 1, nr_of_resources do
 			--print(i)
 			resource = net.ReadString()
 			maxvalue = ReadLong()
 			value = ReadLong()
+			temperature = net.ReadFloat()
 			localmaxvalue = ReadLong()
 			localvalue = ReadLong()
+			localtemperature = net.ReadFloat()
 
 			data.resources[resource] = {
 				value = value,
 				maxvalue = maxvalue,
+				temperature = temperature,
 				localvalue = localvalue,
-				localmaxvalue = localmaxvalue
+				localmaxvalue = localmaxvalue,
+				localtemperature = localtemperature
 			}
 		end
 	end

@@ -15,15 +15,14 @@ function ENT:Initialize()
 	self.ventnit = false
 	self.ventwat = false
 	self.venthwwat = false
-	self.ventlnit = false
 	self.ventamount = 1000
 
 	if WireAddon ~= nil then
 		self.WireDebugName = self.PrintName
 
-		self.Inputs = Wire_CreateInputs(self, {"Vent Amount", "Expel Energy", "Vent Oxygen", "Vent Co2", "Vent Hydrogen", "Vent Nitrogen", "Leak Water", "Leak Heavy Water", "Leak Liquid Nitrogen"})
+		self.Inputs = Wire_CreateInputs(self, {"Vent Amount", "Expel Energy", "Vent Oxygen", "Vent Co2", "Vent Hydrogen", "Vent Nitrogen", "Leak Water", "Leak Heavy Water"})
 
-		self.Outputs = Wire_CreateOutputs(self, {"Energy", "Oxygen", "Co2", "Hydrogen", "Nitrogen", "Liquid Nit", "Water", "Hvy Water", "Max Energy", "Max Oxygen", "Max Co2", "Max Hydrogen", "Max Nitrogen", "Max Liquid Nit", "Max Water", "Max Hvy Water"})
+		self.Outputs = Wire_CreateOutputs(self, {"Energy", "Oxygen", "Co2", "Hydrogen", "Nitrogen", "Water", "Hvy Water", "Max Energy", "Max Oxygen", "Max Co2", "Max Hydrogen", "Max Nitrogen", "Max Water", "Max Hvy Water"})
 	else
 		self.Inputs = {
 			{
@@ -77,12 +76,6 @@ function ENT:TriggerInput(iname, value)
 			self.venthwwat = false
 		else
 			self.venthwat = true
-		end
-	elseif (iname == "Leak Liquid Nitrogen") then
-		if (value ~= 1) then
-			self.ventlnit = false
-		else
-			self.ventlnit = true
 		end
 	elseif (iname == "Vent Amount") then
 		if (value ~= 0) then
@@ -140,17 +133,6 @@ function ENT:LeakHvyWater()
 		self:ConsumeResource("heavy water", self.ventamount)
 	else
 		self:ConsumeResource("heavy water", heavywater)
-		self:StopSound("PhysicsCannister.ThrusterLoop") --Change to a new Liquid Vent/Escaping Sound
-	end
-end
-
-function ENT:LeakLqdNitrogen()
-	local liquidnitrogen = self:GetResourceAmount("liquid nitrogen")
-
-	if (liquidnitrogen >= self.ventamount) then
-		self:ConsumeResource("liquid nitrogen", self.ventamount)
-	else
-		self:ConsumeResource("liquid nitrogen", liquidnitrogen)
 		self:StopSound("PhysicsCannister.ThrusterLoop") --Change to a new Liquid Vent/Escaping Sound
 	end
 end
@@ -337,10 +319,6 @@ function ENT:Think()
 		self:LeakHvyWater()
 	end
 
-	if (self.damaged == 1 or self.ventlnit) then
-		self:LeakLqdNitrogen()
-	end
-
 	if WireAddon ~= nil then
 		self:UpdateWireOutput()
 	end
@@ -354,14 +332,12 @@ end
 function ENT:UpdateWireOutput()
 	local air = self:GetResourceAmount("oxygen")
 	local nitrogen = self:GetResourceAmount("nitrogen")
-	local liquidnitrogen = self:GetResourceAmount("liquid nitrogen")
 	local hydrogen = self:GetResourceAmount("hydrogen")
 	local co2 = self:GetResourceAmount("carbon dioxide")
 	local heavywater = self:GetResourceAmount("heavy water")
 	local energy = self:GetResourceAmount("energy")
 	local coolant = self:GetResourceAmount("water")
 	local maxnitrogen = self:GetNetworkCapacity("nitrogen")
-	local maxliquidnitrogen = self:GetNetworkCapacity("liquid nitrogen")
 	local maxhydrogen = self:GetNetworkCapacity("hydrogen")
 	local maxco2 = self:GetNetworkCapacity("carbon dioxide")
 	local maxheavywater = self:GetNetworkCapacity("heavy water")
@@ -371,7 +347,6 @@ function ENT:UpdateWireOutput()
 	Wire_TriggerOutput(self, "Hydrogen", hydrogen)
 	Wire_TriggerOutput(self, "Co2", co2)
 	Wire_TriggerOutput(self, "Nitrogen", nitrogen)
-	Wire_TriggerOutput(self, "Liquid Nit", liquidnitrogen)
 	Wire_TriggerOutput(self, "Hvy Water", heavywater)
 	Wire_TriggerOutput(self, "Oxygen", air)
 	Wire_TriggerOutput(self, "Energy", energy)
@@ -382,6 +357,5 @@ function ENT:UpdateWireOutput()
 	Wire_TriggerOutput(self, "Max Hvy Water", maxheavywater)
 	Wire_TriggerOutput(self, "Max Co2", maxco2)
 	Wire_TriggerOutput(self, "Max Nitrogen", maxnitrogen)
-	Wire_TriggerOutput(self, "Max Liquid Nit", maxliquidnitrogen)
 	Wire_TriggerOutput(self, "Max Hydrogen", maxhydrogen)
 end

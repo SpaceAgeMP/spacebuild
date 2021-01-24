@@ -72,8 +72,8 @@ end
 ]]
 function LS.__Construct()
 	if status then return false, CAF.GetLangVar("This Addon is already Active!") end
-	local rd = CAF.GetAddon("Resource Distribution")
-	if not rd or not rd.GetStatus() then return false, CAF.GetLangVar("Resource Distribution is Required and needs to be Active!") end
+	local RD = CAF.GetAddon("Resource Distribution")
+	if not RD or not RD.GetStatus() then return false, CAF.GetLangVar("Resource Distribution is Required and needs to be Active!") end
 	util.PrecacheSound("vehicles/v8/skid_lowfriction.wav")
 	util.PrecacheSound("NPC_Stalker.BurnFlesh")
 	util.PrecacheModel("models/player/charple.mdl")
@@ -102,20 +102,17 @@ function LS.__Construct()
 		LSSpawnFunc(ply)
 	end
 
-	rd.AddProperResourceName("energy", CAF.GetLangVar("Energy"))
-	rd.AddProperResourceName("water", CAF.GetLangVar("Water"))
-	rd.AddProperResourceName("nitrogen", CAF.GetLangVar("Nitrogen"))
-	rd.AddProperResourceName("hydrogen", CAF.GetLangVar("Hydrogen"))
-	rd.AddProperResourceName("oxygen", CAF.GetLangVar("Oxygen"))
-	rd.AddProperResourceName("carbon dioxide", CAF.GetLangVar("Carbon Dioxide"))
-	rd.AddProperResourceName("steam", CAF.GetLangVar("Steam"))
-	rd.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
-	rd.AddProperResourceName("liquid nitrogen", CAF.GetLangVar("Liquid Nitrogen"))
+	RD.AddProperResourceName("energy", CAF.GetLangVar("Energy"))
+	RD.AddProperResourceName("water", CAF.GetLangVar("Water"))
+	RD.AddProperResourceName("nitrogen", CAF.GetLangVar("Nitrogen"))
+	RD.AddProperResourceName("hydrogen", CAF.GetLangVar("Hydrogen"))
+	RD.AddProperResourceName("oxygen", CAF.GetLangVar("Oxygen"))
+	RD.AddProperResourceName("carbon dioxide", CAF.GetLangVar("Carbon Dioxide"))
+	RD.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
 	hook.Add("PlayerInitialSpawn", "LS_Core_SpawnFunc", LSSpawnFunc)
 	hook.Add("PlayerSpawn", "LS_Core_ResetSpawnFunc", LSResetSpawnFunc)
 	CAF.AddHook("think3", PlayerLSThink)
 	CAF.AddHook("OnAddonDestruct", AddonDisabled)
-	CAF.AddServerTag("LSC")
 	status = true
 
 	return true

@@ -221,14 +221,7 @@ hook.Add("PlayerSpawnedVehicle", "CAF VEHICLE Spawn", SpawnedVehicle)
 function CAF2.WriteToDebugFile(filename, message)
 	if not filename or not message then return nil, "Missing Argument" end
 
-	if DEBUG then
-		ErrorNoHalt("Filename: " .. tostring(filename) .. ", Message: " .. tostring(message) .. "\n")
-	end
-
-	local contents = file.Read("CAF_Debug/server/" .. filename .. ".txt")
-	contents = contents or ""
-	contents = contents .. message
-	file.Write("CAF_Debug/server/" .. filename .. ".txt", contents)
+	print("Filename: " .. tostring(filename) .. ", Message: " .. tostring(message))
 end
 
 --[[
@@ -260,7 +253,6 @@ function CAF2.Start()
 	CAF2.StartingUp = true
 	net.Start("CAF_Start_true")
 	net.Broadcast()
-	CAF2.AddServerTag("CAF")
 
 	for level, tab in pairs(addonlevel) do
 		print("Loading Level " .. tostring(level) .. " Addons\n")

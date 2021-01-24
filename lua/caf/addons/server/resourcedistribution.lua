@@ -40,11 +40,11 @@ local function sendEntityData(ply, entid, rddata)
 		net.WriteString(l)
 		WriteLong(w.maxvalue)
 		WriteLong(w.value)
+		net.WriteFloat(w.temperature)
 	end
 
 	if ply then
 		net.Send(ply)
-		--net.Broadcast()
 	else
 		net.Broadcast()
 	end
@@ -62,8 +62,10 @@ local function sendNetworkData(ply, netid, rddata)
 		net.WriteString(l)
 		WriteLong(w.maxvalue)
 		WriteLong(w.value)
+		net.WriteFloat(w.temperature)
 		WriteLong(w.localmaxvalue)
 		WriteLong(w.localvalue)
+		net.WriteFloat(w.localtemperature)
 	end
 
 	local nr_of_cons = #rddata.cons
@@ -143,18 +145,22 @@ local function RequestResourceData(ply, com, args)
 
 					if resnames then
 						for _, k in pairs(resnames) do
+							local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
 							data.resources[k] = {
-								value = RD.GetResourceAmount(tmpdata.ent, k),
-								maxvalue = RD.GetNetworkCapacity(tmpdata.ent, k)
+								value = value,
+								temperature = temperature,
+								maxvalue = maxvalue
 							}
 						end
 					end
 
 					if genresnames then
 						for _, k in pairs(genresnames) do
+							local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
 							data.resources[k] = {
-								value = RD.GetResourceAmount(tmpdata.ent, k),
-								maxvalue = RD.GetNetworkCapacity(tmpdata.ent, k)
+								value = value,
+								temperature = temperature,
+								maxvalue = maxvalue
 							}
 						end
 					end
@@ -163,9 +169,11 @@ local function RequestResourceData(ply, com, args)
 
 			if storage then
 				for k, v in pairs(tmpdata.resources) do
+					local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
 					data.resources[k] = {
-						value = RD.GetResourceAmount(tmpdata.ent, k),
-						maxvalue = RD.GetNetworkCapacity(tmpdata.ent, k)
+						value = value,
+						temperature = temperature,
+						maxvalue = maxvalue
 					}
 				end
 			end
@@ -190,11 +198,15 @@ local function RequestResourceData(ply, com, args)
 			data.resources = {}
 
 			for k, v in pairs(tmpdata.resources) do
+				local value, maxvalue, temperature = RD.GetNetResourceData(tonumber(args[2]), k)
+				local localvalue, localmaxvalue, localtemperature = RD.GetNetResourceData(tonumber(args[2]), k, false)
 				data.resources[k] = {
-					value = RD.GetNetResourceAmount(tonumber(args[2]), k),
-					maxvalue = RD.GetNetNetworkCapacity(tonumber(args[2]), k),
-					localvalue = RD.GetNetResourceAmount(tonumber(args[2]), k, false),
-					localmaxvalue = RD.GetNetNetworkCapacity(tonumber(args[2]), k, false)
+					value = value,
+					temperature = temperature,
+					maxvalue = maxvalue,
+					localvalue = localvalue,
+					localtemperature = localtemperature,
+					localmaxvalue = localmaxvalue
 				}
 			end
 
@@ -250,7 +262,6 @@ function RD.__Construct()
 		SendEntireNetWorkToClient(ply)
 	end
 
-	CAF.AddServerTag("RD")
 	status = true
 
 	return true
@@ -312,6 +323,18 @@ function RD.AddResourcesToSend()
 end
 
 CAF.RegisterAddon("Resource Distribution", RD, "1")
+
+local ResourceEnergyContents = {
+	water = 0.1
+}
+
+function RD.GetResourceEnergyContent(res, amount, delta)
+	return ResourceEnergyContents[res] * amount * delta
+end
+
+function RD.GetResourceAmountFromEnergy(res, energy, delta)
+	return energy / (ResourceEnergyContents[res] * delta)
+end
 
 --[[
 	RemoveRDEntity( entity)
@@ -375,6 +398,8 @@ function RD.AddResource(ent, resource, maxamount, defaultvalue)
 	if not IsValid(ent) then return false, "Not a valid entity" end
 	if not resource then return false, "No resource given" end
 
+	local temperature = ent:GetTemperature()
+
 	if not defaultvalue then
 		defaultvalue = 0
 	end
@@ -405,6 +430,7 @@ function RD.AddResource(ent, resource, maxamount, defaultvalue)
 		index.resources[resource].maxvalue = maxamount
 		index.resources[resource].value = defaultvalue
 		index.resources[resource].haschanged = true
+		index.resources[resource].temperature = temperature
 
 		if index.network ~= 0 then
 			nettable[index.network].resources[resource].maxvalue = nettable[index.network].resources[resource].maxvalue + maxamount
@@ -424,6 +450,7 @@ function RD.AddResource(ent, resource, maxamount, defaultvalue)
 		index.resources[resource] = {}
 		index.resources[resource].maxvalue = maxamount
 		index.resources[resource].value = defaultvalue
+		index.resources[resource].temperature = temperature
 		index.network = 0
 		index.clear = false
 		index.haschanged = false
@@ -466,6 +493,7 @@ function RD.AddNetResource(netid, resource, maxamount, defaultvalue)
 
 	if not index.resources[resource] then
 		index.resources[resource] = {}
+		index.resources[resource].temperature = 0
 		index.resources[resource].maxvalue = maxamount
 		index.resources[resource].value = defaultvalue
 		index.resources[resource].haschanged = true
@@ -483,6 +511,26 @@ function RD.AddNetResource(netid, resource, maxamount, defaultvalue)
 	end
 
 	return true
+end
+
+local function tryGetNetResTable(network, resource)
+	local singleNetTable = nettable[network]
+	if not singleNetTable then
+		return
+	end
+	local netResourceTable = singleNetTable.resources
+	if not netResourceTable then
+		return
+	end
+	return netResourceTable[resource], singleNetTable
+end
+
+local function calcNewTemp(curValue, curTemp, addValue, addTemp)
+	local totalValue = curValue + addValue
+	if totalValue == 0 then
+		return curTemp
+	end
+	return (curTemp * (curValue / totalValue)) + (addTemp * (addValue / totalValue))
 end
 
 --[[
@@ -504,39 +552,42 @@ function RD.ConsumeNetResource(netid, resource, amount)
 	local index = {}
 	index.network = netid
 
-	if nettable[index.network] and nettable[index.network].resources and nettable[index.network].resources[resource] and nettable[index.network].resources[resource].maxvalue > 0 then
-		if nettable[index.network].resources[resource].value >= amount then
-			nettable[index.network].resources[resource].value = nettable[index.network].resources[resource].value - amount
-			nettable[index.network].resources[resource].haschanged = true
-			nettable[index.network].haschanged = true
+	local netResourceTable, singleNetTable = tryGetNetResTable(index.network, resource)
+	if netResourceTable and singleNetTable and netResourceTable.maxvalue > 0 then
+		if netResourceTable.value >= amount then
+			netResourceTable.value = netResourceTable.value - amount
+			netResourceTable.haschanged = true
+			singleNetTable.haschanged = true
 		elseif nettable[index.network].resources[resource].value > 0 then
-			amount = nettable[index.network].resources[resource].value
-			nettable[index.network].resources[resource].value = 0
-			nettable[index.network].resources[resource].haschanged = true
-			nettable[index.network].haschanged = true
+			amount = netResourceTable.value
+			netResourceTable.value = 0
+			netResourceTable.haschanged = true
+			singleNetTable.haschanged = true
 		else
 			amount = 0
 		end
 
-		return consumed
+		consumed = amount
 	end
 
 	if consumed ~= origamount and table.Count(nettable[index.network].cons) > 0 then
-		for k, v in pairs(RD.getConnectedNets(index.network)) do
-			amount = origamount - consumed
+		for k, v in pairs(RD.GetConnectedNets(index.network)) do
 			if v == index.network then
 				continue
 			end
-			if nettable[v] and nettable[v].resources and nettable[v].resources[resource] and nettable[v].resources[resource].maxvalue > 0 then
-				if nettable[v].resources[resource].value >= amount then
-					nettable[v].resources[resource].value = nettable[v].resources[resource].value - amount
-					nettable[v].resources[resource].haschanged = true
-					nettable[v].haschanged = true
-				elseif nettable[v].resources[resource].value > 0 then
-					amount = nettable[v].resources[resource].value
-					nettable[v].resources[resource].value = 0
-					nettable[v].resources[resource].haschanged = true
-					nettable[v].haschanged = true
+
+			amount = origamount - consumed
+			local otherNetResourceTable, otherNetTable = tryGetNetResTable(v, resource)
+			if otherNetTable and otherNetResourceTable and otherNetResourceTable.maxvalue > 0 then
+				if otherNetResourceTable.value >= amount then
+					otherNetResourceTable.value = otherNetResourceTable.value - amount
+					otherNetResourceTable.haschanged = true
+					otherNetTable.haschanged = true
+				elseif otherNetResourceTable.value > 0 then
+					amount = otherNetResourceTable.value
+					otherNetResourceTable.value = 0
+					otherNetResourceTable.haschanged = true
+					otherNetTable.haschanged = true
 				else
 					amount = 0
 				end
@@ -581,11 +632,12 @@ function RD.ConsumeResource(ent, resource, amount)
 
 		return amount
 	end
+
 	return RD.ConsumeNetResource(index.network, resource, amount)
 end
 
 --[[
-	SupplyNetResource(netid, resource, amount)
+	SupplyNetResource(netid, resource, amount, temperature)
 	
 		Only use this if you got a special sent (like the Resource Pumps) which don't have direct netinfo stored
 		
@@ -594,50 +646,58 @@ end
 		Returns the amount of resources it couldn't supply to the network (lack of storage fe)
 	
 ]]
-function RD.SupplyNetResource(netid, resource, amount)
+function RD.SupplyNetResource(netid, resource, amount, temperature)
 	if not amount then return 0, "No amount given" end
 	if not nettable[netid] then return amount, "Not a valid network" end
 	if not resource then return amount, "No resource given" end
+	if not temperature then return amount, "No temperature given" end
 	local index = {}
 	local left = amount
 	index.network = netid
 
-	if nettable[index.network] and nettable[index.network].resources and nettable[index.network].resources[resource] then
-		if nettable[index.network].resources[resource].maxvalue > nettable[index.network].resources[resource].value + amount then
-			nettable[index.network].resources[resource].value = nettable[index.network].resources[resource].value + amount
-			amount = 0
-			nettable[index.network].haschanged = true
-			nettable[index.network].resources[resource].haschanged = true
-		elseif nettable[index.network].resources[resource].maxvalue > nettable[index.network].resources[resource].value then
-			amount = nettable[index.network].resources[resource].maxvalue - nettable[index.network].resources[resource].value
-			nettable[index.network].resources[resource].value = nettable[index.network].resources[resource].maxvalue
-			nettable[index.network].haschanged = true
-			nettable[index.network].resources[resource].haschanged = true
+	local netResourceTable, singleNetTable = tryGetNetResTable(index.network, resource)
+	if netResourceTable then
+		if netResourceTable.maxvalue > netResourceTable.value + left then
+			netResourceTable.temperature = calcNewTemp(netResourceTable.value, netResourceTable.temperature, left, temperature)
+			netResourceTable.value = netResourceTable.value + left
+			left = 0
+			singleNetTable.haschanged = true
+			netResourceTable.haschanged = true
+		elseif netResourceTable.maxvalue > netResourceTable.value then
+			local amountTransferred = netResourceTable.maxvalue - netResourceTable.value
+			left = left - amountTransferred
+			netResourceTable.temperature = calcNewTemp(netResourceTable.value, netResourceTable.temperature, amountTransferred, temperature)
+			netResourceTable.value = netResourceTable.maxvalue
+			singleNetTable.haschanged = true
+			netResourceTable.haschanged = true
 		end
-
-		left = amount
 	end
 
-	if left == 0 or table.Count(nettable[index.network].cons) == 0 then
+	if left == 0 or table.Count(singleNetTable.cons) == 0 then
 		return left
 	end
-	for k, v in pairs(RD.getConnectedNets(index.network)) do
-		amount = left
+	for k, v in pairs(RD.GetConnectedNets(index.network)) do
+		if v == index then
+			continue
+		end
 
-		if v ~= index.network and nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
-			if nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value + amount then
-				nettable[v].resources[resource].value = nettable[v].resources[resource].value + amount
-				amount = 0
-				nettable[v].haschanged = true
-				nettable[v].resources[resource].haschanged = true
-			elseif nettable[v].resources[resource].maxvalue > nettable[v].resources[resource].value then
-				amount = nettable[v].resources[resource].maxvalue - nettable[v].resources[resource].value
-				nettable[v].resources[resource].value = nettable[v].resources[resource].maxvalue
-				nettable[v].haschanged = true
-				nettable[v].resources[resource].haschanged = true
+		local otherNetResourceTable, otherNetTable = tryGetNetResTable(v, resource)
+		if otherNetResourceTable then
+			if otherNetResourceTable.maxvalue > otherNetResourceTable.value + left then
+				otherNetResourceTable.temperature = calcNewTemp(otherNetResourceTable.value, otherNetResourceTable.temperature, left, temperature)
+				otherNetResourceTable.value = otherNetResourceTable.value + left
+				left = 0
+				otherNetTable.haschanged = true
+				otherNetResourceTable.haschanged = true
+			elseif otherNetResourceTable.maxvalue > otherNetResourceTable.value then
+				local amountTransferred = otherNetResourceTable.maxvalue - otherNetResourceTable.value
+				left = left - amountTransferred
+				otherNetResourceTable.temperature = calcNewTemp(otherNetResourceTable.value, otherNetResourceTable.temperature, amountTransferred, temperature)
+				otherNetResourceTable.value = otherNetResourceTable.maxvalue
+				otherNetTable.haschanged = true
+				otherNetResourceTable.haschanged = true
 			end
 
-			left = amount
 			if left <= 0 then break end
 		end
 	end
@@ -653,33 +713,39 @@ end
 		Returns the amount of resources it couldn't store
 
 ]]
-function RD.SupplyResource(ent, resource, amount)
+function RD.SupplyResource(ent, resource, amount, temperature)
 	if not amount then return 0, "No amount given" end
 	if not IsValid(ent) then return amount, "Not a valid entity" end
 	if not resource then return amount, "No resource given" end
-	local left = 0
+	local left = amount
+
+	if not temperature then
+		temperature = ent:GetTemperature()
+	end
 
 	if ent_table[ent:EntIndex()] then
 		local index = ent_table[ent:EntIndex()]
 
 		if index.network == 0 then
-			if index.resources[resource] then
-				if index.resources[resource].maxvalue > index.resources[resource].value + amount then
-					index.resources[resource].value = index.resources[resource].value + amount
+			local indexResources = index.resources[resource]
+			if indexResources then
+				if indexResources.maxvalue > indexResources.value + left then
+					indexResources.temperature = calcNewTemp(indexResources.value, indexResources.temperature, left, temperature)
+					indexResources.value = indexResources.value + left
 					index.haschanged = true
-					index.resources[resource].haschanged = true
-					amount = 0
-				elseif index.resources[resource].maxvalue > index.resources[resource].value then
-					amount = index.resources[resource].maxvalue - index.resources[resource].value
-					index.resources[resource].value = index.resources[resource].maxvalue
-					index.resources[resource].haschanged = true
+					indexResources.haschanged = true
+					left = 0
+				elseif indexResources.maxvalue > indexResources.value then
+					local amountTransferred = indexResources.maxvalue - indexResources.value
+					left = left - amountTransferred
+					indexResources.temperature = calcNewTemp(indexResources.value, indexResources.temperature, amountTransferred, temperature)
+					indexResources.value = indexResources.maxvalue
+					indexResources.haschanged = true
 					index.haschanged = true
 				end
-
-				left = amount
 			end
 		else
-			left = RD.SupplyNetResource(index.network, resource, amount)
+			left = RD.SupplyNetResource(index.network, resource, amount, temperature)
 		end
 	end
 
@@ -711,10 +777,12 @@ function RD.Link(ent, netid)
 			resindex = netindex.resources[k]
 			resindex.maxvalue = 0
 			resindex.value = 0
+			resindex.temperature = 0
 		end
 
 		if index.resources[k].maxvalue > 0 then
 			resindex.maxvalue = resindex.maxvalue + index.resources[k].maxvalue
+			resindex.temperature = calcNewTemp(resindex.value, resindex.temperature, index.resources[k].value, index.resources[k].temperature)
 			resindex.value = resindex.value + index.resources[k].value
 		end
 
@@ -1118,7 +1186,7 @@ function RD.ApplyDupeInfo(ent, CreatedEntities)
 end
 
 --[[ Shared stuff ]]
-function RD.getConnectedNets(netid)
+function RD.GetConnectedNets(netid)
 	local contable = {}
 
 	local tmpcons = {netid}
@@ -1142,108 +1210,83 @@ function RD.getConnectedNets(netid)
 	return contable
 end
 
-function RD.GetNetResourceAmount(netid, resource, sumconnectednets)
-	if not nettable[netid] then return 0, "Not a valid network" end
-	if not resource then return 0, "No resource given" end
+function RD.GetNetResourceData(netid, resource, sumconnectednets)
+	if not nettable[netid] then return 0, 0, 0, "Not a valid network" end
+	if not resource then return 0, 0, 0, "No resource given" end
 	local amount = 0
+	local capacity = 0
 	local index = {}
 	sumconnectednets = sumconnectednets or (sumconnectednets == nil)
 	index.network = netid
 
+	local temperature = 0
+
 	if sumconnectednets and table.Count(nettable[index.network].cons) > 0 then
-		for k, v in pairs(RD.getConnectedNets(index.network)) do
+		for k, v in pairs(RD.GetConnectedNets(index.network)) do
 			if nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
-				amount = amount + nettable[v].resources[resource].value
+				local addAmount = nettable[v].resources[resource].value
+				amount = amount + addAmount
+				capacity = capacity + nettable[v].resources[resource].maxvalue
+				temperature = temperature + (nettable[v].resources[resource].temperature * addAmount)
 			end
 		end
 	else
 		if nettable[index.network].resources[resource] then
 			amount = nettable[index.network].resources[resource].value
+			capacity = nettable[index.network].resources[resource].maxvalue
+			temperature = nettable[index.network].resources[resource].temperature * amount
 		end
 	end
 
-	return amount
+	if amount > 0 then
+		temperature = temperature / amount
+	end
+
+	return amount, capacity, temperature
 end
 
-function RD.GetResourceAmount(ent, resource, sumconnectednets)
-	if not IsValid(ent) then return 0, "Not a valid entity" end
-	if not resource then return 0, "No resource given" end
-	local amount = 0
-	sumconnectednets = sumconnectednets or (sumconnectednets == nil)
+function RD.GetResourceData(ent, resource, sumconnectednets, ignorenet)
+	if not IsValid(ent) then return 0, 0, 0, "Not a valid entity" end
+	if not resource then return 0, 0, 0, "No resource given" end
 
-	if ent_table[ent:EntIndex()] then
-		local index = ent_table[ent:EntIndex()]
-
-		if index.network == 0 then
-			if index.resources[resource] then
-				amount = index.resources[resource].value
-			end
-		else
-			amount = RD.GetNetResourceAmount(index.network, resource, sumconnectednets)
-		end
+	if not ent_table[ent:EntIndex()] then
+		return 0, 0, 0
 	end
+	local index = ent_table[ent:EntIndex()]
 
-	return amount
+	if ignorenet or index.network == 0 then
+		if index.resources[resource] then
+			return index.resources[resource].value, index.resources[resource].maxvalue, index.resources[resource].temperature
+		end
+		return 0, 0, 0
+	end
+	sumconnectednets = sumconnectednets or (sumconnectednets == nil)
+	return RD.GetNetResourceData(index.network, resource, sumconnectednets)
+end
+
+function RD.GetNetResourceAmount(...)
+	local amount, _, _, err = RD.GetNetResourceData(...)
+	return amount, err
+end
+
+function RD.GetResourceAmount(...)
+	local amount, _, _, err = RD.GetResourceData(...)
+	return amount, err
 end
 
 function RD.GetUnitCapacity(ent, resource)
-	if not IsValid(ent) then return 0, "Not a valid entity" end
-	if not resource then return 0, "No resource given" end
-	local amount = 0
-
-	if ent_table[ent:EntIndex()] then
-		local index = ent_table[ent:EntIndex()]
-
-		if index.resources[resource] then
-			amount = index.resources[resource].maxvalue
-		end
-	end
-
-	return amount
+	local _, capacity, _, err = RD.GetResourceData(ent, resource, false, true)
+	return capacity, err
 end
 
-function RD.GetNetNetworkCapacity(netid, resource, sumconnectednets)
-	if not nettable[netid] then return 0, "Not a valid Network" end
-	if not resource then return 0, "No resource given" end
-	local amount = 0
-	local index = {}
-	sumconnectednets = sumconnectednets or (sumconnectednets == nil)
-	index.network = netid
-
-	if sumconnectednets and table.Count(nettable[index.network].cons) > 0 then
-		for k, v in pairs(RD.getConnectedNets(index.network)) do
-			if nettable[v] and nettable[v].resources and nettable[v].resources[resource] then
-				amount = amount + nettable[v].resources[resource].maxvalue
-			end
-		end
-	else
-		if nettable[index.network].resources[resource] then
-			amount = nettable[index.network].resources[resource].maxvalue
-		end
-	end
-
-	return amount
+function RD.GetNetNetworkCapacity(...)
+	local _, capacity, _, err = RD.GetNetResourceData(...)
+	return capacity, err
 end
 
-function RD.GetNetworkCapacity(ent, resource, sumconnectednets)
-	if not IsValid(ent) then return 0, "Not a valid entity" end
-	if not resource then return 0, "No resource given" end
-	local amount = 0
-	sumconnectednets = sumconnectednets or (sumconnectednets == nil)
-
-	if ent_table[ent:EntIndex()] then
-		local index = ent_table[ent:EntIndex()]
-
-		if index.network == 0 then
-			if index.resources[resource] then
-				amount = index.resources[resource].maxvalue
-			end
-		else
-			amount = RD.GetNetNetworkCapacity(index.network, resource, sumconnectednets)
-		end
-	end
-
-	return amount
+function RD.GetNetworkCapacity(...)
+	local _, capacity, _, err = RD.GetResourceData(...)
+	return capacity, err
 end
 
 function RD.GetEntityTable(ent)

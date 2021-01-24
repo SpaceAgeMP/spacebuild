@@ -4,6 +4,8 @@ include("shared.lua")
 
 local RD = CAF.GetAddon("Resource Distribution")
 
+local EnergyToTemperature_Increment = 250
+
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -11,8 +13,11 @@ function ENT:Initialize()
 	self:SetNWInt("overlaymode", 1)
 	self:SetNWInt("OOO", 0)
 	self.Active = 0
+	self.Temperature = -1
 	self.caf = self.caf or {}
 	self.caf.custom = self.caf.custom or {}
+
+	self.ThermalMass = self:GetPhysicsObject():GetMass()
 end
 
 --use this to set self.active
@@ -40,6 +45,43 @@ AccessorFunc(ENT, "LSMULTIPLIER", "Multiplier", FORCE_NUMBER)
 
 function ENT:GetMultiplier()
 	return self.LSMULTIPLIER or 1
+end
+
+function ENT:NormalizeTemperatureTo(otherTemperature, increment)
+	if math.abs(self.Temperature - otherTemperature) < 0.1 then
+		self.Temperature = otherTemperature
+		return
+	end
+	self.Temperature = self.Temperature + ((otherTemperature - self.Temperature) * increment / self.ThermalMass)
+end
+
+function ENT:WarmUpWithEnergy(energy)
+	local usedEnergy = self:ConsumeResource("energy", energy)
+	self.Temperature = self.Temperature + (usedEnergy * EnergyToTemperature_Increment / self.ThermalMass)
+end
+
+function ENT:GetTemperature()
+	return self.Temperature
+end
+
+function ENT:Think()
+	self:NextThink(CurTime() + 1)
+
+	local envTemperature = -1
+	if self.environment then
+		envTemperature = self.environment:GetTemperature(self)
+	end
+	if envTemperature < 0 then
+		return true
+	end
+
+	if self.Temperature < 0 then
+		self.Temperature = envTemperature
+	end
+
+	self:NormalizeTemperatureTo(envTemperature, 0.1)
+
+	return true
 end
 
 function ENT:Repair()
@@ -129,6 +171,10 @@ end
 
 function ENT:GetResourceAmount(resource)
 	return RD.GetResourceAmount(self, resource)
+end
+
+function ENT:GetResourceData(resource)
+	return RD.GetResourceData(self, resource)
 end
 
 function ENT:GetUnitCapacity(resource)

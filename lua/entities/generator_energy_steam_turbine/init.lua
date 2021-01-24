@@ -5,9 +5,9 @@ util.PrecacheSound("Airboat_engine_stop")
 util.PrecacheSound("apc_engine_start")
 include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
+
+local RD = CAF.GetAddon("Resource Distribution")
 local Water_Increment = 10
-local Energy_Increment = 90
-local Steam_Increment = 10
 
 function ENT:Initialize()
 	BaseClass.Initialize(self)
@@ -184,35 +184,41 @@ function ENT:OnRemove()
 	self:StopSound("Airboat_engine_idle")
 end
 
+local STEAM_TEMPERATURE_MIN = 373
+
 function ENT:Pump_Air()
-	self.steam = self:GetResourceAmount("steam")
-	local sinc = (Steam_Increment + (self.overdrive * Steam_Increment)) * self.Multiplier
-	sinc = math.ceil(sinc * self:GetMultiplier())
+	local water, _, waterTemp = self:GetResourceData("water")
+
+	if waterTemp < STEAM_TEMPERATURE_MIN then
+		self:TurnOff()
+		return
+	end
+
+	local targetTemperature = self:GetTemperature()
+	if waterTemp <= targetTemperature then
+		self:TurnOff()
+		return
+	end
+
+	local winc = (Water_Increment + (self.overdrive * Water_Increment)) * self.Multiplier
+	winc = math.ceil(winc * self:GetMultiplier())
+
+	if water < winc then
+		self:TurnOff()
+		return
+	end
+
+	local einc = RD.GetResourceEnergyContent("water", winc, waterTemp - targetTemperature) * 0.8
 
 	if WireAddon ~= nil then
-		Wire_TriggerOutput(self, "SteamUsage", math.Round(sinc))
+		Wire_TriggerOutput(self, "EnergyProduction", math.Round(einc))
+		Wire_TriggerOutput(self, "SteamUsage", math.Round(winc))
+		Wire_TriggerOutput(self, "WaterProduction", math.Round(winc))
 	end
 
-	if (self.steam >= sinc) then
-		local einc = (Energy_Increment + (self.overdrive * Energy_Increment)) * self.Multiplier
-		einc = math.ceil(einc * self:GetMultiplier())
-		local winc = (Water_Increment + (self.overdrive * Water_Increment)) * self.Multiplier
-		winc = math.ceil(winc * self:GetMultiplier())
-		self:ConsumeResource("steam", sinc)
-
-		if WireAddon ~= nil then
-			Wire_TriggerOutput(self, "EnergyProduction", math.Round(einc))
-		end
-
-		if WireAddon ~= nil then
-			Wire_TriggerOutput(self, "WaterProduction", math.Round(winc))
-		end
-
-		self:SupplyResource("energy", einc)
-		self:SupplyResource("water", winc)
-	else
-		self:TurnOff()
-	end
+	self:ConsumeResource("water", winc)
+	self:SupplyResource("energy", einc)
+	self:SupplyResource("water", winc, targetTemperature)
 end
 
 function ENT:Think()

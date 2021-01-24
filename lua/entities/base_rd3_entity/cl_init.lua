@@ -7,10 +7,12 @@ OOO[2] = "Overdrive"
 CreateClientConVar("number_to_send", "0", true, false) -- TODO Unused?
 CreateClientConVar("number_to_hold", "1", true, false)
 
+local RD = CAF.GetAddon("Resource Distribution")
+
 function ENT:Draw(bDontDrawModel)
 	self:DoNormalDraw()
 	--draw beams by MadDog
-	CAF.GetAddon("Resource Distribution").Beam_Render(self)
+	RD.Beam_Render(self)
 
 	if (Wire_Render) then
 		Wire_Render(self)
@@ -64,9 +66,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	--End overlaysettings
 	local trace = LocalPlayer():GetEyeTrace()
 
-	local rd = CAF.GetAddon("Resource Distribution")
-
-	local nettable = rd.GetEntityTable(self)
+	local nettable = RD.GetEntityTable(self)
 	if table.Count(nettable) == 0 then return end
 	local playername = self:GetPlayerName()
 
@@ -79,7 +79,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	-- 2 = new overlaytext
 	local empty_value = {
 		value = 0,
-		maxvalue = 0
+		maxvalue = 0,
+		temperature = 0
 	}
 
 	if not mode or mode ~= 2 then
@@ -110,7 +111,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		if num == -1 then
 			if (table.Count(resources) > 0) then
 				for k, v in pairs(resources) do
-					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. " (" .. math.floor(v.temperature) .. " K)\n"
 				end
 			else
 				OverlayText = OverlayText .. "No Resources Connected\n"
@@ -121,7 +122,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			if resnames and table.Count(resnames) > 0 then
 				for _, k in pairs(resnames) do
 					v = resources[k] or empty_value
-					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. " (" .. math.floor(v.temperature) .. " K)\n"
 				end
 			end
 
@@ -130,7 +131,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 				for _, k in pairs(genresnames) do
 					v = resources[k] or empty_value
-					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. " (" .. math.floor(v.temperature) .. " K)\n"
 				end
 			end
 		end
@@ -203,7 +204,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			if num == -1 then
 				for k, v in pairs(resources) do
-					stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+					stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 					i = i + 1
 
 					if i == 3 then
@@ -220,7 +221,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 				if resnames and table.Count(resnames) > 0 then
 					for _, k in pairs(resnames) do
 						v = resources[k] or empty_value
-						stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+						stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 						i = i + 1
 
 						if i == 3 then
@@ -247,7 +248,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 					for _, k in pairs(genresnames) do
 						v = resources[k] or empty_value
-						stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+						stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 						i = i + 1
 
 						if i == 3 then
@@ -274,7 +275,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			for _, k in pairs(genresnames) do
 				v = resources[k] or empty_value
-				stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+				stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 				i = i + 1
 
 				if i == 3 then
