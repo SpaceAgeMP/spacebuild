@@ -8,11 +8,11 @@ TOOL.Name = "#Auto Link Tool"
 TOOL.Command = nil
 TOOL.ConfigName = ""
 
-if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 	TOOL.Tab = "Custom Addon Framework"
 end
 
-if (CLIENT) then
+if CLIENT then
 	language.Add("tool.rd3_dev_link3.name", "Auto Link Tool")
 	language.Add("tool.rd3_dev_link3.desc", "Links Resource-Carrying Devices together to a Resource Node, including Vehicle Pods.")
 	language.Add("tool.rd3_dev_link3.0", "Left Click: Auto link all devices in the range of the select node that aren't connected and are owned by you.  Right Click: Unlink Two Devices.  Reload: Unlink Device from All.")
@@ -43,8 +43,8 @@ local function link_in_range(ent, range)
 end
 
 function TOOL:LeftClick(trace)
-	if (not trace.Entity:IsValid()) or (trace.Entity:IsPlayer()) then return end
-	if (CLIENT) then return true end
+	if not trace.Entity:IsValid() or trace.Entity:IsPlayer() then return end
+	if CLIENT then return true end
 
 	if trace.Entity.IsNode then
 		local ent = trace.Entity
@@ -59,11 +59,11 @@ end
 
 function TOOL:RightClick(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 	-- If there's no physics object then we can't constraint it!
-	if (SERVER and not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone)) then return false end
+	if SERVER and not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false end
 	--how many objects stored
 	local iNum = self:NumObjects() + 1
 	--save clicked postion
@@ -78,7 +78,7 @@ function TOOL:RightClick(trace)
 
 	local rd = CAF.GetAddon("Resource Distribution")
 
-	if (Ent1 == Ent2) then
+	if Ent1 == Ent2 then
 		if Ent1.IsNode then
 			rd.UnlinkAllFromNode(Ent1.netid)
 		elseif Ent1.IsValve then
@@ -168,9 +168,9 @@ end
 
 function TOOL:Reload(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 
 	local rd = CAF.GetAddon("Resource Distribution")
 

@@ -36,8 +36,8 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
-		if (self.Mute == 0) then
+	if self.Active == 0 then
+		if self.Mute == 0 then
 			self:EmitSound("Airboat_engine_idle")
 		end
 
@@ -48,14 +48,14 @@ function ENT:TurnOn()
 		end
 
 		self:SetOOO(1)
-	elseif (self.overdrive == 0) then
+	elseif self.overdrive == 0 then
 		self:TurnOnOverdrive()
 	end
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
-		if (self.Mute == 0) then
+	if self.Active == 1 then
+		if self.Mute == 0 then
 			self:StopSound("Airboat_engine_idle")
 			self:EmitSound("Airboat_engine_stop")
 			self:StopSound("apc_engine_start")
@@ -73,8 +73,8 @@ function ENT:TurnOff()
 end
 
 function ENT:TurnOnOverdrive()
-	if (self.Active == 1) then
-		if (self.Mute == 0) then
+	if self.Active == 1 then
+		if self.Mute == 0 then
 			self:StopSound("Airboat_engine_idle")
 			self:EmitSound("Airboat_engine_idle")
 			self:EmitSound("apc_engine_start")
@@ -90,8 +90,8 @@ function ENT:TurnOnOverdrive()
 end
 
 function ENT:TurnOffOverdrive()
-	if (self.Active == 1 and self.overdrive == 1) then
-		if (self.Mute == 0) then
+	if self.Active == 1 and self.overdrive == 1 then
+		if self.Mute == 0 then
 			self:StopSound("Airboat_engine_idle")
 			self:EmitSound("Airboat_engine_idle")
 			self:StopSound("apc_engine_start")
@@ -107,18 +107,18 @@ function ENT:TurnOffOverdrive()
 end
 
 function ENT:SetActive(value)
-	if (value) then
-		if (value ~= 0 and self.Active == 0) then
+	if value then
+		if value ~= 0 and self.Active == 0 then
 			self:TurnOn()
-		elseif (value == 0 and self.Active == 1) then
+		elseif value == 0 and self.Active == 1 then
 			self:TurnOff()
 		end
 	else
-		if (self.Active == 0) then
+		if self.Active == 0 then
 			self.lastused = CurTime()
 			self:TurnOn()
 		else
-			if (((CurTime() - self.lastused) < 2) and (self.overdrive == 0)) then
+			if ((CurTime() - self.lastused) < 2) and (self.overdrive == 0) then
 				self:TurnOnOverdrive()
 			else
 				self.overdrive = 0
@@ -129,26 +129,26 @@ function ENT:SetActive(value)
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		self:SetActive(value)
-	elseif (iname == "Overdrive") then
-		if (value ~= 0) then
+	elseif iname == "Overdrive" then
+		if value ~= 0 then
 			self:TurnOnOverdrive()
 		else
 			self:TurnOffOverdrive()
 		end
 	end
 
-	if (iname == "Mute") then
-		if (value > 0) then
+	if iname == "Mute" then
+		if value > 0 then
 			self.Mute = 1
 		else
 			self.Mute = 0
 		end
 	end
 
-	if (iname == "Multiplier") then
-		if (value > 0) then
+	if iname == "Multiplier" then
+		if value > 0 then
 			self.Multiplier = value
 		else
 			self.Multiplier = 1
@@ -157,11 +157,11 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 
-	if ((self.Active == 1) and (math.random(1, 10) <= 4)) then
+	if (self.Active == 1) and (math.random(1, 10) <= 4) then
 		self:TurnOff()
 	end
 end
@@ -193,8 +193,8 @@ function ENT:Proc_Water()
 	local consumeH = winc * 2
 	local consumeO2 = math.Round(winc / 2)
 
-	if (h >= consumeH and o2 >= consumeO2) then
-		if (self.overdrive == 1) then
+	if h >= consumeH and o2 >= consumeO2 then
+		if self.overdrive == 1 then
 			if CAF and CAF.GetAddon("Life Support") then
 				CAF.GetAddon("Life Support").DamageLS(self, math.random(2, 3))
 			else
@@ -239,7 +239,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:Proc_Water()
 	end
 

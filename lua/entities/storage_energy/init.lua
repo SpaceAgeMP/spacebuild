@@ -25,8 +25,8 @@ function ENT:Initialize()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Vent") then
-		if (value ~= 1) then
+	if iname == "Vent" then
+		if value ~= 1 then
 			self.vent = false
 		else
 			self.vent = true
@@ -35,7 +35,7 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -71,7 +71,7 @@ function ENT:Leak()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 0) then
+	if waterlevel > 0 then
 		if zapme then
 			zapme(self:GetPos(), 1)
 		end
@@ -90,7 +90,7 @@ function ENT:Leak()
 
 		self:ConsumeResource("energy", energy)
 	else
-		if (math.random(1, 10) < 2) then
+		if math.random(1, 10) < 2 then
 			if zapme then
 				zapme(self:GetPos(), 1)
 			end
@@ -104,7 +104,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.damaged == 1 or self.vent) then
+	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 

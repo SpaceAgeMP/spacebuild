@@ -14,13 +14,13 @@ function ENT:Draw(bDontDrawModel)
 	--draw beams by MadDog
 	RD.Beam_Render(self)
 
-	if (Wire_Render) then
+	if Wire_Render then
 		Wire_Render(self)
 	end
 end
 
 function ENT:DrawTranslucent(bDontDrawModel)
-	if (bDontDrawModel) then return end
+	if bDontDrawModel then return end
 	self:Draw()
 end
 
@@ -50,12 +50,12 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 	end
 
-	if (not bDontDrawModel) then
+	if not bDontDrawModel then
 		self:DrawModel()
 	end
 
 	local trace = LocalPlayer():GetEyeTrace()
-	if (not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
+	if not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
 		return
 	end
 	--overlaysettings
@@ -114,7 +114,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		local resources = nettable.resources
 
 		if num == -1 then
-			if (table.Count(resources) > 0) then
+			if table.Count(resources) > 0 then
 				for k, v in pairs(resources) do
 					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. " (" .. math.floor(v.temperature) .. " K)\n"
 				end
@@ -201,7 +201,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		local stringUsage = ""
 		local resources = nettable.resources
 
-		if (table.Count(resources) > 0) then
+		if table.Count(resources) > 0 then
 			local i = 0
 			surface.SetTextPos(textStartPos + 15, TempY)
 			surface.DrawText("Resources: ")

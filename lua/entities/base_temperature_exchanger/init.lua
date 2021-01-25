@@ -176,7 +176,7 @@ function ENT:GetResourcesToHeat()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self:EmitSound(self.startsound)
 		self.Active = 1
 
@@ -189,7 +189,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:StopSound(self.startsound)
 		self:EmitSound(self.stopsound)
 		self.Active = 0
@@ -203,7 +203,7 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		BaseClass.SetActive(self, value)
 	end
 end
@@ -211,7 +211,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:ConsumeBaseResources()
 		self:CheckResources()
 	end
@@ -260,11 +260,11 @@ end
 --Still need to check
 --check
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 
-	if ((self.Active == 1) and (math.random(1, 10) <= 3)) then
+	if (self.Active == 1) and (math.random(1, 10) <= 3) then
 		self:TurnOff()
 	end
 end

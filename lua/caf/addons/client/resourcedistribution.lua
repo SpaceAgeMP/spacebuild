@@ -52,7 +52,7 @@ local function AddEntityToCache(nrofbytes)
 	data.resources = {}
 	local nr_of_resources = ReadShort()
 
-	if (nr_of_resources > 0) then
+	if nr_of_resources > 0 then
 		--print("nr_of_sources", nr_of_resources)
 		local resource
 		local maxvalue
@@ -95,7 +95,7 @@ local function AddNetworkToCache(nrofbytes)
 	data.resources = {}
 	local nr_of_resources = ReadShort()
 
-	if (nr_of_resources > 0) then
+	if nr_of_resources > 0 then
 		--print("nr_of_sources", nr_of_resources)
 		local resource
 		local maxvalue
@@ -129,7 +129,7 @@ local function AddNetworkToCache(nrofbytes)
 	data.cons = {}
 	local nr_of_cons = ReadShort()
 
-	if (nr_of_cons > 0) then
+	if nr_of_cons > 0 then
 		--print("nr_of_cons", nr_of_cons)
 		for i = 1, nr_of_cons do
 			--print(i)
@@ -224,24 +224,16 @@ function RD.GetNetResourceAmount(netid, resource)
 	if not resource then return 0, "No resource given" end
 	local data = RD.GetNetTable(netid)
 	if not data then return 0, "Not a valid network" end
-	if not data.resources or (data.resources and table.Count(data.resources) == 0) then return 0, "No resources available" end
-	if not data.resources[resource] then return 0, "Resource not available" end
-	local amount = 0
-	amount = data.resources[resource].value
-
-	return amount
+	if not data.resources or not data.resources[resource] then return 0, "No resources available" end
+	return data.resources[resource].value
 end
 
 function RD.GetResourceAmount(ent, resource)
 	if not IsValid(ent) then return 0, "Not a valid entity" end
 	if not resource then return 0, "No resource given" end
 	local data = RD.GetEntityTable(ent)
-	if not data.resources or (data.resources and table.Count(data.resources) == 0) then return 0, "No resources available" end
-	if not data.resources[resource] then return 0, "Resource not available" end
-	local amount = 0
-	amount = data.resources[resource].value
-
-	return amount
+	if not data.resources or not data.resources[resource] then return 0, "No resources available" end
+	return data.resources[resource].value
 end
 
 --[[function RD.GetUnitCapacity(ent, resource)
@@ -260,12 +252,8 @@ function RD.GetNetNetworkCapacity(netid, resource)
 	if not resource then return 0, "No resource given" end
 	local data = RD.GetNetTable(netid)
 	if not data then return 0, "Not a valid network" end
-	if not data.resources or (data.resources and table.Count(data.resources) == 0) then return 0, "No resources available" end
-	if not data.resources[resource] then return 0, "Resource not available" end
-	local amount = 0
-	amount = data.resources[resource].maxvalue
-
-	return amount
+	if not data.resources or not data.resources[resource] then return 0, "No resources available" end
+	return data.resources[resource].maxvalue
 end
 
 function RD.GetNetworkCapacity(ent, resource)
@@ -273,15 +261,8 @@ function RD.GetNetworkCapacity(ent, resource)
 	if not resource then return 0, "No resource given" end
 	local data = RD.GetEntityTable(ent)
 	if not data then return 0, "Not a valid network" end
-	if not data.resources or (data.resources and table.Count(data.resources) == 0) then return 0, "No resources available" end
-	if not data.resources[resource] then return 0, "Resource not available" end
-	local amount = 0
-
-	if data.resources[resource] then
-		amount = data.resources[resource].maxvalue
-	end
-
-	return amount
+	if not data.resources or not data.resources[resource] then return 0, "No resources available" end
+	return data.resources[resource].maxvalue
 end
 
 local requests = {}
@@ -292,12 +273,10 @@ function RD.GetEntityTable(ent)
 	local id = "entity_" .. tostring(entid)
 	local data, needs_update = rd_cache:get(id)
 
-	if not data or needs_update then
-		if not requests[id] or requests[id] < CurTime() then
-			--Do (new) request
-			requests[id] = CurTime() + ttl
-			RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "ENT", entid, needs_update and "UPDATE")
-		end
+	if not data or needs_update and not requests[id] or requests[id] < CurTime() then
+		--Do (new) request
+		requests[id] = CurTime() + ttl
+		RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "ENT", entid, needs_update and "UPDATE")
 	end
 	--PrintTable(data)
 
@@ -308,12 +287,10 @@ function RD.GetNetTable(netid)
 	local id = "network_" .. tostring(netid)
 	local data, needs_update = rd_cache:get(id)
 
-	if not data or needs_update then
-		if not requests[id] or requests[id] < CurTime() then
-			--Do (new) request
-			requests[id] = CurTime() + ttl
-			RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "NET", netid, needs_update and "UPDATE")
-		end
+	if not data or needs_update and not requests[id] or requests[id] < CurTime() then
+		--Do (new) request
+		requests[id] = CurTime() + ttl
+		RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "NET", netid, needs_update and "UPDATE")
 	end
 
 	return data or {}

@@ -27,7 +27,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 	end
 
-	if (not bDontDrawModel) then
+	if not bDontDrawModel then
 		self:DrawModel()
 	end
 

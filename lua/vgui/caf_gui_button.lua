@@ -30,7 +30,7 @@ end
 local bgColor = Color(50, 50, 255, 250)
 
 function PANEL:Paint(w, h)
-	if (LocalPlayer():GetInfo(self.toolname .. "_name") == self.num) then
+	if LocalPlayer():GetInfo(self.toolname .. "_name") == self.num then
 		draw.RoundedBox(4, 0, 0, w, h, bgColor)
 	end
 

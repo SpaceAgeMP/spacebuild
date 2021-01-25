@@ -133,7 +133,7 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Open") then
+	if iname == "Open" then
 		if value == 0 then
 			self:TurnOff()
 		elseif value == 1 then
@@ -202,20 +202,16 @@ function ENT:Think()
 	end
 
 	-- Check if they are still in range!
-	if self.connected.node1 then
-		if self:GetPos():Distance(self.connected.node1:GetPos()) > self.connected.node1.range then
-			self:TurnOff()
-			self.connected.node1 = nil
-			self:SetNWInt("netid1", 0)
-		end
+	if self.connected.node1 and self:GetPos():Distance(self.connected.node1:GetPos()) > self.connected.node1.range then
+		self:TurnOff()
+		self.connected.node1 = nil
+		self:SetNWInt("netid1", 0)
 	end
 
-	if self.connected.node2 then
-		if self:GetPos():Distance(self.connected.node2:GetPos()) > self.connected.node2.range then
-			self:TurnOff()
-			self.connected.node2 = nil
-			self:SetNWInt("netid2", 0)
-		end
+	if self.connected.node2 and self:GetPos():Distance(self.connected.node2:GetPos()) > self.connected.node2.range then
+		self:TurnOff()
+		self.connected.node2 = nil
+		self:SetNWInt("netid2", 0)
 	end
 
 	self:NextThink(CurTime() + 1)
@@ -238,7 +234,7 @@ function ENT:OnRestore()
 end
 
 function ENT:PreEntityCopy()
-	CAF.GetAddon("Resource Distribution")BuildDupeInfo(self)
+	CAF.GetAddon("Resource Distribution").BuildDupeInfo(self)
 
 	if WireAddon ~= nil then
 		local DupeInfo = WireLib.BuildDupeInfo(self)

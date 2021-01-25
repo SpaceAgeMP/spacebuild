@@ -21,7 +21,7 @@ function PANEL:Init()
 end
 
 function PANEL:AddSheet(label, panel, material, NoStretchX, NoStretchY, Tooltip)
-	if (not IsValid(panel)) then return end
+	if not IsValid(panel) then return end
 	local Sheet = {}
 	Sheet.Tab = vgui.Create("DTab", self.leftPanel)
 	Sheet.Tab:SetTooltip(Tooltip)
@@ -32,7 +32,7 @@ function PANEL:AddSheet(label, panel, material, NoStretchX, NoStretchY, Tooltip)
 	panel:SetParent(self.rightPanel)
 	table.insert(self.Items, Sheet)
 
-	if (not self:GetActiveTab()) then
+	if not self:GetActiveTab() then
 		self:SetActiveTab(Sheet.Tab)
 	end
 
@@ -40,9 +40,9 @@ function PANEL:AddSheet(label, panel, material, NoStretchX, NoStretchY, Tooltip)
 end
 
 function PANEL:SetActiveTab(active)
-	if (self.m_pActiveTab == active) then return end
+	if self.m_pActiveTab == active then return end
 
-	if (self.m_pActiveTab) then
+	if self.m_pActiveTab then
 		self.animFade:Start(self:GetFadeTime(), {
 			OldTab = self.m_pActiveTab,
 			NewTab = active
@@ -61,7 +61,7 @@ function PANEL:CrossFade(anim, delta, data)
 	local old = data.OldTab:GetPanel()
 	local new = data.NewTab:GetPanel()
 
-	if (anim.Finished) then
+	if anim.Finished then
 		old:SetVisible(false)
 		new:SetAlpha(255)
 		old:SetZPos(0)
@@ -70,7 +70,7 @@ function PANEL:CrossFade(anim, delta, data)
 		return
 	end
 
-	if (anim.Started) then
+	if anim.Started then
 		old:SetZPos(0)
 		new:SetZPos(1)
 		old:SetAlpha(255)
@@ -87,7 +87,7 @@ function PANEL:PerformLayout(w, h)
 	local Padding = self:GetPadding()
 	self.leftPanel:InvalidateLayout(true)
 	self.rightPanel:InvalidateLayout(true)
-	if (not ActiveTab) then return end
+	if not ActiveTab then return end
 	-- Update size now, so the height is definitiely right.
 	ActiveTab:InvalidateLayout(true)
 	self.tabScroller:StretchToParent(4, 4, 4, 4)
@@ -105,18 +105,18 @@ function PANEL:PerformLayout(w, h)
 	self.rightPanel:SetTall(w - 101, h)
 	self.tabScroller:SetTall(h - 10)
 
-	if (ActiveTab) then
+	if ActiveTab then
 		local ActivePanel = ActiveTab:GetPanel()
 		ActivePanel:SetVisible(true)
 		ActivePanel:SetPos(Padding, Padding * 2)
 
-		if (not ActivePanel.NoStretchX) then
+		if not ActivePanel.NoStretchX then
 			ActivePanel:SetWide(self.rightPanel:GetWide() - Padding * 2)
 		else
 			ActivePanel:CenterHorizontal()
 		end
 
-		if (not ActivePanel.NoStretchY) then
+		if not ActivePanel.NoStretchY then
 			ActivePanel:SetTall(self.rightPanel:GetTall() - Padding * 2)
 		else
 			ActivePanel:CenterVertical()
@@ -134,7 +134,7 @@ function PANEL:SizeToContentWidth()
 	local tall = 0
 
 	for k, v in pairs(self.Items) do
-		if (v.Panel) then
+		if v.Panel then
 			v.Panel:InvalidateLayout(true)
 			tall = math.max(tall, v.Panel:GetTall() + self.m_iPadding * 2) --math.max( wide, v.Panel:GetWide()  + self.m_iPadding * 2 )
 		end

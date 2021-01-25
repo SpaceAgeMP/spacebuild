@@ -9,13 +9,13 @@ function ENT:Draw(bDontDrawModel)
 	--draw beams by MadDog
 	CAF.GetAddon("Resource Distribution").Beam_Render(self)
 
-	if (Wire_Render) then
+	if Wire_Render then
 		Wire_Render(self)
 	end
 end
 
 function ENT:DrawTranslucent(bDontDrawModel)
-	if (bDontDrawModel) then return end
+	if bDontDrawModel then return end
 	self:Draw()
 end
 
@@ -56,7 +56,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 	local HasOOO = true
 
-	if (not bDontDrawModel) then
+	if not bDontDrawModel then
 		self:DrawModel()
 	end
 

@@ -27,8 +27,8 @@ function ENT:Initialize()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Vent") then
-		if (value ~= 1) then
+	if iname == "Vent" then
+		if value ~= 1 then
 			self.vent = false
 		else
 			self.vent = true
@@ -37,7 +37,7 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 		self:EmitSound("PhysicsCannister.ThrusterLoop") --Change to a new Liquid Vent/Escaping Sound
 	end
@@ -64,7 +64,7 @@ end
 function ENT:Leak()
 	local coolant = self:GetResourceAmount("water")
 
-	if (coolant >= 100) then
+	if coolant >= 100 then
 		self:ConsumeResource("water", 100)
 	else
 		self:ConsumeResource("water", coolant)
@@ -78,18 +78,16 @@ function ENT:UpdateMass()
 	local mass = self.mass + ((self:GetResourceAmount("water") * mul) / div) -- self.mass = default mass + need a good multiplier
 	local phys = self:GetPhysicsObject()
 
-	if (phys:IsValid()) then
-		if phys:GetMass() ~= mass then
-			phys:SetMass(mass)
-			phys:Wake()
-		end
+	if phys:IsValid() and phys:GetMass() ~= mass then
+		phys:SetMass(mass)
+		phys:Wake()
 	end
 end
 
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.damaged == 1 or self.vent) then
+	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 

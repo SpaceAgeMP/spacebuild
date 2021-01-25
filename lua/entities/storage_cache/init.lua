@@ -35,50 +35,50 @@ function ENT:Initialize()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Expel Energy") then
-		if (value ~= 1) then
+	if iname == "Expel Energy" then
+		if value ~= 1 then
 			self.venten = false
 		else
 			self.venten = true
 		end
-	elseif (iname == "Vent Oxygen") then
-		if (value ~= 1) then
+	elseif iname == "Vent Oxygen" then
+		if value ~= 1 then
 			self.ventoxy = false
 		else
 			self.ventoxy = true
 		end
-	elseif (iname == "Vent Co2") then
-		if (value ~= 1) then
+	elseif iname == "Vent Co2" then
+		if value ~= 1 then
 			self.ventco2 = false
 		else
 			self.ventco2 = true
 		end
-	elseif (iname == "Vent Hydrogen") then
-		if (value ~= 1) then
+	elseif iname == "Vent Hydrogen" then
+		if value ~= 1 then
 			self.venthyd = false
 		else
 			self.venthyd = true
 		end
-	elseif (iname == "Vent Nitrogen") then
-		if (value ~= 1) then
+	elseif iname == "Vent Nitrogen" then
+		if value ~= 1 then
 			self.ventnit = false
 		else
 			self.ventnit = true
 		end
-	elseif (iname == "Leak Water") then
-		if (value ~= 1) then
+	elseif iname == "Leak Water" then
+		if value ~= 1 then
 			self.ventwat = false
 		else
 			self.ventwat = true
 		end
-	elseif (iname == "Leak Heavy Water") then
-		if (value ~= 1) then
+	elseif iname == "Leak Heavy Water" then
+		if value ~= 1 then
 			self.venthwwat = false
 		else
 			self.venthwat = true
 		end
-	elseif (iname == "Vent Amount") then
-		if (value ~= 0) then
+	elseif iname == "Vent Amount" then
+		if value ~= 0 then
 			self.ventamount = math.abs(value)
 		else
 			self.ventamount = 1000
@@ -87,7 +87,7 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 		self:EmitSound("PhysicsCannister.ThrusterLoop")
 		self:EmitSound("ambient.steam01")
@@ -129,7 +129,7 @@ end
 function ENT:LeakHvyWater()
 	local heavywater = self:GetResourceAmount("heavy water")
 
-	if (heavywater >= self.ventamount) then
+	if heavywater >= self.ventamount then
 		self:ConsumeResource("heavy water", self.ventamount)
 	else
 		self:ConsumeResource("heavy water", heavywater)
@@ -140,7 +140,7 @@ end
 function ENT:VentCo2()
 	local co2 = self:GetResourceAmount("carbon dioxide")
 
-	if (co2 >= self.ventamount) then
+	if co2 >= self.ventamount then
 		self:ConsumeResource("carbon dioxide", self.ventamount)
 
 		if self.environment then
@@ -160,8 +160,8 @@ end
 function ENT:VentO2()
 	local air = self:GetResourceAmount("oxygen")
 
-	if (air > 0) then
-		if (air >= self.ventamount) then
+	if air > 0 then
+		if air >= self.ventamount then
 			self:ConsumeResource("oxygen", self.ventamount)
 
 			if self.environment then
@@ -182,7 +182,7 @@ end
 function ENT:VentHydrogen()
 	local hydrogen = self:GetResourceAmount("hydrogen")
 
-	if (hydrogen >= self.ventamount) then
+	if hydrogen >= self.ventamount then
 		self:ConsumeResource("hydrogen", self.ventamount)
 
 		if self.environment then
@@ -202,7 +202,7 @@ end
 function ENT:VentNitrogen()
 	local nitrogen = self:GetResourceAmount("nitrogen")
 
-	if (nitrogen >= self.ventamount) then
+	if nitrogen >= self.ventamount then
 		self:ConsumeResource("nitrogen", self.ventamount)
 
 		if self.environment then
@@ -222,41 +222,42 @@ end
 function ENT:ExpEnergy()
 	local energy = self:GetResourceAmount("energy")
 
-	if (energy > 0) then
-		local waterlevel = 0
+	if energy == 0 then
+		return
+	end
+	local waterlevel = 0
 
-		if CAF then
-			waterlevel = self:WaterLevel2()
-		else
-			waterlevel = self:WaterLevel()
+	if CAF then
+		waterlevel = self:WaterLevel2()
+	else
+		waterlevel = self:WaterLevel()
+	end
+
+	if waterlevel > 0 then
+		zapme(self:GetPos(), 1)
+		local tmp = ents.FindInSphere(self:GetPos(), 600)
+
+		for _, ply in ipairs(tmp) do
+			--??? wont that be zaping any player in any water??? should do a dist check first and have damage based on dist
+			if ply:IsPlayer() and ply:WaterLevel() > 0 then
+				zapme(ply:GetPos(), 1)
+				ply:TakeDamage(ply:WaterLevel() * energy / 100, 0)
+			end
 		end
 
-		if (waterlevel > 0) then
-			zapme(self:GetPos(), 1)
-			local tmp = ents.FindInSphere(self:GetPos(), 600)
+		self.maxenergy = self:GetUnitCapacity("energy")
 
-			for _, ply in ipairs(tmp) do
-				--??? wont that be zaping any player in any water??? should do a dist check first and have damage based on dist
-				if (ply:IsPlayer() and ply:WaterLevel() > 0) then
-					zapme(ply:GetPos(), 1)
-					ply:TakeDamage((ply:WaterLevel() * energy / 100), 0)
-				end
-			end
-
-			self.maxenergy = self:GetUnitCapacity("energy")
-
-			--??? loose all energy on net when damaged and in water??? that sounds crazy to me
-			if (energy >= self.maxenergy) then
-				self:ConsumeResource("energy", self.maxenergy)
-			else
-				self:ConsumeResource("energy", energy)
-			end
+		--??? loose all energy on net when damaged and in water??? that sounds crazy to me
+		if energy >= self.maxenergy then
+			self:ConsumeResource("energy", self.maxenergy)
 		else
-			if (energy >= self.ventamount) then
-				self:ConsumeResource("energy", self.ventamount)
-			else
-				self:ConsumeResource("energy", energy)
-			end
+			self:ConsumeResource("energy", energy)
+		end
+	else
+		if energy >= self.ventamount then
+			self:ConsumeResource("energy", self.ventamount)
+		else
+			self:ConsumeResource("energy", energy)
 		end
 	end
 end
@@ -264,13 +265,14 @@ end
 function ENT:LeakWater()
 	local water = self:GetResourceAmount("water")
 
-	if (water > 0) then
-		if (water >= self.ventamount) then
-			self:ConsumeResource("water", self.ventamount)
-		else
-			self:ConsumeResource("water", water)
-			self:StopSound("ambient.steam01")
-		end
+	if water == 0 then
+		return
+	end
+	if water >= self.ventamount then
+		self:ConsumeResource("water", self.ventamount)
+	else
+		self:ConsumeResource("water", water)
+		self:StopSound("ambient.steam01")
 	end
 end
 
@@ -280,7 +282,7 @@ function ENT:UpdateMass()
      local div = math.Round(RD.GetNetworkCapacity(self, "carbon dioxide")/self.MAXRESOURCE)
      local mass = self.mass + ((RD.GetResourceAmount(self, "carbon dioxide") * mul)/div) -- self.mass = default mass + need a good multiplier
      local phys = self:GetPhysicsObject()
-     if (phys:IsValid()) then
+     if phys:IsValid() then
          if phys:GetMass() ~= mass then
              phys:SetMass(mass)
              phys:Wake()
@@ -291,31 +293,31 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.damaged == 1 or self.venten) then
+	if self.damaged == 1 or self.venten then
 		self:ExpEnergy()
 	end
 
-	if (self.damaged == 1 or self.ventoxy) then
+	if self.damaged == 1 or self.ventoxy then
 		self:VentO2()
 	end
 
-	if (self.damaged == 1 or self.ventnit) then
+	if self.damaged == 1 or self.ventnit then
 		self:VentNitrogen()
 	end
 
-	if (self.damaged == 1 or self.venthyd) then
+	if self.damaged == 1 or self.venthyd then
 		self:VentHydrogen()
 	end
 
-	if (self.damaged == 1 or self.ventco2) then
+	if self.damaged == 1 or self.ventco2 then
 		self:VentCo2()
 	end
 
-	if (self.damaged == 1 or self.ventwat) then
+	if self.damaged == 1 or self.ventwat then
 		self:LeakWater()
 	end
 
-	if (self.damaged == 1 or self.venthwat) then
+	if self.damaged == 1 or self.venthwat then
 		self:LeakHvyWater()
 	end
 
@@ -330,32 +332,18 @@ function ENT:Think()
 end
 
 function ENT:UpdateWireOutput()
-	local air = self:GetResourceAmount("oxygen")
-	local nitrogen = self:GetResourceAmount("nitrogen")
-	local hydrogen = self:GetResourceAmount("hydrogen")
-	local co2 = self:GetResourceAmount("carbon dioxide")
-	local heavywater = self:GetResourceAmount("heavy water")
-	local energy = self:GetResourceAmount("energy")
-	local coolant = self:GetResourceAmount("water")
-	local maxnitrogen = self:GetNetworkCapacity("nitrogen")
-	local maxhydrogen = self:GetNetworkCapacity("hydrogen")
-	local maxco2 = self:GetNetworkCapacity("carbon dioxide")
-	local maxheavywater = self:GetNetworkCapacity("heavy water")
-	local maxair = self:GetNetworkCapacity("oxygen")
-	local maxcoolant = self:GetNetworkCapacity("water")
-	local maxenergy = self:GetNetworkCapacity("energy")
-	Wire_TriggerOutput(self, "Hydrogen", hydrogen)
-	Wire_TriggerOutput(self, "Co2", co2)
-	Wire_TriggerOutput(self, "Nitrogen", nitrogen)
-	Wire_TriggerOutput(self, "Hvy Water", heavywater)
-	Wire_TriggerOutput(self, "Oxygen", air)
-	Wire_TriggerOutput(self, "Energy", energy)
-	Wire_TriggerOutput(self, "Water", coolant)
-	Wire_TriggerOutput(self, "Max Oxygen", maxair)
-	Wire_TriggerOutput(self, "Max Energy", maxenergy)
-	Wire_TriggerOutput(self, "Max Water", maxcoolant)
-	Wire_TriggerOutput(self, "Max Hvy Water", maxheavywater)
-	Wire_TriggerOutput(self, "Max Co2", maxco2)
-	Wire_TriggerOutput(self, "Max Nitrogen", maxnitrogen)
-	Wire_TriggerOutput(self, "Max Hydrogen", maxhydrogen)
+	Wire_TriggerOutput(self, "Hydrogen", self:GetResourceAmount("hydrogen"))
+	Wire_TriggerOutput(self, "Co2", self:GetResourceAmount("carbon dioxide"))
+	Wire_TriggerOutput(self, "Nitrogen", self:GetResourceAmount("nitrogen"))
+	Wire_TriggerOutput(self, "Hvy Water", self:GetResourceAmount("heavy water"))
+	Wire_TriggerOutput(self, "Oxygen", self:GetResourceAmount("oxygen"))
+	Wire_TriggerOutput(self, "Energy", self:GetResourceAmount("energy"))
+	Wire_TriggerOutput(self, "Water", self:GetResourceAmount("water"))
+	Wire_TriggerOutput(self, "Max Oxygen", self:GetNetworkCapacity("oxygen"))
+	Wire_TriggerOutput(self, "Max Energy", self:GetNetworkCapacity("energy"))
+	Wire_TriggerOutput(self, "Max Water", self:GetNetworkCapacity("water"))
+	Wire_TriggerOutput(self, "Max Hvy Water", self:GetNetworkCapacity("heavy water"))
+	Wire_TriggerOutput(self, "Max Co2", self:GetNetworkCapacity("carbon dioxide"))
+	Wire_TriggerOutput(self, "Max Nitrogen", self:GetNetworkCapacity("nitrogen"))
+	Wire_TriggerOutput(self, "Max Hydrogen", self:GetNetworkCapacity("hydrogen"))
 end

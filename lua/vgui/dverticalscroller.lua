@@ -31,12 +31,12 @@ function PANEL:Think()
 	local FrameRate = VGUIFrameTime() - self.FrameTime
 	self.FrameTime = VGUIFrameTime()
 
-	if (self.btnRight:IsDown()) then
+	if self.btnRight:IsDown() then
 		self.OffsetX = self.OffsetX + (500 * FrameRate)
 		self:InvalidateLayout(true)
 	end
 
-	if (self.btnLeft:IsDown()) then
+	if self.btnLeft:IsDown() then
 		self.OffsetX = self.OffsetX - (500 * FrameRate)
 		self:InvalidateLayout(true)
 	end
@@ -56,7 +56,7 @@ function PANEL:PerformLayout(w, h)
 
 	self.pnlCanvas:SetTall(x + self.m_iOverlap) --SetWide
 
-	if (w < self.pnlCanvas:GetWide()) then
+	if w < self.pnlCanvas:GetWide() then
 		self.OffsetX = math.Clamp(self.OffsetX, 0, self.pnlCanvas:GetTall() - self:GetTall()) --GetWide, GetWide
 	else
 		self.OffsetX = 0

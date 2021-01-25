@@ -211,13 +211,13 @@ function ENT:Draw(bDontDrawModel)
 	--draw beams by MadDog
 	CAF.GetAddon("Resource Distribution").Beam_Render(self)
 
-	if (Wire_Render) then
+	if Wire_Render then
 		Wire_Render(self)
 	end
 end
 
 function ENT:DrawTranslucent(bDontDrawModel)
-	if (bDontDrawModel) then return end
+	if bDontDrawModel then return end
 	self:Draw()
 end
 
@@ -247,7 +247,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 	end
 
-	if (not bDontDrawModel) then
+	if not bDontDrawModel then
 		self:DrawModel()
 	end
 
@@ -301,7 +301,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
 		end
 
-		if (table.Count(self.ResourcesToSend) > 0) then
+		if table.Count(self.ResourcesToSend) > 0 then
 			local rd = CAF.GetAddon("Resource Distribution")
 			for k, v in pairs(self.ResourcesToSend) do
 				OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. tostring(v) .. "\n"
@@ -374,7 +374,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	-- Print the used resources
 	local stringUsage = ""
 
-	if (table.Count(self.ResourcesToSend) > 0) then
+	if table.Count(self.ResourcesToSend) > 0 then
 		local i = 0
 		surface.SetTextPos(textStartPos + 15, TempY)
 		surface.DrawText("Resources Being Transfered: ")

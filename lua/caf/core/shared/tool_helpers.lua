@@ -19,7 +19,7 @@ function CAFToolSetup.open(s_toolmode)
 	TOOL.UpdateGhost = CAFTool.UpdateGhost
 	TOOL.Think = CAFTool.Think
 
-	if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+	if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 		TOOL.Tab = "Custom Addon Framework"
 	end
 end
@@ -395,9 +395,9 @@ function CAFTool.LeftClick(self, trace)
 		if not ent or not ent:IsValid() then return false end
 		local min = ent:OBBMins()
 
-		if (self.GetGhostMin) then
+		if self.GetGhostMin then
 			ent:SetPos(trace.HitPos - trace.HitNormal * self:GetGhostMin(min))
-		elseif (self.GhostMin) then
+		elseif self.GhostMin then
 			ent:SetPos(trace.HitPos - trace.HitNormal * min[self.GhostMin])
 		elseif self.GetGhostOffset then
 			ent:SetPos(self:GetGhostOffset(trace.HitPos, Ang))
@@ -459,10 +459,10 @@ function CAFTool.Reload(self, trace)
 end
 
 function CAFTool.UpdateGhost(self, ent)
-	if (not ent or not ent:IsValid()) then return end
+	if not ent or not ent:IsValid() then return end
 	local tr = util.GetPlayerTrace(self:GetOwner(), self:GetOwner():GetAimVector())
 	local trace = util.TraceLine(tr)
-	if (not trace.Hit) then return end
+	if not trace.Hit then return end
 
 	if (not trace.Hit or trace.Entity:IsPlayer() or trace.Entity:IsNPC() or (self.NoLeftOnClass and trace.Entity:GetClass() == self.ClassName)) or NoLeftClickOn(self, trace) then
 		ent:SetNoDraw(true)
@@ -481,9 +481,9 @@ function CAFTool.UpdateGhost(self, ent)
 	Ang.pitch = Ang.pitch + 90
 	local min = ent:OBBMins()
 
-	if (self.GetGhostMin) then
+	if self.GetGhostMin then
 		ent:SetPos(trace.HitPos - trace.HitNormal * self:GetGhostMin(min))
-	elseif (self.GhostMin) then
+	elseif self.GhostMin then
 		ent:SetPos(trace.HitPos - trace.HitNormal * min[self.GhostMin])
 	elseif self.GetGhostOffset then
 		ent:SetPos(self:GetGhostOffset(trace.HitPos, Ang))
@@ -497,7 +497,7 @@ end
 
 function CAFTool.Think(self)
 	local model = self.Model or self:GetClientInfo("model")
-	if (not model) or (model == nil) or (model == "") or (not util.IsValidModel(model)) then return end
+	if not model or not util.IsValidModel(model) then return end
 
 	if not IsValid(self.GhostEntity) or string.lower(model) ~= string.lower(self.GhostEntity:GetModel()) then
 		if self.GetGhostAngle then

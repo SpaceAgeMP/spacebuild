@@ -3,12 +3,12 @@ TOOL.Name = '#Gravity Plating'
 TOOL.Command = nil
 TOOL.ConfigName = ''
 
-if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 	TOOL.Tab = "Custom Addon Framework"
 end
 
 -- Add Default Language translation (saves adding it to the txt files)
-if (CLIENT) then
+if CLIENT then
 	language.Add("tool.grav_plate.name", "Gravity Plating")
 	language.Add("tool.grav_plate.desc", "Enables walking on a prop even in low-to-zero gravity.")
 	language.Add("tool.grav_plate.0", "Left Click to attach Gravity Plating.  Right Click to take it off.")

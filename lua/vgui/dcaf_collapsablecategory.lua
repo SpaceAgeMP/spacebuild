@@ -82,14 +82,14 @@ function PANEL:Setup(name, addon)
 end
 
 function PANEL:Paint(w, h)
-	if (not self.Material) then return end
+	if not self.Material then return end
 	surface.SetDrawColor(255, 255, 255, 255)
 	surface.SetMaterial(self.Material)
 	surface.DrawTexturedRect(4, 4, 56, 56)
 end
 
 function PANEL:OnMousePressed(mcode)
-	if (mcode == MOUSE_LEFT) then
+	if mcode == MOUSE_LEFT then
 		self:GetParent():Toggle()
 
 		return
@@ -148,7 +148,7 @@ function PANEL:Toggle()
 	self:GetParent():GetParent():InvalidateLayout()
 	local cookie = '1'
 
-	if (not self:GetExpanded()) then
+	if not self:GetExpanded() then
 		cookie = '0'
 	end
 
@@ -160,8 +160,8 @@ function PANEL:PerformLayout(w, h)
 	self.Header:SetPos(0, 0)
 	self.Header:SetWide(w)
 
-	if (self.Contents) then
-		if (self:GetExpanded()) then
+	if self.Contents then
+		if self:GetExpanded() then
 			self.Contents:SetPos(Padding, self.Header:GetTall() + Padding)
 			self.Contents:SetWide(w - Padding * 2)
 			self.Contents:InvalidateLayout(true)
@@ -179,23 +179,23 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:OnMousePressed(mcode)
-	if (not self:GetParent().OnMousePressed) then return end
+	if not self:GetParent().OnMousePressed then return end
 
 	return self:GetParent():OnMousePressed(mcode)
 end
 
 function PANEL:AnimSlide(anim, delta, data)
-	if (anim.Started) then
+	if anim.Started then
 		data.To = self:GetTall()
 	end
 
-	if (anim.Finished) then
+	if anim.Finished then
 		self:InvalidateLayout()
 
 		return
 	end
 
-	if (self.Contents) then
+	if self.Contents then
 		self.Contents:SetVisible(true)
 	end
 

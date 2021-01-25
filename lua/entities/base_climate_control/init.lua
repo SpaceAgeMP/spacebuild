@@ -41,7 +41,7 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self:EmitSound("apc_engine_start")
 		self.Active = 1
 		self:UpdateSize(self.sbenvironment.size, self.currentsize) --We turn the forcefield that contains the environment on
@@ -56,7 +56,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:StopSound("apc_engine_start")
 		self:EmitSound("apc_engine_stop")
 		self.Active = 0
@@ -96,9 +96,9 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		self:SetActive(value)
-	elseif (iname == "Radius") then
+	elseif iname == "Radius" then
 		if value >= 0 and value < self.maxsize then
 			if self.Active == 1 then
 				self:UpdateSize(self.sbenvironment.size, value)
@@ -112,7 +112,7 @@ function ENT:TriggerInput(iname, value)
 
 			self.currentsize = self.maxsize
 		end
-	elseif (iname == "Gravity") then
+	elseif iname == "Gravity" then
 		local gravity = value
 
 		if value <= 0 then
@@ -120,7 +120,7 @@ function ENT:TriggerInput(iname, value)
 		end
 
 		self.sbenvironment.gravity = gravity
-	elseif (iname == "Max O2 level") then
+	elseif iname == "Max O2 level" then
 		local level = 100
 		level = math.Clamp(math.Round(value), 0, 100)
 		self.maxO2Level = level
@@ -128,11 +128,11 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 
-	if ((self.Active == 1) and (math.random(1, 10) <= 3)) then
+	if (self.Active == 1) and (math.random(1, 10) <= 3) then
 		self:TurnOff()
 	end
 end

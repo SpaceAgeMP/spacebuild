@@ -1,6 +1,6 @@
 ﻿local gmod_version_required = 145
 
-if (VERSION < gmod_version_required) then
+if VERSION < gmod_version_required then
 	error("CAF: Your gmod is out of date: found version ", VERSION, "required ", gmod_version_required)
 end
 
@@ -50,7 +50,7 @@ CAF2.CAF3 = CAF3
 include("caf/core/shared/sh_general_caf.lua")
 CAF2.CAF3 = nil
 
-if (not sql.TableExists("CAF_AddonStatus")) then
+if not sql.TableExists("CAF_AddonStatus") then
 	sql.Query("CREATE TABLE IF NOT EXISTS CAF_AddonStatus ( id VARCHAR(50) PRIMARY KEY , status TINYINT(1));")
 end
 
@@ -89,7 +89,7 @@ local function LoadAddonStatus(addon, defaultstatus)
 		end
 	end
 
-	if (not data) then
+	if not data then
 		SaveAddonStatus(addon, defaultstatus)
 	else
 		return tobool(data[1]["status"])
@@ -450,7 +450,7 @@ local Files = file.Find("caf/core/server/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(include, "caf/core/server/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Loaded: Successfully\n")
@@ -462,7 +462,7 @@ Files = file.Find("CAF/Core/client/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/client/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -474,7 +474,7 @@ Files = file.Find("CAF/Core/shared/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/shared/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -486,7 +486,7 @@ Files = file.Find("caf/languagevars/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/languagevars/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -496,7 +496,7 @@ end
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -509,7 +509,7 @@ local Files = file.Find("caf/addons/server/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/server/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Loaded: Successfully\n")
@@ -521,7 +521,7 @@ Files = file.Find("caf/addons/client/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/client/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -533,7 +533,7 @@ Files = file.Find("caf/addons/shared/*.lua", "LUA")
 for k, File in ipairs(Files) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/shared/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")

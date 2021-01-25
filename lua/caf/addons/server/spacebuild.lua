@@ -69,7 +69,7 @@ end
 hook.Add("CAFOnEntitySpawn", "SB_OnEntitySpawn", OnEntitySpawn)
 
 local function AllowAdminNoclip(ply)
-	if (ply:IsAdmin() or ply:IsSuperAdmin()) and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
+	if ply:IsAdmin() or ply:IsSuperAdmin() and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
 	if ply:IsSuperAdmin() and GetConVar("SB_SuperAdminSpaceNoclip"):GetBool() then return true end
 
 	return false
@@ -107,9 +107,9 @@ hook.Add("PlayerKilled","SBRagdoll",GM.SB_Ragdoll)]]
 local function PlayerSay(ply, txt)
 	if not ply:IsAdmin() then return end --[[tostring(txt)]]
 
-	if (string.sub(txt, 1, 10) == "!freespace") then
+	if string.sub(txt, 1, 10) == "!freespace" then
 		SB.RemoveSBProps()
-	elseif (string.sub(txt, 1, 10) == "!freeworld") then
+	elseif string.sub(txt, 1, 10) == "!freeworld" then
 		SB.RemoveSBProps(true)
 	end
 	--if not txt then txt = "" end
@@ -125,7 +125,7 @@ local function Register_Sun()
 			local values = ent:GetKeyValues()
 
 			for key, value in pairs(values) do
-				if ((key == "target") and (string.len(value) > 0)) then
+				if (key == "target") and (string.len(value) > 0) then
 					local targets = ents.FindByName("sun_target")
 
 					for _, target in pairs(targets) do
@@ -544,17 +544,17 @@ local function Register_Environments()
 
 				if string.len(case2) > 0 then
 					hash.AddColor_r = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.AddColor_g = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.AddColor_b = tonumber(case2)
 				end
 
 				if string.len(case3) > 0 then
 					hash.MulColor_r = tonumber(string.Left(case3, string.find(case3, " ") - 1))
-					case3 = string.Right(case3, (string.len(case3) - string.find(case3, " ")))
+					case3 = string.Right(case3, string.len(case3) - string.find(case3, " "))
 					hash.MulColor_g = tonumber(string.Left(case3, string.find(case3, " ") - 1))
-					case3 = string.Right(case3, (string.len(case3) - string.find(case3, " ")))
+					case3 = string.Right(case3, string.len(case3) - string.find(case3, " "))
 					hash.MulColor_b = tonumber(case3)
 				end
 
@@ -850,7 +850,7 @@ CAF.RegisterAddon("Spacebuild", SB, "1")
 --local time_count = 0;
 --local time_amount = 0;
 function SB.PerformEnvironmentCheck()
-	if (SB_InSpace == 0) then return end
+	if SB_InSpace == 0 then return end
 
 	--local begintime = CAF.begintime()
 	--local amount = #sb_spawned_entities;
@@ -1161,7 +1161,7 @@ function SB.FindVolume(name, radius)
 		tries = tries - 1
 		local pos = VectorRand() * 16384
 
-		if (util.IsInWorld(pos) == true) then
+		if util.IsInWorld(pos) == true then
 			found = 1
 
 			for k, v in pairs(volumes) do
@@ -1190,19 +1190,19 @@ function SB.FindVolume(name, radius)
 					trace.filter = {}
 					local tr = util.TraceLine(trace)
 
-					if (tr.Hit) then
+					if tr.Hit then
 						found = 0
 						break
 					end
 				end
 			end
 
-			if (found == 0) then
+			if found == 0 then
 				Msg("Rejected Volume.\n")
 			end
 		end
 
-		if (found == 1) then
+		if found == 1 then
 			volumes[name].pos = pos
 		elseif tries <= 0 then
 			volumes[name] = nil
@@ -1256,7 +1256,7 @@ function SB.FindClosestPlanet(pos, starsto)
 			if not closestplanet then
 				closestplanet = v
 			else
-				if (v:GetPos():Distance(pos) - v:GetSize() < closestplanet:GetPos():Distance(pos) - closestplanet:GetSize()) then
+				if v:GetPos():Distance(pos) - v:GetSize() < closestplanet:GetPos():Distance(pos) - closestplanet:GetSize() then
 					closestplanet = v
 				end
 			end
@@ -1269,7 +1269,7 @@ function SB.FindClosestPlanet(pos, starsto)
 				if not closestplanet then
 					closestplanet = v
 				else
-					if (v:GetPos():Distance(pos) - v:GetSize() < closestplanet:GetPos():Distance(pos) - closestplanet:GetSize()) then
+					if v:GetPos():Distance(pos) - v:GetSize() < closestplanet:GetPos():Distance(pos) - closestplanet:GetSize() then
 						closestplanet = v
 					end
 				end

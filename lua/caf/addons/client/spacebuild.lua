@@ -44,10 +44,10 @@ local Bloom = {
 -- Color receive message
 local function SetColor(planet)
 	-- don't support colormod?
-	if (not render.SupportsPixelShaders_2_0()) then return end
+	if not render.SupportsPixelShaders_2_0() then return end
 	-- enabled?
 	Color_Enabled = planet.color
-	if (not Color_Enabled) then return end
+	if not Color_Enabled then return end
 	-- read attributes
 	ColorModify["$pp_colour_addr"] = planet.AddColor_r
 	ColorModify["$pp_colour_addg"] = planet.AddColor_g
@@ -63,10 +63,10 @@ end
 -- Bloom receive message
 local function SetBloom(planet)
 	-- don't support bloom?
-	if (not render.SupportsPixelShaders_2_0()) then return end
+	if not render.SupportsPixelShaders_2_0() then return end
 	-- enabled?
 	Bloom_Enabled = planet.bloom
-	if (not Bloom_Enabled) then return end
+	if not Bloom_Enabled then return end
 	-- read attributes
 	Bloom.darken = planet.Darken
 	Bloom.multiply = planet.Multiply
@@ -81,7 +81,7 @@ end
 
 local function DrawSunEffects()
 	-- no pixel shaders? no sun effects!
-	if (not render.SupportsPixelShaders_2_0()) then return end
+	if not render.SupportsPixelShaders_2_0() then return end
 	local eyePos = EyePos()
 
 	-- render each star.
@@ -98,8 +98,8 @@ local function DrawSunEffects()
 		local sunpos = eyePos + normVec * (dist * 0.5)
 		local scrpos = sunpos:ToScreen()
 
-		if (dist <= Sun.BeamRadius and dot > 0) then
-			local frac = (1 - ((1 / (Sun.BeamRadius)) * dist)) * dot
+		if dist <= Sun.BeamRadius and dot > 0 then
+			local frac = (1 - ((1 / Sun.BeamRadius) * dist)) * dot
 			-- draw sun.
 			--DrawSunbeams( darken, multiply, sunsize, sunx, suny )
 			DrawSunbeams(0.95, frac, 0.255, scrpos.x / ScrW(), scrpos.y / ScrH())
@@ -113,7 +113,7 @@ local function DrawSunEffects()
 		})
 
 		-- draw!
-		if (dist <= Sun.Radius and dot > 0 and tr.Fraction >= 1) then
+		if dist <= Sun.Radius and dot > 0 and tr.Fraction >= 1 then
 			-- calculate brightness.
 			local frac = (1 - ((1 / Sun.Radius) * dist)) * dot
 			-- draw bloom.
@@ -136,12 +136,12 @@ end
 
 -- render.
 local function Render()
-	if (Color_Enabled) then
+	if Color_Enabled then
 		-- draw colormod.
 		DrawColorModify(ColorModify)
 	end
 
-	if (Bloom_Enabled) then
+	if Bloom_Enabled then
 		-- draw bloom.
 		--DrawBloom( darken, multiply, sizex, sizey, passes, color, colr, colg, colb )
 		DrawBloom(Bloom.darken, Bloom.multiply, Bloom.sizex, Bloom.sizey, Bloom.passes, Bloom.color, Bloom.col.r, Bloom.col.g, Bloom.col.b)
@@ -257,7 +257,7 @@ function SB.Space_Affect_Cl()
 		end
 	end
 
-	if (ply.planet ~= nil) then
+	if ply.planet ~= nil then
 		Color_Enabled = false
 		Bloom_Enabled = false
 		ply.planet = nil
@@ -288,7 +288,7 @@ function SB.FindClosestPlanet(pos, starsto)
 			if not closestplanet then
 				closestplanet = v
 			else
-				if (v.position:Distance(pos) < closestplanet.position:Distance(pos)) then
+				if v.position:Distance(pos) < closestplanet.position:Distance(pos) then
 					closestplanet = v
 				end
 			end
@@ -301,7 +301,7 @@ function SB.FindClosestPlanet(pos, starsto)
 				if not closestplanet then
 					closestplanet = v
 				else
-					if (v.position:Distance(pos) < closestplanet.position:Distance(pos)) then
+					if v.position:Distance(pos) < closestplanet.position:Distance(pos) then
 						closestplanet = v
 					end
 				end

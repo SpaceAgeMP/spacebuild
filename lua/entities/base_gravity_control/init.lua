@@ -37,7 +37,7 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self:EmitSound("apc_engine_start")
 		self.Active = 1
 		self.sbenvironment.size = self.currentsize
@@ -51,7 +51,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:StopSound("apc_engine_start")
 		self:EmitSound("apc_engine_stop")
 		self.Active = 0
@@ -66,9 +66,9 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		self:SetActive(value)
-	elseif (iname == "Radius") then
+	elseif iname == "Radius" then
 		if value >= 0 and value < self.maxsize then
 			if self.Active == 1 then
 				self.sbenvironment.size = value
@@ -82,7 +82,7 @@ function ENT:TriggerInput(iname, value)
 
 			self.currentsize = self.maxsize
 		end
-	elseif (iname == "Gravity") then
+	elseif iname == "Gravity" then
 		local gravity = 1
 
 		if value <= 0 then
@@ -94,11 +94,11 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 
-	if ((self.Active == 1) and (math.random(1, 10) <= 3)) then
+	if (self.Active == 1) and (math.random(1, 10) <= 3) then
 		self:TurnOff()
 	end
 end
@@ -123,7 +123,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		local dif = 1
 
 		if self.environment then
@@ -134,7 +134,7 @@ function ENT:Think()
 			end
 		end
 
-		if (self:GetResourceAmount("energy") < math.Round((Energy_Increment * self:GetMultiplier()) + (Energy_Increment * dif * self:GetMultiplier()))) then
+		if self:GetResourceAmount("energy") < math.Round((Energy_Increment * self:GetMultiplier()) + (Energy_Increment * dif * self:GetMultiplier())) then
 			self:EmitSound("common/warning.wav")
 			self:TurnOff(true)
 		else
@@ -151,8 +151,8 @@ end
 function ENT:OnEnvironment(ent)
 	if not ent then return end
 
-	if ent:GetClass() == self:GetClass() then
-		if self.environment == ent then return end
+	if ent:GetClass() == self:GetClass() and self.environment == ent then
+		return
 	end
 
 	BaseClass.OnEnvironment(self, ent)

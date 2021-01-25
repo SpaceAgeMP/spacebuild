@@ -25,7 +25,7 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self.Active = 1
 		self:EmitSound("k_lab.ambient_powergenerators")
 		self:EmitSound("ambient/machines/thumper_startup1.wav")
@@ -37,7 +37,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self.Active = 0
 		self:StopSound("k_lab.ambient_powergenerators")
 

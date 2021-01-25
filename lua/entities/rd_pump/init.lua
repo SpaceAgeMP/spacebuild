@@ -193,7 +193,7 @@ function ENT:SetNetwork(netid)
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self.Active = 1
 		self:SetOOO(1)
 
@@ -204,7 +204,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self.Active = 0
 		self:SetOOO(0)
 
@@ -215,21 +215,21 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		if value == 0 then
 			self:TurnOff()
 		elseif value == 1 then
 			self:TurnOn()
 		end
-	elseif (iname == "Disconnect") then
+	elseif iname == "Disconnect" then
 		if value == 1 then
 			self:Disconnect()
 		end
-	elseif (iname == "ConnectID") then
+	elseif iname == "ConnectID" then
 		if value > -1 then
 			self.WireConnectPump = value
 		end
-	elseif (iname == "Connect") then
+	elseif iname == "Connect" then
 		if value ~= 0 and self.WireConnectPump >= 0 then
 			local ent2 = ents.GetByIndex(self.WireConnectPump)
 			if not ent2 then return end

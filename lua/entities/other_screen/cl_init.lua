@@ -241,7 +241,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	TempY = TempY + (70 / mul)
 
 
-	if (table.Count(self.resources) > 0) then
+	if table.Count(self.resources) > 0 then
 		local i = 0
 
 		local nettable = enttable.network and enttable.network ~= 0 and rd.GetNetTable(enttable.network)

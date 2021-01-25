@@ -1,6 +1,6 @@
 ﻿local gmod_version_required = 145
 
-if (VERSION < gmod_version_required) then
+if VERSION < gmod_version_required then
 	error("SB CORE: Your gmod is out of date: found version ", VERSION, "required ", gmod_version_required)
 end
 
@@ -55,7 +55,7 @@ CAF2.SaveVar("CAF_LANGUAGE", GetConVar("gmod_language"):GetString())
 local function OnAddonDestruct(name)
 	if not name then return end
 
-	if (CAF2.GetAddonStatus(name)) then
+	if CAF2.GetAddonStatus(name) then
 		local ok, err = pcall(Addons[name].__Destruct)
 
 		if not ok then
@@ -70,7 +70,6 @@ local function OnAddonDestruct(name)
 		end
 	end
 
-	
 	if not CAF2.StartingUp then
 		hook.Call("CAFOnAddonDestruct", name)
 		CAF2.RefreshMainMenu()
@@ -284,7 +283,7 @@ local function GetHelpPanel(frame)
 					local HTMLTest = vgui.Create("HTML", RightPanel)
 					HTMLTest:StretchToParent(10, 10, 10, 10)
 					HTMLTest:OpenURL(w.interneturl)
-				elseif (w.localurl) then
+				elseif w.localurl then
 					local HTMLTest = vgui.Create("HTML", RightPanel)
 					HTMLTest:StretchToParent(10, 10, 10, 10)
 					HTMLTest:SetHTML(file.Read(w.localurl))
@@ -301,7 +300,7 @@ local function GetHelpPanel(frame)
 						local HTMLTest = vgui.Create("HTML", RightPanel)
 						HTMLTest:StretchToParent(10, 10, 10, 10)
 						HTMLTest:OpenURL(x.interneturl)
-					elseif (x.localurl) then
+					elseif x.localurl then
 						RightPanel:Clear()
 						local HTMLTest = vgui.Create("HTML", RightPanel)
 						HTMLTest:StretchToParent(10, 10, 10, 10)
@@ -721,7 +720,7 @@ local coreFiles = file.Find("caf/core/client/*.lua", "LUA")
 for k, File in ipairs(coreFiles) do
 	local ErrorCheck, PCallError = pcall(include, "caf/core/client/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Loaded: Successfully\n")
@@ -733,7 +732,7 @@ local languageFiles = file.Find("caf/languagevars/*.lua", "LUA")
 for k, File in ipairs(languageFiles) do
 	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Sent: Successfully\n")
@@ -746,7 +745,7 @@ local addonFiles = file.Find("caf/addons/client/*.lua", "LUA")
 for k, File in ipairs(addonFiles) do
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/client/" .. File)
 
-	if (not ErrorCheck) then
+	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	else
 		Msg("Loaded: Successfully\n")

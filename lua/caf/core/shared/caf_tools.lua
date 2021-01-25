@@ -1,7 +1,7 @@
 ﻿--
 --	Custom Addon Framework TOOLS HAPPY-FUN TIME-SAVER FUNCTIONS
 --
-if (SERVER) then
+if SERVER then
 	AddCSLuaFile("vgui/caf_gui.lua")
 	AddCSLuaFile("vgui/caf_gui_button.lua")
 	-- Global list of callbacks

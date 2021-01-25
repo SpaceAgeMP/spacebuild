@@ -27,8 +27,8 @@ function ENT:Initialize()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Vent") then
-		if (value ~= 1) then
+	if iname == "Vent" then
+		if value ~= 1 then
 			self.vent = false
 		else
 			self.vent = true
@@ -56,7 +56,7 @@ function ENT:OnRemove()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 		self:EmitSound("PhysicsCannister.ThrusterLoop")
 	end
@@ -80,7 +80,7 @@ function ENT:Leak()
 	local mul = air / self.MAXRESOURCE
 	local am = math.Round(mul * 1000)
 
-	if (air >= am) then
+	if air >= am then
 		self:ConsumeResource(self.caf.custom.resource, am)
 
 		if self.environment then
@@ -130,18 +130,16 @@ function ENT:UpdateMass()
 	local mass = self.mass + ((self:GetResourceAmount(self.caf.custom.resource) * mul) / div) -- self.mass = default mass + need a good multiplier
 	local phys = self:GetPhysicsObject()
 
-	if (phys:IsValid()) then
-		if phys:GetMass() ~= mass then
-			phys:SetMass(mass)
-			phys:Wake()
-		end
+	if phys:IsValid() and phys:GetMass() ~= mass then
+		phys:SetMass(mass)
+		phys:Wake()
 	end
 end
 
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.damaged == 1 or self.vent) then
+	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 

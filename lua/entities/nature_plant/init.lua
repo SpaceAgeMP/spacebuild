@@ -38,7 +38,7 @@ function ENT:ShowOutput()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end

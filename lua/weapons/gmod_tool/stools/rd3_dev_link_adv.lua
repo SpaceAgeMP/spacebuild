@@ -4,11 +4,11 @@ TOOL.Name = "#Advanced Link Tool"
 TOOL.Command = nil
 TOOL.ConfigName = ""
 
-if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 	TOOL.Tab = "Custom Addon Framework"
 end
 
-if (CLIENT) then
+if CLIENT then
 	language.Add("tool.rd3_dev_link_adv.name", "Advanced Link Tool")
 	language.Add("tool.rd3_dev_link_adv.desc", "Links Resource-Carrying Devices together to a Resource Node, including Vehicle Pods. Waypoints can be set using this stool!!")
 	language.Add("tool.rd3_dev_link_adv.0", "Left Click: Link Devices.  Right Click: Place link point.  Reload: Unlink Device from All.")
@@ -29,11 +29,11 @@ TOOL.ClientConVar["color_a"] = "255"
 
 function TOOL:LeftClick(tr)
 	--if not valid or player, exit
-	if (tr.Entity:IsValid() and tr.Entity:IsPlayer()) then return end
+	if tr.Entity:IsValid() and tr.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 	-- If there's no physics object then we can't constraint it!
-	if (not util.IsValidPhysicsObject(tr.Entity, tr.PhysicsBone)) then return false end
+	if not util.IsValidPhysicsObject(tr.Entity, tr.PhysicsBone) then return false end
 	--how many objects stored
 	local iNum = self:NumObjects() + 1
 	--save clicked postion
@@ -54,17 +54,15 @@ function TOOL:LeftClick(tr)
 		rd.Beam_settings(self:GetEnt(1), self:GetClientInfo("material"), self:GetClientInfo("width"), Color(self:GetClientInfo("color_r"), self:GetClientInfo("color_g"), self:GetClientInfo("color_b"), self:GetClientInfo("color_a")))
 	end
 
-	if iNum == 2 then
-		if self:GetEnt(2).IsNode then
-			rd.Beam_clear(self:GetEnt(2))
-		end
+	if iNum == 2 and self:GetEnt(2).IsNode then
+		rd.Beam_clear(self:GetEnt(2))
 	end
 
 	--add beam point
 	rd.Beam_add(self:GetEnt(1), tr.Entity, tr.Entity:WorldToLocal(tr.HitPos + tr.HitNormal))
 
 	--if finishing, run StartTouch on Resource Node to do link
-	if (iNum > 1) then
+	if iNum > 1 then
 		local Ent1 = self:GetEnt(1) --get first ent
 		local Ent2 = self:GetEnt(iNum) --get last ent
 		local length = (self:GetPos(1) - self:GetPos(iNum)):Length()
@@ -151,7 +149,7 @@ function TOOL:LeftClick(tr)
 	end
 
 	--clear objects on 2nd click
-	if (iNum > 1) then
+	if iNum > 1 then
 		self:ClearObjects()
 	end
 	--success!
@@ -161,11 +159,11 @@ end
 
 function TOOL:RightClick(tr)
 	--if not valid, exit
-	if (not tr.Entity) or (not tr.Entity:IsValid()) or (tr.Entity:IsPlayer()) or (tr.Entity:IsWorld()) then return false end
+	if not tr.Entity or not tr.Entity:IsValid() or tr.Entity:IsPlayer() or tr.Entity:IsWorld() then return false end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 	-- If there's no physics object then we can't constraint it!
-	if (not util.IsValidPhysicsObject(tr.Entity, tr.PhysicsBone)) then return false end
+	if not util.IsValidPhysicsObject(tr.Entity, tr.PhysicsBone) then return false end
 	--how many objects stored
 	local iNum = self:NumObjects() + 1
 	--save clicked postion
@@ -179,9 +177,9 @@ end
 
 function TOOL:Reload(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 
 	local rd = CAF.GetAddon("Resource Distribution")
 
