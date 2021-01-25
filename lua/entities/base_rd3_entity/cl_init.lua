@@ -106,7 +106,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		end
 
 		local entTemperature = self:GetTemperature()
-		if entTemperature >= 0 then
+		if entTemperature and entTemperature >= 0 then
 			OverlayText = OverlayText .. "Temperature: " .. math.floor(entTemperature) .. " K\n"
 		end
 
