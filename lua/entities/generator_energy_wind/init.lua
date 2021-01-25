@@ -19,7 +19,7 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self.Active = 1
 		self:SetOOO(1)
 		self.sequence = self:LookupSequence("rotate")
@@ -33,7 +33,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self.Active = 0
 		self:SetOOO(0)
 		self.sequence = self:LookupSequence("idle")
@@ -55,7 +55,7 @@ function ENT:SetActive()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -76,7 +76,7 @@ function ENT:Extract_Energy()
 	local inc = 0
 
 	--or (math.random(1, 10) < 6)
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		if self.environment then
 			local planet = self.environment:IsOnPlanet()
 
@@ -87,9 +87,9 @@ function ENT:Extract_Energy()
 			inc = 1
 		end
 
-		if (inc > 0) then
+		if inc > 0 then
 			local einc = math.floor(inc * Energy_Increment)
-			--if (inc > Energy_Increment) then inc = Energy_Increment end
+			--if inc > Energy_Increment then inc = Energy_Increment end
 			einc = math.ceil(einc * self:GetMultiplier())
 			self:SupplyResource("energy", einc)
 
@@ -113,7 +113,7 @@ function ENT:GenEnergy()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 1) then
+	if waterlevel > 1 then
 		self:TurnOff()
 		self:Destruct()
 	else
@@ -138,7 +138,7 @@ function ENT:Think()
 			if self.environment then
 				local planet = self.environment:IsOnPlanet()
 
-				if (planet and planet:GetAtmosphere() > 0) then
+				if planet and planet:GetAtmosphere() > 0 then
 					self:SetPlaybackRate(planet:GetAtmosphere())
 					self:TurnOn()
 				else
@@ -150,7 +150,7 @@ function ENT:Think()
 			self:TurnOn()
 		end
 
-		if (self.Active == 1) then
+		if self.Active == 1 then
 			self:GenEnergy()
 		end
 

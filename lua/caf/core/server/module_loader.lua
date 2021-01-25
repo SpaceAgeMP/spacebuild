@@ -19,13 +19,13 @@ end
 function meta:WaterLevel2()
 	local waterlevel = self:WaterLevel()
 
-	if (self:GetPhysicsObject():IsValid() and self:GetPhysicsObject():IsMoveable()) then
+	if self:GetPhysicsObject():IsValid() and self:GetPhysicsObject():IsMoveable() then
 		--Msg("Normal WaterLEvel\n")
 		--this doesn't look like it works when ent is welded to world, or not moveable
 		return waterlevel
 	end
 	--Msg("Special WaterLEvel\n") --Broken in Gmod SVN!!!
-	if (waterlevel ~= 0) then return waterlevel end
+	if waterlevel ~= 0 then return waterlevel end
 	local pos = self:GetPos()
 	local tr = util.TraceLine({
 		start = pos,

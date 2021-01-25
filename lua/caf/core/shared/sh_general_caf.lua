@@ -23,7 +23,7 @@ CAF2.colors.white = Color(255, 255, 255, 255)
 
 --END COLOR Settings
 -- CAF Custom Status Saving
-if (not sql.TableExists("CAF_Custom_Vars")) then
+if not sql.TableExists("CAF_Custom_Vars") then
 	sql.Query("CREATE TABLE IF NOT EXISTS CAF_Custom_Vars ( varname VARCHAR(255) , varvalue VARCHAR(255));")
 end
 
@@ -54,7 +54,7 @@ function CAF2.LoadVar(name, defaultvalue)
 	if vars[name] then return vars[name] end
 	local data = sql.Query("SELECT * FROM CAF_Custom_Vars WHERE varname = '" .. name .. "';")
 
-	if (not data) then
+	if not data then
 		print(sql.LastError())
 		InsertVar(name, defaultvalue)
 	else
@@ -76,9 +76,9 @@ CAF2.currentlanguage = CAF2.LoadVar("CAF_LANGUAGE", DefaultLang)
 function CAF2.GetAddonStatus(AddonName)
 	if not AddonName then return nil, "No AddonName given" end
 
-	if (Addons[AddonName]) then
+	if Addons[AddonName] then
 		local ok, status = pcall(Addons[AddonName].GetStatus)
-		if (ok) then return status end
+		if ok then return status end
 	end
 
 	return nil, "No Status Info Found"

@@ -40,7 +40,7 @@ function ENT:TurnOn()
 end
 
 function ENT:TurnOff(warn)
-	if (not warn) then
+	if not warn then
 		self:EmitSound("Buttons.snd17")
 	end
 
@@ -62,13 +62,13 @@ function ENT:TurnOff(warn)
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "On") then
+	if iname == "On" then
 		self:SetActive(value)
 	end
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -86,13 +86,13 @@ function ENT:Destruct()
 end
 
 function ENT:Sense()
-	if (self:GetResourceAmount("energy") <= 0) then
+	if self:GetResourceAmount("energy") <= 0 then
 		self:EmitSound("common/warning.wav")
 		self:TurnOff(true)
 
 		return
 	else
-		if (BeepCount > 0) then
+		if BeepCount > 0 then
 			BeepCount = BeepCount - 1
 		else
 			self:EmitSound("Buttons.snd17")
@@ -129,7 +129,7 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self:Sense()
 		self:ShowOutput()
 	end

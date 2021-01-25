@@ -35,8 +35,8 @@ end
 
 function PANEL:SortByName()
 	table.sort(self.List.Items, function(a, b)
-		if (b.name == nil) then return false end
-		if (a.name == nil) then return true end
+		if b.name == nil then return false end
+		if a.name == nil then return true end
 
 		return b.name > a.name
 	end)

@@ -21,14 +21,14 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self.Active = 1
 		self:SetOOO(1)
 	end
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self.Active = 0
 		self:SetOOO(0)
 
@@ -43,7 +43,7 @@ function ENT:SetActive()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -63,7 +63,7 @@ end
 function ENT:Extract_Energy()
 	local inc = 0
 
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		if self.NscoopSpeed > 1 then
 			inc = math.Round(math.Clamp(self.NscoopSpeed * 0.1, 1, 200))
 		else
@@ -87,7 +87,7 @@ function ENT:GenEnergy()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 1) then
+	if waterlevel > 1 then
 		self:TurnOff()
 		self:Destruct()
 	else
@@ -114,7 +114,7 @@ function ENT:Think()
 			self:TurnOff()
 		end
 
-		if (self.Active == 1) then
+		if self.Active == 1 then
 			self:GenEnergy()
 		end
 

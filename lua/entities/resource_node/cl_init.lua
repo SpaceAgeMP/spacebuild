@@ -18,13 +18,13 @@ function ENT:Draw(bDontDrawModel)
 	--draw beams by MadDog
 	CAF.GetAddon("Resource Distribution").Beam_Render(self)
 
-	if (Wire_Render) then
+	if Wire_Render then
 		Wire_Render(self)
 	end
 end
 
 function ENT:DrawTranslucent(bDontDrawModel)
-	if (bDontDrawModel) then return end
+	if bDontDrawModel then return end
 	self:Draw()
 end
 
@@ -53,7 +53,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local mdl = self:GetModel()
 
 
-	if (not bDontDrawModel) then
+	if not bDontDrawModel then
 		self:DrawModel()
 	end
 	if not ((EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) and ((mode ~= 1 and not string.find(mdl, "s_small_res")) or LocalPlayer():GetEyeTrace().Entity == self)) then
@@ -90,7 +90,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		else
 			local cons = nettable.cons
 
-			if (table.Count(cons) > 0) then
+			if table.Count(cons) > 0 then
 				OverlayText = OverlayText .. "Connected to networks: "
 
 				for k, v in pairs(cons) do
@@ -102,7 +102,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			local resources = nettable.resources
 
-			if (table.Count(resources) > 0) then
+			if table.Count(resources) > 0 then
 				for k, v in pairs(resources) do
 					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
@@ -180,7 +180,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		local stringUsage = ""
 		local cons = nettable.cons
 
-		if (table.Count(cons) > 0) then
+		if table.Count(cons) > 0 then
 
 			for k, v in pairs(cons) do
 				stringUsage = stringUsage .. tostring(v) .. " "
@@ -194,7 +194,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		stringUsage = ""
 		local resources = nettable.resources
 
-		if (table.Count(resources) > 0) then
+		if table.Count(resources) > 0 then
 			local i = 0
 			surface.SetTextPos(textStartPos + 15, TempY)
 			surface.DrawText("Resources: ")

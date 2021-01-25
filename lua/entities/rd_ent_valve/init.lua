@@ -96,7 +96,7 @@ function ENT:TurnOff()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Open") then
+	if iname == "Open" then
 		if value == 0 then
 			self:TurnOff()
 		elseif value == 1 then

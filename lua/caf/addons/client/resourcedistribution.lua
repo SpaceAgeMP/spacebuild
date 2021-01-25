@@ -52,7 +52,7 @@ local function AddEntityToCache(nrofbytes)
 	data.resources = {}
 	local nr_of_resources = ReadShort()
 
-	if (nr_of_resources > 0) then
+	if nr_of_resources > 0 then
 		--print("nr_of_sources", nr_of_resources)
 		local resource
 		local maxvalue
@@ -95,7 +95,7 @@ local function AddNetworkToCache(nrofbytes)
 	data.resources = {}
 	local nr_of_resources = ReadShort()
 
-	if (nr_of_resources > 0) then
+	if nr_of_resources > 0 then
 		--print("nr_of_sources", nr_of_resources)
 		local resource
 		local maxvalue
@@ -129,7 +129,7 @@ local function AddNetworkToCache(nrofbytes)
 	data.cons = {}
 	local nr_of_cons = ReadShort()
 
-	if (nr_of_cons > 0) then
+	if nr_of_cons > 0 then
 		--print("nr_of_cons", nr_of_cons)
 		for i = 1, nr_of_cons do
 			--print(i)

@@ -20,7 +20,7 @@ function ENT:Initialize()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -46,7 +46,7 @@ function ENT:Extract_Energy()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 0) then
+	if waterlevel > 0 then
 		waterlevel = waterlevel / 3
 	else
 		waterlevel = 1 / 3
@@ -69,8 +69,8 @@ function ENT:GenEnergy()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 0) then
-		if (self.Active == 0) then
+	if waterlevel > 0 then
+		if self.Active == 0 then
 			self.Active = 1
 			self:SetOOO(1)
 			self.sequence = self:LookupSequence("HydroFans")
@@ -82,15 +82,15 @@ function ENT:GenEnergy()
 			end
 		end
 
-		if (self.damaged == 1) then
-			if (math.random(1, 10) < 6) then
+		if self.damaged == 1 then
+			if math.random(1, 10) < 6 then
 				self:Extract_Energy()
 			end
 		else
 			self:Extract_Energy()
 		end
 	else
-		if (self.Active == 1) then
+		if self.Active == 1 then
 			self.Active = 0
 			self:SetOOO(0)
 			self.sequence = self:LookupSequence("idle")

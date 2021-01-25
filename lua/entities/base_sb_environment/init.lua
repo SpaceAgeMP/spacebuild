@@ -242,7 +242,7 @@ end
 
 function ENT:Think()
 	if self.NextOverlayTextTime and (CurTime() >= self.NextOverlayTextTime) then
-		if (self.NextOverlayText) then
+		if self.NextOverlayText then
 			self:SetNWString("GModOverlayText", self.NextOverlayText)
 			self.NextOverlayText = nil
 		end
@@ -600,7 +600,7 @@ function ENT:UpdateGravity(ent)
 
 		local tr = util.TraceLine(trace)
 
-		if (tr.Hit and tr.Entity.grav_plate == 1) then
+		if tr.Hit and tr.Entity.grav_plate == 1 then
 			ent:SetGravity(1)
 			ent.gravity = 1
 			phys:EnableGravity(true)

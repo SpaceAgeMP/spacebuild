@@ -8,11 +8,11 @@ TOOL.Name = "#Entity Valve Link Tool"
 TOOL.Command = nil
 TOOL.ConfigName = ''
 
-if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 	TOOL.Tab = "Custom Addon Framework"
 end
 
-if (CLIENT) then
+if CLIENT then
 	language.Add("tool.rd3_dev_link_en_valve.name", "Entity Valve Link Tool")
 	language.Add("tool.rd3_dev_link_en_valve.desc", "Links an Entity or Resource Node to an Entity Valve.")
 	language.Add("tool.rd3_dev_link_en_valve.0", "Left Click: Link Devices.  Right Click: Unlink Two Devices.  Reload: Unlink Device from All.")
@@ -33,11 +33,11 @@ TOOL.ClientConVar["color_a"] = "255"
 
 function TOOL:LeftClick(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 	-- If there's no physics object then we can't constraint it!
-	if (not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone)) then return false end
+	if not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false end
 	--how many objects stored
 	local iNum = self:NumObjects() + 1
 	--save clicked postion
@@ -66,7 +66,7 @@ function TOOL:LeftClick(trace)
 	rd.Beam_add(self:GetEnt(1), trace.Entity, trace.Entity:WorldToLocal(trace.HitPos + trace.HitNormal))
 
 	--if finishing, run StartTouch on Resource Node to do link
-	if (iNum > 1) then
+	if iNum > 1 then
 		local Ent1 = self:GetEnt(1) --get first ent
 		local Ent2 = self:GetEnt(iNum) --get last ent
 
@@ -120,18 +120,18 @@ end
 
 function TOOL:RightClick(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 	-- If there's no physics object then we can't constraint it!
-	if (SERVER and not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone)) then return false end
+	if SERVER and not util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false end
 	--how many objects stored
 	local iNum = self:NumObjects() + 1
 	--save clicked postion
 	self:SetObject(iNum, trace.Entity, trace.HitPos, trace.Entity:GetPhysicsObjectNum(trace.PhysicsBone), trace.PhysicsBone, trace.HitNormal)
 
 
-	if (iNum <= 1) then
+	if iNum <= 1 then
 		self:SetStage(iNum)
 		return true
 	end
@@ -140,7 +140,7 @@ function TOOL:RightClick(trace)
 	-- Get information we're about to use
 	local Ent1, Ent2 = self:GetEnt(1), self:GetEnt(2)
 
-	if (Ent1 == Ent2) then
+	if Ent1 == Ent2 then
 		if Ent1.IsNode then
 			rd.UnlinkAllFromNode(Ent1.netid)
 		elseif Ent1.IsValve then
@@ -230,9 +230,9 @@ end
 
 function TOOL:Reload(trace)
 	--if not valid or player, exit
-	if (trace.Entity:IsValid() and trace.Entity:IsPlayer()) then return end
+	if trace.Entity:IsValid() and trace.Entity:IsPlayer() then return end
 	--if client exit
-	if (CLIENT) then return true end
+	if CLIENT then return true end
 
 	local rd = CAF.GetAddon("Resource Distribution")
 

@@ -58,7 +58,7 @@ function ENT:GetTemperature(ent)
 			continue
 		end
 
-		if (tr.Entity ~= ent) then continue end
+		if tr.Entity ~= ent then continue end
 		lit = true
 
 		if self.sbenvironment.sunburn and ent:IsPlayer() and ent:Health() > 0 then

@@ -17,14 +17,14 @@ function ENT:Initialize()
 end
 
 function ENT:TurnOn()
-	if (self.Active == 0) then
+	if self.Active == 0 then
 		self.Active = 1
 		self:SetOOO(1)
 	end
 end
 
 function ENT:TurnOff()
-	if (self.Active == 1) then
+	if self.Active == 1 then
 		self.Active = 0
 		self:SetOOO(0)
 
@@ -39,7 +39,7 @@ function ENT:SetActive()
 end
 
 function ENT:Damage()
-	if (self.damaged == 0) then
+	if self.damaged == 0 then
 		self.damaged = 1
 	end
 end
@@ -69,11 +69,11 @@ function ENT:Extract_Energy(mul)
 		inc = math.ceil(Energy_Increment / 2)
 	end
 
-	if (self.damaged == 1) then
+	if self.damaged == 1 then
 		inc = math.ceil(inc / 2)
 	end
 
-	if (inc > 0) then
+	if inc > 0 then
 		inc = math.ceil(inc * self:GetMultiplier() * mul)
 		self:SupplyResource("energy", inc)
 	end
@@ -92,7 +92,7 @@ function ENT:GenEnergy()
 		waterlevel = self:WaterLevel()
 	end
 
-	if (waterlevel > 1) then
+	if waterlevel > 1 then
 		self:TurnOff()
 		return
 	end
@@ -110,8 +110,8 @@ function ENT:GenEnergy()
 				trace.start = startpos
 				trace.endpos = entpos --+ Vector(0,0,30)
 				local tr = util.TraceLine( trace )
-				if (tr.Hit) then
-					if (tr.Entity == self) then
+				if tr.Hit then
+					if tr.Entity == self then
 						self:TurnOn()
 						self:Extract_Energy()
 						return
@@ -158,8 +158,8 @@ function ENT:GenEnergy()
 	--[[trace.start = startpos
 		trace.endpos = entpos --+ Vector(0,0,30)
 		local tr = util.TraceLine( trace )
-		if (tr.Hit) then
-			if (tr.Entity == self) then
+		if tr.Hit then
+			if tr.Entity == self then
 				self:TurnOn()
 				self:Extract_Energy(1)
 				return

@@ -26,7 +26,7 @@ local function LSResetSpawnFunc(ply)
 end
 
 local function RemoveEntity(ent)
-	if (ent:IsValid()) then
+	if ent:IsValid() then
 		ent:Remove()
 	end
 end
@@ -94,7 +94,7 @@ function LS.__Construct()
 	--SB_Override_PlayerHeatDestroy = true
 	hook.Add("PlayerSpawnedVehicle", "LS_vehicle_spawn", LS_Reg_Veh)
 
-	if (SunAngle == nil) then
+	if SunAngle == nil then
 		SunAngle = Vector(0, 0, -1)
 	end
 
@@ -270,7 +270,7 @@ end
 function LS.ColorDamage(ent, HP, Col)
 	if not ent or not HP or not Col or not IsValid(ent) then return end
 
-	if (ent:Health() <= (ent:GetMaxHealth() / HP)) then
+	if ent:Health() <= (ent:GetMaxHealth() / HP) then
 		ent:SetColor(Color(Col, Col, Col, 255))
 	end
 end
@@ -298,7 +298,7 @@ function LS.DamageLS(ent, dam)
 	LS.ColorDamage(ent, 6, 100)
 	LS.ColorDamage(ent, 7, 75)
 
-	if (ent:Health() <= 0) then
+	if ent:Health() <= 0 then
 		ent:SetColor(Color(50, 50, 50, 255))
 
 		if ent.Destruct then
@@ -310,7 +310,7 @@ function LS.DamageLS(ent, dam)
 end
 
 function LS.Destruct(ent, Simple)
-	if (Simple) then
+	if Simple then
 		Explode2(ent)
 	else
 		timer.Simple(1, function()
@@ -464,7 +464,7 @@ function Ply:LsCheck()
 				if self.caf.custom.ls.temperature < 283 then
 					local needed = math.ceil((283 - self.caf.custom.ls.temperature) / 8)
 
-					if (RD.GetResourceAmount(pod, "energy") > needed) then
+					if RD.GetResourceAmount(pod, "energy") > needed then
 						RD.ConsumeResource(pod, "energy", needed)
 						self.caf.custom.ls.temperature = 283
 					else
@@ -475,7 +475,7 @@ function Ply:LsCheck()
 				elseif self.caf.custom.ls.temperature > 308 then
 					local needed = math.ceil((self.caf.custom.ls.temperature - 308) / 16)
 
-					if (RD.GetResourceAmount(pod, "nitrogen") > needed) then
+					if RD.GetResourceAmount(pod, "nitrogen") > needed then
 						RD.ConsumeResource(pod, "nitorgen", needed)
 						self.caf.custom.ls.temperature = 308
 					else
@@ -487,7 +487,7 @@ function Ply:LsCheck()
 					if self.caf.custom.ls.temperature > 308 then
 						needed = math.ceil((self.caf.custom.ls.temperature - 308) / 8)
 
-						if (RD.GetResourceAmount(pod, "water") > needed) then
+						if RD.GetResourceAmount(pod, "water") > needed then
 							RD.ConsumeResource(pod, "water", needed)
 							self.caf.custom.ls.temperature = 308
 						else
@@ -512,19 +512,19 @@ function Ply:LsCheck()
 				if self.caf.custom.ls.temperature < 283 then
 					local dam = (283 - self.caf.custom.ls.temperature) / 5
 
-					if (self.environment:GetPressure() > 0) then
+					if self.environment:GetPressure() > 0 then
 						dec = math.ceil(5 * (4 - (self.caf.custom.ls.temperature / 72)))
 					else
 						dec = 5
 					end
 
-					if (self.suit.energy > dec) then
+					if self.suit.energy > dec then
 						self.suit.energy = self.suit.energy - dec
 					else
 						self.suit.energy = 0
 
-						if (self.environment:GetPressure() > 0) then
-							if (self:Health() <= dam) then
+						if self.environment:GetPressure() > 0 then
+							if self:Health() <= dam then
 								if self:Health() > 0 then
 									self:TakeDamage(dam, 0)
 									LS.LS_Frosty(self)
@@ -537,7 +537,7 @@ function Ply:LsCheck()
 								self.suit.recover = self.suit.recover + dam
 							end
 						else
-							if (self:Health() <= 7) and (self:Health() > 0) then
+							if self:Health() <= 7 and self:Health() > 0 then
 								self:TakeDamage(7, 0)
 								LS.LS_Frosty(self)
 								self:LsResetSuit()
@@ -553,12 +553,12 @@ function Ply:LsCheck()
 					local dam = (self.caf.custom.ls.temperature - 308) / 5
 					dec = math.ceil(5 * ((self.caf.custom.ls.temperature - 308) / 72))
 
-					if (self.suit.coolant > dec) then
+					if self.suit.coolant > dec then
 						self.suit.coolant = self.suit.coolant - dec
 					else
 						self.suit.coolant = 0
 
-						if (self:Health() <= dam) and (self:Health() > 0) then
+						if self:Health() <= dam and self:Health() > 0 then
 							LS.LS_Immolate(self)
 							self:TakeDamage(dam, 0)
 							self:LsResetSuit()
@@ -580,7 +580,7 @@ function Ply:LsCheck()
 			if pod and pod:IsValid() then
 				local air = RD.GetResourceAmount(pod, "oxygen")
 
-				if (air >= 5) then
+				if air >= 5 then
 					RD.ConsumeResource(pod, "oxygen", 5)
 					self.caf.custom.ls.airused = true
 				end
@@ -598,13 +598,13 @@ function Ply:LsCheck()
 			end
 
 			if not self.caf.custom.ls.airused then
-				if (self.suit.air <= 0) then
-					if (self:Health() > 10) then
+				if self.suit.air <= 0 then
+					if self:Health() > 10 then
 						self:TakeDamage(10, 0)
 						self.suit.recover = self.suit.recover + 10
 						self:EmitSound("Player.DrownStart")
 					else
-						if (self:Health() > 0) then
+						if self:Health() > 0 then
 							self:TakeDamage(10, 0)
 							self:LsResetSuit()
 							self:EmitSound("streetwar.slimegurgle04")
@@ -644,7 +644,7 @@ function Ply:LsCheck()
 				if pod and pod:IsValid() then
 					local air = RD.GetResourceAmount(pod, "oxygen")
 
-					if (air >= 5) then
+					if air >= 5 then
 						RD.ConsumeResource(pod, "oxygen", 5)
 						self.caf.custom.ls.airused = true
 					end
@@ -662,13 +662,13 @@ function Ply:LsCheck()
 				end
 
 				if not self.caf.custom.ls.airused then
-					if (self.suit.air <= 0) then
-						if (self:Health() > 10) then
+					if self.suit.air <= 0 then
+						if self:Health() > 10 then
 							self:TakeDamage(10, 0)
 							self.suit.recover = self.suit.recover + 10
 							self:EmitSound("Player.DrownStart")
 						else
-							if (self:Health() > 0) then
+							if self:Health() > 0 then
 								self:TakeDamage(10, 0)
 								self:LsResetSuit()
 								self:EmitSound("streetwar.slimegurgle04")
@@ -695,7 +695,7 @@ function Ply:LsCheck()
 	end
 
 	if self.caf.custom.ls.temperature >= 283 and self.caf.custom.ls.temperature <= 308 and self.caf.custom.ls.air and self.suit.recover > 0 then
-		if ((self:Health() + 5) >= 100) then
+		if (self:Health() + 5) >= 100 then
 			self:SetHealth(100)
 			self.suit.recover = 0
 		else

@@ -576,7 +576,7 @@ function RD.ConsumeNetResource(netid, resource, amount)
 				end
 
 				consumed = consumed + amount
-				if (consumed >= origamount) then break end
+				if consumed >= origamount then break end
 			end
 		end
 	end

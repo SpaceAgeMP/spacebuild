@@ -8,11 +8,11 @@ TOOL.Name = "#Smart Link Tool"
 TOOL.Command = nil
 TOOL.ConfigName = ""
 
-if (CLIENT and GetConVarNumber("CAF_UseTab") == 1) then
+if CLIENT and GetConVarNumber("CAF_UseTab") == 1 then
 	TOOL.Tab = "Custom Addon Framework"
 end
 
-if (CLIENT) then
+if CLIENT then
 	language.Add("tool.rd3_dev_link2.name", "Smart Link Tool")
 	language.Add("tool.rd3_dev_link2.desc", "Links Resource-Carrying Devices to a Resource Node, including Vehicle Pods.")
 	language.Add("tool.rd3_dev_link2.0", "Left Click: Select Devices.  Right Click: Link All devices to the selected Node.  Reload: Reset selected devices.")
@@ -31,8 +31,8 @@ TOOL.ClientConVar["color_b"] = "255"
 TOOL.ClientConVar["color_a"] = "255"
 
 function TOOL:LeftClick(trace)
-	if (not trace.Entity:IsValid()) or (trace.Entity:IsPlayer()) then return end
-	if (CLIENT) then return true end
+	if not trace.Entity:IsValid() or trace.Entity:IsPlayer() then return end
+	if CLIENT then return true end
 	local enttable = CAF.GetAddon("Resource Distribution").GetEntityTable(trace.Entity)
 
 	if table.Count(enttable) > 0 or trace.Entity.IsNode or trace.Entity.IsValve or trace.Entity.IsPump then
@@ -46,8 +46,8 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-	if (not trace.Entity:IsValid()) or (trace.Entity:IsPlayer()) then return end
-	if (CLIENT) then return true end
+	if not trace.Entity:IsValid() or trace.Entity:IsPlayer() then return end
+	if CLIENT then return true end
 	local iNum = self:NumObjects()
 
 	--local Phys = trace.Entity:GetPhysicsObjectNum( trace.PhysicsBone )

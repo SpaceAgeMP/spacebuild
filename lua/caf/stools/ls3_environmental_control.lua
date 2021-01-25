@@ -48,7 +48,7 @@ local function environmental_control_func(ent, type, sub_type, devinfo, Extra_Da
 		base_health = 600
 
 		--TODO: MAke it volume based or a tool setting??
-		if (sub_type == "small_air_exchanger") then
+		if sub_type == "small_air_exchanger" then
 			ent:SetRange(256)
 		else
 			ent:SetRange(768) --right value??
@@ -58,7 +58,7 @@ local function environmental_control_func(ent, type, sub_type, devinfo, Extra_Da
 		base_mass = 100
 		base_health = 500
 
-		if (sub_type == "small_temp_exchanger") then
+		if sub_type == "small_temp_exchanger" then
 			ent:SetRange(256)
 		else
 			ent:SetRange(768) --right value??
