@@ -256,7 +256,6 @@ function RD.__Construct()
 	ClearEntities()
 	nettable = {}
 	ent_table = {}
-	CAF.AddHook("think3", UpdateNetworksAndEntities)
 
 	for k, ply in pairs(player.GetAll()) do
 		SendEntireNetWorkToClient(ply)
@@ -277,8 +276,6 @@ function RD.__Destruct()
 	ClearEntities()
 	nettable = {}
 	ent_table = {}
-	CAF.RemoveHook("think3", UpdateNetworksAndEntities)
-	CAF.RemoveServerTag("RD")
 	status = false
 
 	return true
@@ -303,20 +300,6 @@ end
 ]]
 function RD.GetVersion()
 	return 3.1, "Alpha"
-end
-
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function RD.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function RD.GetCustomStatus()
-	return "Not Implemented Yet"
 end
 
 function RD.AddResourcesToSend()

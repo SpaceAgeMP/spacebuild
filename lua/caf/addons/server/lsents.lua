@@ -38,20 +38,6 @@ function RD.GetVersion()
 	return 3.05, "Beta"
 end
 
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function RD.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function RD.GetCustomStatus()
-	return "Not Implemented Yet"
-end
-
 function RD.AddResourcesToSend()
 end
 

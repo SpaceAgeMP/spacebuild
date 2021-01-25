@@ -50,11 +50,11 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	end
 
 
-	if not (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
+	local trace = LocalPlayer():GetEyeTrace()
+	if not (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0) then
 		return
 	end
 	local HasOOO = true
-	local trace = LocalPlayer():GetEyeTrace()
 
 
 	local playername = self:GetPlayerName()

@@ -79,6 +79,61 @@ local function SetBloom(planet)
 	Bloom.col.b = planet.Col_b
 end
 
+local function DrawSunEffects()
+	-- no pixel shaders? no sun effects!
+	if (not render.SupportsPixelShaders_2_0()) then return end
+	local eyePos = EyePos()
+
+	-- render each star.
+	for ent, Sun in pairs(stars) do
+		-- calculate brightness.
+		local entpos = Sun.Position --Sun.ent:LocalToWorld( Vector(0,0,0) )
+		local normVec = Vector(entpos - eyePos)
+		normVec:Normalize()
+		local dot = math.Clamp(EyeAngles():Forward():Dot(normVec), -1, 1)
+		dot = math.abs(dot)
+		--local dist = Vector( entpos - EyePos() ):Length();
+		local dist = entpos:Distance(eyePos) / 1.5
+		-- draw sunbeams.
+		local sunpos = eyePos + normVec * (dist * 0.5)
+		local scrpos = sunpos:ToScreen()
+
+		if (dist <= Sun.BeamRadius and dot > 0) then
+			local frac = (1 - ((1 / (Sun.BeamRadius)) * dist)) * dot
+			-- draw sun.
+			--DrawSunbeams( darken, multiply, sunsize, sunx, suny )
+			DrawSunbeams(0.95, frac, 0.255, scrpos.x / ScrW(), scrpos.y / ScrH())
+		end
+
+		-- can the sun see us?
+		local tr = util.TraceLine({
+			start = entpos,
+			endpos = eyePos,
+			filter = LocalPlayer(),
+		})
+
+		-- draw!
+		if (dist <= Sun.Radius and dot > 0 and tr.Fraction >= 1) then
+			-- calculate brightness.
+			local frac = (1 - ((1 / Sun.Radius) * dist)) * dot
+			-- draw bloom.
+			DrawBloom(0.428, 3 * frac, 15 * frac, 15 * frac, 5, 0, 1, 1, 1)
+			-- draw colormod.
+			DrawColorModify({
+				["$pp_colour_addr"] = 0.35 * frac,
+				["$pp_colour_addg"] = 0.15 * frac,
+				["$pp_colour_addb"] = 0.05 * frac,
+				["$pp_colour_brightness"] = 0.8 * frac,
+				["$pp_colour_contrast"] = 1 + (0.15 * frac),
+				["$pp_colour_colour"] = 1,
+				["$pp_colour_mulr"] = 0,
+				["$pp_colour_mulg"] = 0,
+				["$pp_colour_mulb"] = 0,
+			})
+		end
+	end
+end
+
 -- render.
 local function Render()
 	if (Color_Enabled) then
@@ -91,76 +146,8 @@ local function Render()
 		--DrawBloom( darken, multiply, sizex, sizey, passes, color, colr, colg, colb )
 		DrawBloom(Bloom.darken, Bloom.multiply, Bloom.sizex, Bloom.sizey, Bloom.passes, Bloom.color, Bloom.col.r, Bloom.col.g, Bloom.col.b)
 	end
-end
 
-local function DrawSunEffects()
-	-- no pixel shaders? no sun effects!
-	if (not render.SupportsPixelShaders_2_0()) then return end
-
-	-- render each star.
-	for ent, Sun in pairs(stars) do
-		-- calculate brightness.
-		local entpos = Sun.Position --Sun.ent:LocalToWorld( Vector(0,0,0) )
-		local normVec = Vector(entpos - EyePos())
-		normVec:Normalize()
-		local dot = math.Clamp(EyeAngles():Forward():Dot(normVec), -1, 1)
-		dot = math.abs(dot)
-		--local dist = Vector( entpos - EyePos() ):Length();
-		local dist = entpos:Distance(EyePos()) / 1.5
-		-- draw sunbeams.
-		local sunpos = EyePos() + normVec * (dist * 0.5)
-		local scrpos = sunpos:ToScreen()
-
-		if (dist <= Sun.BeamRadius and dot > 0) then
-			local frac = (1 - ((1 / (Sun.BeamRadius)) * dist)) * dot
-			-- draw sun.
-			--DrawSunbeams( darken, multiply, sunsize, sunx, suny )
-			DrawSunbeams(0.95, frac, 0.255, scrpos.x / ScrW(), scrpos.y / ScrH())
-		end
-
-		-- can the sun see us?
-		local trace = {
-			start = entpos,
-			endpos = EyePos(),
-			filter = LocalPlayer(),
-		}
-
-		local tr = util.TraceLine(trace)
-
-		-- draw!
-		if (dist <= Sun.Radius and dot > 0 and tr.Fraction >= 1) then
-			-- calculate brightness.
-			local frac = (1 - ((1 / Sun.Radius) * dist)) * dot
-			-- draw bloom.
-			DrawBloom(0.428, 3 * frac, 15 * frac, 15 * frac, 5, 0, 1, 1, 1)
-
-			--[[DrawBloom(
-				0, 
-				0.75 * frac, 
-				3 * frac, 3 * frac, 
-				2, 
-				3, 
-				1, 
-				1, 
-				1
-			);]]
-			-- draw color.
-			local tab = {
-				["$pp_colour_addr"] = 0.35 * frac,
-				["$pp_colour_addg"] = 0.15 * frac,
-				["$pp_colour_addb"] = 0.05 * frac,
-				["$pp_colour_brightness"] = 0.8 * frac,
-				["$pp_colour_contrast"] = 1 + (0.15 * frac),
-				["$pp_colour_colour"] = 1,
-				["$pp_colour_mulr"] = 0,
-				["$pp_colour_mulg"] = 0,
-				["$pp_colour_mulb"] = 0,
-			}
-
-			-- draw colormod.
-			DrawColorModify(tab)
-		end
-	end
+	DrawSunEffects()
 end
 
 local function recvPlanet()
@@ -230,9 +217,8 @@ net.Receive("AddStar", recvSun)
 	The Constructor for this Custom Addon Class
 ]]
 function SB.__Construct()
-	hook.Add("RenderScreenspaceEffects", "VFX_Render", Render)
-	hook.Add("RenderScreenspaceEffects", "SunEffects", DrawSunEffects)
-	CAF.AddHook("think2", SB.Space_Affect_Cl)
+	hook.Add("RenderScreenspaceEffects", "SB_VFX_Render", Render)
+	timer.Create("SBPlayerEnvUpdate", 0.5, 0, SB.Space_Affect_Cl)
 	status = true
 
 	return true
@@ -242,9 +228,8 @@ end
 	The Destructor for this Custom Addon Class
 ]]
 function SB.__Destruct()
-	hook.Remove("RenderScreenspaceEffects", "VFX_Render")
-	hook.Remove("RenderScreenspaceEffects", "SunEffects")
-	CAF.RemoveHook("think2", SB.Space_Affect_Cl)
+	hook.Remove("RenderScreenspaceEffects", "SB_VFX_Render")
+	timer.Remove("SBPlayerEnvUpdate")
 	status = false
 
 	return true
@@ -335,13 +320,6 @@ function SB.GetVersion()
 end
 
 --[[
-	Get any custom options this Custom Addon Class might have
-]]
-function SB.GetExtraOptions()
-	return {}
-end
-
---[[
 	Gets a menu from this Custom Addon Class
 ]]
 --Name is nil for main menu, String for others
@@ -349,13 +327,6 @@ function SB.GetMenu(menutype, menuname)
 	local data = {}
 
 	return data
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function SB.GetCustomStatus()
-	return
 end
 
 --[[

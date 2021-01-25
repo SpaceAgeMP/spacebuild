@@ -63,7 +63,8 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		self:DrawModel()
 	end
 
-	if not (RD and (LocalPlayer():GetEyeTrace().Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
+	local trace = LocalPlayer():GetEyeTrace()
+	if not (RD and (trace.Entity == self and EyePos():Distance(self:GetPos()) < rd_overlay_dist and mode ~= 0)) then
 		return
 	end
 	--overlaysettings
@@ -72,7 +73,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	local num = OverlaySettings.num or 0
 	local resnames = OverlaySettings.resnames
 	--End overlaysettings
-	local trace = LocalPlayer():GetEyeTrace()
 
 	if (not bDontDrawModel) then
 		self:DrawModel()
@@ -133,7 +133,6 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		return
 	end
 	local TempY = 0
-	--local pos = self:GetPos() + (self:GetForward() ) + (self:GetUp() * 40 ) + (self:GetRight())
 	local pos = self:GetPos() + (self:GetUp() * (self:BoundingRadius() + 10))
 	local angle = (LocalPlayer():GetPos() - trace.HitPos):Angle()
 	angle.r = angle.r + 90

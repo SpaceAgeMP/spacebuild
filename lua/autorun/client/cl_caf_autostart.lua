@@ -38,13 +38,6 @@ addonlevel[2] = {}
 addonlevel[3] = {}
 addonlevel[4] = {}
 addonlevel[5] = {}
-local hooks = {}
-CAF3.hooks = hooks
-hooks["think"] = {}
-hooks["think2"] = {}
-hooks["think3"] = {}
-hooks["OnAddonDestruct"] = {}
-hooks["OnAddonConstruct"] = {}
 
 local function ErrorOffStuff(String)
 	Msg("----------------------------------------------------------------------\n")
@@ -77,15 +70,9 @@ local function OnAddonDestruct(name)
 		end
 	end
 
+	
 	if not CAF2.StartingUp then
-		for k, v in pairs(hooks["OnAddonDestruct"]) do
-			local ok, err = pcall(v, name)
-
-			if not ok then
-				CAF2.WriteToDebugFile("CAF_Hooks", "OnAddonDestruct Error " .. err .. "\n")
-			end
-		end
-
+		hook.Call("CAFOnAddonDestruct", name)
 		CAF2.RefreshMainMenu()
 	end
 end
@@ -105,13 +92,7 @@ local function OnAddonConstruct(name)
 	end
 
 	if not CAF2.StartingUp then
-		for k, v in pairs(hooks["OnAddonConstruct"]) do
-			local ok, err = pcall(v, name)
-
-			if not ok then
-				CAF2.WriteToDebugFile("CAF_Hooks", "OnAddonConstruct Error " .. err .. "\n")
-			end
-		end
+		hook.Call("CAFOnAddonConstruct", name)
 
 		CAF2.RefreshMainMenu()
 	end
@@ -738,7 +719,6 @@ net.Receive("CAF_Addon_POPUP", ProccessMessage)
 local coreFiles = file.Find("caf/core/client/*.lua", "LUA")
 
 for k, File in ipairs(coreFiles) do
-	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/core/client/" .. File)
 
 	if (not ErrorCheck) then
@@ -751,7 +731,6 @@ end
 local languageFiles = file.Find("caf/languagevars/*.lua", "LUA")
 
 for k, File in ipairs(languageFiles) do
-	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
 
 	if (not ErrorCheck) then
@@ -765,7 +744,6 @@ end
 local addonFiles = file.Find("caf/addons/client/*.lua", "LUA")
 
 for k, File in ipairs(addonFiles) do
-	Msg(CAF.GetLangVar("Loading") .. ": " .. File .. "...")
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/client/" .. File)
 
 	if (not ErrorCheck) then

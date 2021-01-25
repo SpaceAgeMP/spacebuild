@@ -11,8 +11,6 @@ util.PrecacheModel("models/player/samzanemesis/MarineOfficer.mdl")
 util.PrecacheModel("models/player/samzanemesis/MarineTech.mdl")
 local SB = {}
 local status = false
---Local stuff
-SB_DEBUG = true
 --local NextUpdateTime
 local SB_InSpace = 0
 --SetGlobalInt("InSpace", 0)
@@ -68,7 +66,7 @@ local function OnEntitySpawn(ent)
 	end
 end
 
-CAF.AddHook("OnEntitySpawn", OnEntitySpawn)
+hook.Add("CAFOnEntitySpawn", OnEntitySpawn)
 
 local function AllowAdminNoclip(ply)
 	if (ply:IsAdmin() or ply:IsSuperAdmin()) and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
@@ -754,7 +752,7 @@ function SB.__Construct()
 		hook.Add("PlayerFullLoad", "SB_PlayerInitialSpawn_Check", PlayerInitialSpawn)
 		hook.Add("PlayerSay", "SB_PlayerSay_Check", PlayerSay)
 		hook.Add("PlayerSetModel", "SB_Force_Model_Check", ForcePlyModel)
-		CAF.AddHook("think3", SB.PerformEnvironmentCheck)
+		timer.Create("SBEnvironmentCheck", 1, 0, SB.PerformEnvironmentCheck)
 		ResetGravity()
 
 		for k, v in pairs(player.GetAll()) do
@@ -781,9 +779,8 @@ function SB.__Destruct()
 	hook.Remove("PlayerFullLoad", "SB_PlayerInitialSpawn_Check")
 	hook.Remove("PlayerSay", "SB_PlayerSay_Check")
 	hook.Remove("PlayerSetModel", "SB_Force_Model_Check")
-	CAF.RemoveHook("think3", SB.PerformEnvironmentCheck)
+	timer.Remove("SBEnvironmentCheck")
 	ResetGravity()
-	CAF.RemoveServerTag("SB")
 	status = false
 
 	return true
@@ -816,22 +813,6 @@ end
 ]]
 function SB.GetVersion()
 	return 3.1, CAF.GetLangVar("Beta")
-end
-
---[[
-	Get any custom options this Custom Addon Class might have
-	Not implemented yet
-]]
-function SB.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-	Optional, returns a custom String status, could be used if your addon has more then 1 status based on the options activated?
-]]
-function SB.GetCustomStatus()
-	return
 end
 
 --[[

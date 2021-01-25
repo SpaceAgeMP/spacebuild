@@ -2,7 +2,7 @@
 local status = false
 --Stuff that can't be disabled
 CreateConVar("LS_AllowNukeEffect", "1") --Update to something changeable later on
---end 
+--end
 --Local Functions
 local SB_AIR_O2 = 0
 local SB_AIR_CO2 = 1
@@ -111,8 +111,8 @@ function LS.__Construct()
 	RD.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
 	hook.Add("PlayerInitialSpawn", "LS_Core_SpawnFunc", LSSpawnFunc)
 	hook.Add("PlayerSpawn", "LS_Core_ResetSpawnFunc", LSResetSpawnFunc)
-	CAF.AddHook("think3", PlayerLSThink)
-	CAF.AddHook("OnAddonDestruct", AddonDisabled)
+	hook.Add("CAFOnAddonDestruct", "LSAddonDisable", AddonDisabled)
+	timer.Create("PlayerLSThink", 1, 0, PlayerLSThink)
 	status = true
 
 	return true
@@ -126,8 +126,8 @@ function LS.__Destruct()
 	hook.Remove("PlayerInitialSpawn", "LS_Core_SpawnFunc")
 	hook.Remove("PlayerSpawn", "LS_Core_ResetSpawnFunc")
 	hook.Remove("PlayerSpawnedVehicle", "LS_vehicle_spawn")
-	CAF.RemoveHook("think3", PlayerLSThink)
-	CAF.RemoveHook("OnAddonDestruct", AddonDisabled)
+	hook.Remove("CAFOnAddonDestruct", "LSAddonDisable")
+	timer.Remove("PlayerLSThink")
 	local SB = CAF.GetAddon("Spacebuild")
 
 	if SB then
@@ -138,7 +138,6 @@ function LS.__Destruct()
 	LS.generators = {}
 	LS.generators.air = {}
 	LS.generators.temperature = {}
-	CAF.RemoveServerTag("LSC")
 	status = false
 
 	return true
@@ -163,20 +162,6 @@ end
 ]]
 function LS.GetVersion()
 	return 3.08, CAF.GetLangVar("Beta")
-end
-
---[[
-	Get any custom options this Custom Addon Class might have
-]]
-function LS.GetExtraOptions()
-	return {}
-end
-
---[[
-	Get the Custom String Status from this Addon Class
-]]
-function LS.GetCustomStatus()
-	return CAF.GetLangVar("Not Implemented Yet")
 end
 
 function LS.AddResourcesToSend()
@@ -242,7 +227,7 @@ end
 
 function LS.ZapMe(pos, magnitude)
 	if not (pos and magnitude) then return end
-	zap = ents.Create("point_tesla")
+	local zap = ents.Create("point_tesla")
 	zap:SetKeyValue("targetname", "teslab")
 	zap:SetKeyValue("m_SoundName", "DoSpark")
 	zap:SetKeyValue("texture", "sprites/physbeam.spr")
@@ -519,8 +504,9 @@ function Ply:LsCheck()
 				end
 			end
 
+			local plyPos = self:GetPos()
 			for k, v in pairs(LS.GetTemperatureRegulators()) do
-				if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+				if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 					self.caf.custom.ls.temperature = self.caf.custom.ls.temperature + v:CoolDown(self.caf.custom.ls.temperature)
 				end
 			end
@@ -529,7 +515,7 @@ function Ply:LsCheck()
 				local dec = 0
 
 				if self.caf.custom.ls.temperature < 283 then
-					dam = (283 - self.caf.custom.ls.temperature) / 5
+					local dam = (283 - self.caf.custom.ls.temperature) / 5
 
 					if (self.environment:GetPressure() > 0) then
 						dec = math.ceil(5 * (4 - (self.caf.custom.ls.temperature / 72)))
@@ -569,7 +555,7 @@ function Ply:LsCheck()
 						end
 					end
 				elseif self.caf.custom.ls.temperature > 308 then
-					dam = (self.caf.custom.ls.temperature - 308) / 5
+					local dam = (self.caf.custom.ls.temperature - 308) / 5
 					dec = math.ceil(5 * ((self.caf.custom.ls.temperature - 308) / 72))
 
 					if (self.suit.coolant > dec) then
@@ -606,8 +592,9 @@ function Ply:LsCheck()
 			end
 
 			if not self.caf.custom.ls.airused then
+				local plyPos = self:GetPos()
 				for k, v in pairs(LS.GetAirRegulators()) do
-					if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+					if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 						self.suit.air = self.suit.air + v:UsePerson()
 						self.caf.custom.ls.airused = true
 						break
@@ -669,8 +656,9 @@ function Ply:LsCheck()
 				end
 
 				if not self.caf.custom.ls.airused then
+					local plyPos = self:GetPos()
 					for k, v in pairs(LS.GetAirRegulators()) do
-						if v and IsValid(v) and v:IsActive() and self:GetPos():Distance(v:GetPos()) < v:GetRange() then
+						if v and IsValid(v) and v:IsActive() and plyPos:Distance(v:GetPos()) < v:GetRange() then
 							self.suit.air = self.suit.air + v:UsePerson()
 							self.caf.custom.ls.airused = true
 							break

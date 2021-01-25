@@ -206,7 +206,7 @@ function TOOL:RightClick(trace)
 				if Ent1:GetNode() and Ent1:GetNode() == Ent2 then
 					Ent1:SetNode(nil)
 				else
-					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren\'t connected!")
+					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren't connected!")
 				end
 			else
 				if Ent1:GetNode() and Ent1:GetNode1() == Ent2 then
@@ -214,7 +214,7 @@ function TOOL:RightClick(trace)
 				elseif Ent1:GetNode2() and Ent1:GetNode2() == Ent2 then
 					Ent1:SetNode2(nil)
 				else
-					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren\'t connected!")
+					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren't connected!")
 				end
 			end
 		elseif Ent2.IsValve and Ent1.IsNode then
@@ -222,7 +222,7 @@ function TOOL:RightClick(trace)
 				if Ent2:GetNode() and Ent2:GetNode() == Ent1 then
 					Ent2:SetNode(nil)
 				else
-					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren\'t connected!")
+					CAF.NotifyOwner(self, "This Entity Valve and Resource Node weren't connected!")
 				end
 			else
 				if Ent2:GetNode() and Ent2:GetNode1() == Ent1 then
@@ -230,7 +230,7 @@ function TOOL:RightClick(trace)
 				elseif Ent2:GetNode2() and Ent2:GetNode2() == Ent1 then
 					Ent2:SetNode2(nil)
 				else
-					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren\'t connected!")
+					CAF.NotifyOwner(self, "This Resource Node Valve and Resource Node weren't connected!")
 				end
 			end
 		elseif Ent1.IsPump and Ent2.IsNode then
@@ -245,13 +245,13 @@ function TOOL:RightClick(trace)
 			if Ent1:GetRDEntity() and Ent1:GetRDEntity() == Ent2 then
 				Ent1:SetRDEntity(nil)
 			else
-				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\'t connected!")
+				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\\'t connected!")
 			end
 		elseif Ent2.IsValve and Ent2.IsEntityValve and table.Count(rd.GetEntityTable(Ent1)) > 0 then
 			if Ent2:GetRDEntity() and Ent2:GetRDEntity() == Ent1 then
 				Ent2:SetRDEntity(nil)
 			else
-				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\'t connected!")
+				CAF.NotifyOwner(self, "This Entity Valve and Entity weren\\'t connected!")
 			end
 		elseif Ent1.IsNode and rd.GetEntityTable(Ent2).network == Ent1.netid then
 			rd.Unlink(Ent2)
