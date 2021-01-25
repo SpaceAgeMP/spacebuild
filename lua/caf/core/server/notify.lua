@@ -1,5 +1,13 @@
+local PLY = FindMetaTable("Player")
+util.AddNetworkString("Player_AddHint")
+function PLY:AddHint(txt, typ, len)
+    net.Start("Player_AddHint")
+        net.WriteString(txt)
+        net.WriteInt(typ, 32)
+        net.WriteInt(len, 32)
+    net.Send(self)
+end
+
 function CAF.NotifyOwner(ent, msg)
-    -- TODO: Replace with net msg, this is unsafe!
-    msg = msg:Replace("'", "\\'")
-    ent:GetOwner():SendLua("GAMEMODE:AddNotify('" .. msg .. "', NOTIFY_GENERIC, 7);")
+    ent:GetOwner():AddHint(msg, NOTIFY_GENERIC, 7)
 end
