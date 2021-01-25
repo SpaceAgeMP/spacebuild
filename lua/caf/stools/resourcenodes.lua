@@ -38,11 +38,9 @@ local function link_in_range(ent, range)
 	for k, v in pairs(ents.FindInSphere(ent:GetPos(), range)) do
 		local enttable = rd.GetEntityTable(v)
 
-		if IsValid(v) and enttable.network == 0 then
+		if IsValid(v) and enttable.network == 0 and (CPPI and CPPI.GetOwner and CPPI.GetOwner(ent) ~= CPPI.GetOwner(v)) or (ent.GetPlayerName and v.GetPlayerName and ent:GetPlayerName() == v:GetPlayerName()) then
 			-- try CPPI first, fallback if CPPI is not available
-			if (CPPI and CPPI.GetOwner and CPPI.GetOwner(ent) ~= CPPI.GetOwner(v)) or (ent.GetPlayerName and v.GetPlayerName and ent:GetPlayerName() == v:GetPlayerName()) then
-				rd.Link(v, ent.netid)
-			end
+			rd.Link(v, ent.netid)
 		end
 	end
 end

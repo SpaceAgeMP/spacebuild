@@ -104,9 +104,7 @@ function ENT:Think()
 
 		if SB and SB.GetStatus() then
 			if self.environment then
-				local planet = self.environment:IsOnPlanet()
-
-				if not (planet) then
+				if not self.environment:IsOnPlanet() then
 					self:TurnOn()
 				else
 					self:TurnOff()

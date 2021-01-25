@@ -46,14 +46,12 @@ local function AddResource(ply, com, args)
 	local ent = ents.GetByIndex(id)
 	if not ent then return end
 
-	if ent.IsScreen and ent.resources then
-		if not table.HasValue(ent.resources, args[2]) then
-			table.insert(ent.resources, args[2])
-			net.Start("LS_Add_ScreenResource")
-			net.WriteEntity(ent)
-			net.WriteString(args[2])
-			net.Broadcast()
-		end
+	if ent.IsScreen and ent.resources and not table.HasValue(ent.resources, args[2]) then
+		table.insert(ent.resources, args[2])
+		net.Start("LS_Add_ScreenResource")
+		net.WriteEntity(ent)
+		net.WriteString(args[2])
+		net.Broadcast()
 	end
 end
 
@@ -65,20 +63,18 @@ local function RemoveResource(ply, com, args)
 	local ent = ents.GetByIndex(id)
 	if not ent then return end
 
-	if ent.IsScreen and ent.resources then
-		if table.HasValue(ent.resources, args[2]) then
-			for k, v in pairs(ent.resources) do
-				if v == args[2] then
-					table.remove(ent.resources, k)
-					break
-				end
+	if ent.IsScreen and ent.resources and table.HasValue(ent.resources, args[2]) then
+		for k, v in pairs(ent.resources) do
+			if v == args[2] then
+				table.remove(ent.resources, k)
+				break
 			end
-
-			net.Start("LS_Remove_ScreenResource")
-			net.WriteEntity(ent)
-			net.WriteString(args[2])
-			net.Broadcast()
 		end
+
+		net.Start("LS_Remove_ScreenResource")
+		net.WriteEntity(ent)
+		net.WriteString(args[2])
+		net.Broadcast()
 	end
 end
 
@@ -212,10 +208,7 @@ end
 
 function ENT:PreEntityCopy()
 	local RD = CAF.GetAddon("Resource Distribution")
-	local info = {}
-	info.Active = self.Active
-	info.damaged = self.damaged
-	info.resources = self.resources
+
 	RD.BuildDupeInfo(self)
 
 	if WireAddon ~= nil then
@@ -226,8 +219,11 @@ function ENT:PreEntityCopy()
 		end
 	end
 
-	duplicator.ClearEntityModifier(ent, "SBOtherScreen")
-	duplicator.StoreEntityModifier(self, "SBOtherScreen", info)
+	duplicator.StoreEntityModifier(self, "SBOtherScreen", {
+		Active = self.Active,
+		damaged = self.damaged,
+		resources = self.resources
+	})
 end
 
 duplicator.RegisterEntityModifier("SBOtherScreen", function() end)
@@ -236,7 +232,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	local RD = CAF.GetAddon("Resource Distribution")
 	RD.ApplyDupeInfo(ent, CreatedEntities)
 
-	if WireAddon ~= nil and (ent.EntityMods) and (ent.EntityMods.WireDupeInfo) then
+	if WireAddon ~= nil and ent.EntityMods and ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(ply, ent, ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
 

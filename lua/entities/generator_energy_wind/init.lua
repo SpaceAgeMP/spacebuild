@@ -81,7 +81,7 @@ function ENT:Extract_Energy()
 			local planet = self.environment:IsOnPlanet()
 
 			if planet and planet:GetAtmosphere() > 0.2 then
-				inc = math.random(1, (Energy_Increment * planet:GetAtmosphere()))
+				inc = math.random(1, Energy_Increment * planet:GetAtmosphere())
 			end
 		else
 			inc = 1

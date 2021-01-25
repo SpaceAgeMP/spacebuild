@@ -1324,13 +1324,9 @@ end
 function RD.PrintDebug(ent)
 	if ent then
 		if ent.IsNode then
-			local nettable = RD.GetNetTable(ent.netid)
-			PrintTable(nettable)
-		elseif ent.IsValve then
-		elseif ent.IsPump then
-		else -- --
-			local enttable = RD.GetEntityTable(ent)
-			PrintTable(enttable)
+			PrintTable(RD.GetNetTable(ent.netid))
+		else
+			PrintTable(RD.GetEntityTable(ent))
 		end
 	end
 end

@@ -100,17 +100,15 @@ function ENT:Sense()
 		end
 	end
 
-	if WireAddon ~= nil then
-		if self.environment then
-			Wire_TriggerOutput(self, "O2 Level", self.environment:GetO2Percentage())
-			Wire_TriggerOutput(self, "CO2 Level", self.environment:GetCO2Percentage())
-			Wire_TriggerOutput(self, "Nitrogen Level", self.environment:GetNPercentage())
-			Wire_TriggerOutput(self, "Hydrogen Level", self.environment:GetHPercentage())
-			Wire_TriggerOutput(self, "Empty Air Level", self.environment:GetEmptyAirPercentage())
-			Wire_TriggerOutput(self, "Pressure", self.environment:GetPressure())
-			Wire_TriggerOutput(self, "Temperature", self.environment:GetTemperature(self))
-			Wire_TriggerOutput(self, "Gravity", self.environment:GetGravity())
-		end
+	if WireAddon ~= nil and self.environment then
+		Wire_TriggerOutput(self, "O2 Level", self.environment:GetO2Percentage())
+		Wire_TriggerOutput(self, "CO2 Level", self.environment:GetCO2Percentage())
+		Wire_TriggerOutput(self, "Nitrogen Level", self.environment:GetNPercentage())
+		Wire_TriggerOutput(self, "Hydrogen Level", self.environment:GetHPercentage())
+		Wire_TriggerOutput(self, "Empty Air Level", self.environment:GetEmptyAirPercentage())
+		Wire_TriggerOutput(self, "Pressure", self.environment:GetPressure())
+		Wire_TriggerOutput(self, "Temperature", self.environment:GetTemperature(self))
+		Wire_TriggerOutput(self, "Gravity", self.environment:GetGravity())
 	end
 
 	self:ConsumeResource("energy", Energy_Increment)

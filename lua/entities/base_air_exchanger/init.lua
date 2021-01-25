@@ -92,7 +92,7 @@ function ENT:UsePerson()
 	end
 
 	self:CheckResources()
-	self:SupplyResource("carbon dioxide", (self.gair or 0))
+	self:SupplyResource("carbon dioxide", self.gair or 0)
 
 	return (self.gair or 0) - 5
 end

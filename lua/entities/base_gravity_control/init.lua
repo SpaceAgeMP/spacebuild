@@ -151,8 +151,8 @@ end
 function ENT:OnEnvironment(ent)
 	if not ent then return end
 
-	if ent:GetClass() == self:GetClass() then
-		if self.environment == ent then return end
+	if ent:GetClass() == self:GetClass() and self.environment == ent then
+		return
 	end
 
 	BaseClass.OnEnvironment(self, ent)

@@ -33,8 +33,8 @@ function ENT:GetSunburn()
 end
 
 function ENT:Unstable()
-	if self.sbenvironment.unstable then
-		if (math.random(1, 20) < 2) then end --self:GetParent():Fire("invalue", "shake", "0") --self:GetParent():Fire("invalue", "rumble", "0")
+	if self.sbenvironment.unstable and math.random(1, 20) < 2 then
+		-- self:GetParent():Fire("invalue", "shake", "0") --self:GetParent():Fire("invalue", "rumble", "0")
 	end
 end
 

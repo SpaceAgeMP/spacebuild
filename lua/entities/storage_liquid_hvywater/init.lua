@@ -78,11 +78,9 @@ function ENT:UpdateMass()
 	local mass = self.mass + ((self:GetResourceAmount("heavy water") * mul) / div) -- self.mass = default mass + need a good multiplier
 	local phys = self:GetPhysicsObject()
 
-	if (phys:IsValid()) then
-		if phys:GetMass() ~= mass then
-			phys:SetMass(mass)
-			phys:Wake()
-		end
+	if phys:IsValid() and phys:GetMass() ~= mass then
+		phys:SetMass(mass)
+		phys:Wake()
 	end
 end
 

@@ -182,21 +182,16 @@ CAF.RegisterAddon("Life Support", LS, "2")
 
 --Extra Methodes
 function LS.AddAirRegulator(ent)
-	if ent.GetLSClass and ent:GetLSClass() == "air exchanger" then
-		if table.insert(LS.generators.air, ent) then return true end --table.insert(LS.generators.air, ent) --	Msg("Added Air Exchanger\n");
-		--Msg("Not Added Air Exchanger\n");
+	if ent.GetLSClass and ent:GetLSClass() == "air exchanger" and table.insert(LS.generators.air, ent) then --TODO(always truthy for insert)
+		return true
 	end
-	--Msg("Not Added Air Exchanger\n");
-
 	return false
 end
 
 function LS.AddTemperatureRegulator(ent)
-	if ent.GetLSClass and ent:GetLSClass() == "temperature exchanger" then
-		if table.insert(LS.generators.temperature, ent) then return true end --table.insert(LS.generators.temperature, ent) --Msg("Added Temp Exchanger\n");
-		--Msg("Not Added temp Exchanger\n");
+	if ent.GetLSClass and ent:GetLSClass() == "temperature exchanger" and table.insert(LS.generators.temperature, ent) then --TODO table.insert return value is always truthy??
+		return true
 	end
-	--Msg("Not Added temp Exchanger\n");
 
 	return false
 end
@@ -285,31 +280,31 @@ function LS.DamageLS(ent, dam)
 	if ent:GetMaxHealth() == 0 then return end
 	dam = math.floor(dam / 2)
 
-	if (ent:Health() > 0) then
-		local HP = ent:Health() - dam
-		ent:SetHealth(HP)
+	if ent:Health() == 0 then
+		return
+	end
 
-		if (ent:Health() <= (ent:GetMaxHealth() / 2)) then
-			if ent.Damage then
-				ent:Damage()
-			end
-		end
+	local HP = ent:Health() - dam
+	ent:SetHealth(HP)
 
-		LS.ColorDamage(ent, 2, 200)
-		LS.ColorDamage(ent, 3, 175)
-		LS.ColorDamage(ent, 4, 150)
-		LS.ColorDamage(ent, 5, 125)
-		LS.ColorDamage(ent, 6, 100)
-		LS.ColorDamage(ent, 7, 75)
+	if ent:Health() <= (ent:GetMaxHealth() / 2) and ent.Damage then
+		ent:Damage()
+	end
 
-		if (ent:Health() <= 0) then
-			ent:SetColor(Color(50, 50, 50, 255))
+	LS.ColorDamage(ent, 2, 200)
+	LS.ColorDamage(ent, 3, 175)
+	LS.ColorDamage(ent, 4, 150)
+	LS.ColorDamage(ent, 5, 125)
+	LS.ColorDamage(ent, 6, 100)
+	LS.ColorDamage(ent, 7, 75)
 
-			if ent.Destruct then
-				ent:Destruct()
-			else
-				LS.Destruct(ent, true)
-			end
+	if (ent:Health() <= 0) then
+		ent:SetColor(Color(50, 50, 50, 255))
+
+		if ent.Destruct then
+			ent:Destruct()
+		else
+			LS.Destruct(ent, true)
 		end
 	end
 end
@@ -439,7 +434,7 @@ function Ply:LsCheck()
 
 			if pressure > 0 then
 				if self.suit.air <= 0 then
-					self:TakeDamage((pressure) * 50, 0)
+					self:TakeDamage(pressure * 50, 0)
 					LS.LS_Crush(self)
 
 					if self:Health() <= 0 then

@@ -197,7 +197,6 @@ end
 
 function ENT:Think()
 	BaseClass.Think(self)
-	if (self.Active == 1) then end -- CODE TO IMPROVE A PLANET HERE!!
 	self:NextThink(CurTime() + 1)
 
 	return true

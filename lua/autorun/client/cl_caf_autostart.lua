@@ -70,7 +70,6 @@ local function OnAddonDestruct(name)
 		end
 	end
 
-	
 	if not CAF2.StartingUp then
 		hook.Call("CAFOnAddonDestruct", name)
 		CAF2.RefreshMainMenu()

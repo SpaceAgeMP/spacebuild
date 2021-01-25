@@ -99,7 +99,7 @@ local function DrawSunEffects()
 		local scrpos = sunpos:ToScreen()
 
 		if (dist <= Sun.BeamRadius and dot > 0) then
-			local frac = (1 - ((1 / (Sun.BeamRadius)) * dist)) * dot
+			local frac = (1 - ((1 / Sun.BeamRadius) * dist)) * dot
 			-- draw sun.
 			--DrawSunbeams( darken, multiply, sunsize, sunx, suny )
 			DrawSunbeams(0.95, frac, 0.255, scrpos.x / ScrW(), scrpos.y / ScrH())

@@ -78,42 +78,41 @@ function EFFECT:Think()
 	local Pos = self.Position
 	local timeleft = self.TimeLeft - CurTime()
 
-	if timeleft > 0 then
-		local ftime = FrameTime()
-		self.GAlpha = self.GAlpha - 10.5 * ftime
-		self.GSize = self.GSize - 0.12 * timeleft * ftime
-		self.Size = self.Size + 1200 * ftime
-		self.Refract = self.Refract + 1.3 * ftime
-
-		--shock ring
-		if (self.Size < 8000) then
-			local spawndist = self.Size
-			local NumPuffs = spawndist / 80
-			local ang = self.vecang:Angle()
-
-			for i = 1, NumPuffs do
-				ang:RotateAroundAxis(ang:Up(), (360 / NumPuffs))
-				local newang = ang:Forward()
-				local spawnpos = (Pos + (newang * spawndist))
-				local particle = self.Emitter:Add("particles/flamelet" .. math.random(1, 5), spawnpos)
-				--			particle:SetVelocity(vecang*math.Rand(2,3))
-				particle:SetVelocity(Vector(0, 0, 0))
-				particle:SetDieTime(2)
-				particle:SetStartAlpha(math.Rand(230, 250))
-				particle:SetStartSize(20 * math.Rand(13, 15))
-				particle:SetEndSize(math.Rand(17, 19))
-				particle:SetRoll(math.Rand(20, 80))
-				particle:SetRollDelta(math.random(-1, 1))
-				particle:SetColor(20, math.random(20, 60), math.random(100, 255))
-			end
-		end
-
-		return true
-	else
+	if timeleft <= 0 then
 		self.Emitter:Finish()
-
 		return false
 	end
+
+	local ftime = FrameTime()
+	self.GAlpha = self.GAlpha - 10.5 * ftime
+	self.GSize = self.GSize - 0.12 * timeleft * ftime
+	self.Size = self.Size + 1200 * ftime
+	self.Refract = self.Refract + 1.3 * ftime
+
+	--shock ring
+	if self.Size < 8000 then
+		local spawndist = self.Size
+		local NumPuffs = spawndist / 80
+		local ang = self.vecang:Angle()
+
+		for i = 1, NumPuffs do
+			ang:RotateAroundAxis(ang:Up(), 360 / NumPuffs)
+			local newang = ang:Forward()
+			local spawnpos = (Pos + (newang * spawndist))
+			local particle = self.Emitter:Add("particles/flamelet" .. math.random(1, 5), spawnpos)
+			--			particle:SetVelocity(vecang*math.Rand(2,3))
+			particle:SetVelocity(Vector(0, 0, 0))
+			particle:SetDieTime(2)
+			particle:SetStartAlpha(math.Rand(230, 250))
+			particle:SetStartSize(20 * math.Rand(13, 15))
+			particle:SetEndSize(math.Rand(17, 19))
+			particle:SetRoll(math.Rand(20, 80))
+			particle:SetRollDelta(math.random(-1, 1))
+			particle:SetColor(20, math.random(20, 60), math.random(100, 255))
+		end
+	end
+
+	return true
 end
 
 function EFFECT:Render()
@@ -127,7 +126,7 @@ function EFFECT:Render()
 	if self.Size < 32768 then
 		local pos = self:GetPos()
 		local Distance = EyePos():Distance(pos)
-		local spritePos = pos + (EyePos() - pos):GetNormal() * (Distance * (self.Refract ^ (0.3)) * 0.8)
+		local spritePos = pos + (EyePos() - pos):GetNormal() * (Distance * (self.Refract ^ 0.3) * 0.8)
 		matRefraction:SetFloat("$refractamount", math.sin(self.Refract * math.pi) * 0.1)
 		render.SetMaterial(matRefraction)
 		render.UpdateRefractTexture()

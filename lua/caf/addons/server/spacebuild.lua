@@ -544,17 +544,17 @@ local function Register_Environments()
 
 				if string.len(case2) > 0 then
 					hash.AddColor_r = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.AddColor_g = tonumber(string.Left(case2, string.find(case2, " ") - 1))
-					case2 = string.Right(case2, (string.len(case2) - string.find(case2, " ")))
+					case2 = string.Right(case2, string.len(case2) - string.find(case2, " "))
 					hash.AddColor_b = tonumber(case2)
 				end
 
 				if string.len(case3) > 0 then
 					hash.MulColor_r = tonumber(string.Left(case3, string.find(case3, " ") - 1))
-					case3 = string.Right(case3, (string.len(case3) - string.find(case3, " ")))
+					case3 = string.Right(case3, string.len(case3) - string.find(case3, " "))
 					hash.MulColor_g = tonumber(string.Left(case3, string.find(case3, " ") - 1))
-					case3 = string.Right(case3, (string.len(case3) - string.find(case3, " ")))
+					case3 = string.Right(case3, string.len(case3) - string.find(case3, " "))
 					hash.MulColor_b = tonumber(case3)
 				end
 
