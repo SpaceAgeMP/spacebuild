@@ -17,7 +17,6 @@ local Hydrogen_Increment = 2000
 function ENT:Initialize()
 	BaseClass.Initialize(self)
 	self.Active = 0
-	self.Temperature = -1
 
 	self.WireDebugName = self.PrintName
 
@@ -59,8 +58,8 @@ function ENT:OnRemove()
 	BaseClass.OnRemove(self)
 end
 
-function ENT:Extract_Energy()
-	if self.Temperature >= MIN_FUSION_TEMP then
+function ENT:Extract_Energy(selfTemperature)
+	if selfTemperature >= MIN_FUSION_TEMP then
 		WireLib.TriggerOutput(self, "Fusion", 1)
 
 		local hydrogenUse = math.ceil(Hydrogen_Increment * self:GetMultiplier())
@@ -72,12 +71,12 @@ function ENT:Extract_Energy()
 		local madeEnergy = usedHydrogen * HydrogenToEnergy
 
 		local _, _, waterTemp = self:GetResourceData("water")
-		if self.Temperature > waterTemp then
-			local delta = self.Temperature - waterTemp
+		if selfTemperature > waterTemp then
+			local delta = selfTemperature - waterTemp
 			local waterUse = RD.GetResourceAmountFromEnergy("water", madeEnergy * 0.95, delta)
 			local usedWater = self:ConsumeResource("water", waterUse)
 			local waterEnergyDiff = RD.GetResourceEnergyContent("water", usedWater, delta)
-			self:SupplyResource("water", usedWater, self.Temperature)
+			self:SupplyResource("water", usedWater, selfTemperature)
 			madeEnergy = madeEnergy - waterEnergyDiff
 		end
 
@@ -93,14 +92,16 @@ function ENT:Think()
 	BaseClass.Think(self)
 	self:NextThink(CurTime() + 1)
 
-	if self.Temperature < 0 then
+	local selfTemperature = self:GetTemperature()
+
+	if selfTemperature < 0 then
 		return true
 	end
 
-	WireLib.TriggerOutput(self, "Temperature", self.Temperature)
+	WireLib.TriggerOutput(self, "Temperature", selfTemperature)
 
 	if self.Active == 1 then
-		self:Extract_Energy()
+		self:Extract_Energy(selfTemperature)
 	end
 	return true
 end

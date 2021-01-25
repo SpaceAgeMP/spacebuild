@@ -13,7 +13,7 @@ function ENT:Initialize()
 	self:SetNWInt("overlaymode", 1)
 	self:SetNWInt("OOO", 0)
 	self.Active = 0
-	self.Temperature = -1
+	self:SetTemperature(-1)
 	self.caf = self.caf or {}
 	self.caf.custom = self.caf.custom or {}
 
@@ -48,20 +48,21 @@ function ENT:GetMultiplier()
 end
 
 function ENT:NormalizeTemperatureTo(otherTemperature, increment)
-	if math.abs(self.Temperature - otherTemperature) < 0.1 then
-		self.Temperature = otherTemperature
+	local selfTemperature = self:GetTemperature()
+	if selfTemperature < 0 or math.abs(selfTemperature - otherTemperature) < 0.1 then
+		self:SetTemperature(otherTemperature)
 		return
 	end
-	self.Temperature = self.Temperature + ((otherTemperature - self.Temperature) * increment / self.ThermalMass)
+	self:SetTemperature(selfTemperature + ((otherTemperature - selfTemperature) * increment / self.ThermalMass))
 end
 
 function ENT:WarmUpWithEnergy(energy)
 	local usedEnergy = self:ConsumeResource("energy", energy)
-	self.Temperature = self.Temperature + (usedEnergy * EnergyToTemperature_Increment / self.ThermalMass)
+	self:SetTemperature(self:GetTemperature() + (usedEnergy * EnergyToTemperature_Increment / self.ThermalMass))
 end
 
-function ENT:GetTemperature()
-	return self.Temperature
+function ENT:SetTemperature(temp)
+	self:SetNWFloat("Temperature", temp)
 end
 
 function ENT:Think()
@@ -73,10 +74,6 @@ function ENT:Think()
 	end
 	if envTemperature < 0 then
 		return true
-	end
-
-	if self.Temperature < 0 then
-		self.Temperature = envTemperature
 	end
 
 	self:NormalizeTemperatureTo(envTemperature, 0.1)

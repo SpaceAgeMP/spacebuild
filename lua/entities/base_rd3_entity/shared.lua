@@ -8,3 +8,7 @@ ENT.Purpose = "Base for all RD Sents"
 ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
+
+function ENT:GetTemperature()
+	return self:GetNWFloat("Temperature")
+end
