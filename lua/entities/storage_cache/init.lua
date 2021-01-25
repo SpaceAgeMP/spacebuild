@@ -291,8 +291,6 @@ function ENT:UpdateMass()
 end
 
 function ENT:Think()
-	BaseClass.Think(self)
-
 	if self.damaged == 1 or self.venten then
 		self:ExpEnergy()
 	end
@@ -321,29 +319,19 @@ function ENT:Think()
 		self:LeakHvyWater()
 	end
 
-	if WireAddon ~= nil then
-		self:UpdateWireOutput()
-	end
-
 	self:UpdateMass()
-	self:NextThink(CurTime() + 1)
+
+	BaseClass.Think(self)
 
 	return true
 end
 
 function ENT:UpdateWireOutput()
-	Wire_TriggerOutput(self, "Hydrogen", self:GetResourceAmount("hydrogen"))
-	Wire_TriggerOutput(self, "Co2", self:GetResourceAmount("carbon dioxide"))
-	Wire_TriggerOutput(self, "Nitrogen", self:GetResourceAmount("nitrogen"))
-	Wire_TriggerOutput(self, "Hvy Water", self:GetResourceAmount("heavy water"))
-	Wire_TriggerOutput(self, "Oxygen", self:GetResourceAmount("oxygen"))
-	Wire_TriggerOutput(self, "Energy", self:GetResourceAmount("energy"))
-	Wire_TriggerOutput(self, "Water", self:GetResourceAmount("water"))
-	Wire_TriggerOutput(self, "Max Oxygen", self:GetNetworkCapacity("oxygen"))
-	Wire_TriggerOutput(self, "Max Energy", self:GetNetworkCapacity("energy"))
-	Wire_TriggerOutput(self, "Max Water", self:GetNetworkCapacity("water"))
-	Wire_TriggerOutput(self, "Max Hvy Water", self:GetNetworkCapacity("heavy water"))
-	Wire_TriggerOutput(self, "Max Co2", self:GetNetworkCapacity("carbon dioxide"))
-	Wire_TriggerOutput(self, "Max Nitrogen", self:GetNetworkCapacity("nitrogen"))
-	Wire_TriggerOutput(self, "Max Hydrogen", self:GetNetworkCapacity("hydrogen"))
+	self:DoUpdateWireOutput("Hydrogen", "hydrogen")
+	self:DoUpdateWireOutput("Co2", "carbon dioxide")
+	self:DoUpdateWireOutput("Nitrogen", "nitrogen")
+	self:DoUpdateWireOutput("Hvy Water", "heavy water")
+	self:DoUpdateWireOutput("Oxygen", "oxygen")
+	self:DoUpdateWireOutput("Energy", "energy")
+	self:DoUpdateWireOutput("Water", "water")
 end

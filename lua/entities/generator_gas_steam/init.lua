@@ -222,7 +222,5 @@ function ENT:Think()
 		self:Proc_Water()
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end

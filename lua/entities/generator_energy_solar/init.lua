@@ -201,7 +201,6 @@ end
 function ENT:Think()
 	BaseClass.Think(self)
 	self:GenEnergy()
-	self:NextThink(CurTime() + 1)
 
 	return true
 end

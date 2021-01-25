@@ -134,7 +134,5 @@ function ENT:Think()
 		self:ShowOutput()
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end

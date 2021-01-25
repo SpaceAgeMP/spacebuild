@@ -197,8 +197,6 @@ function ENT:Think()
 		self:CheckResources()
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end
 

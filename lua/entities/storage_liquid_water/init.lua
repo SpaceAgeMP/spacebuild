@@ -85,25 +85,17 @@ function ENT:UpdateMass()
 end
 
 function ENT:Think()
-	BaseClass.Think(self)
-
 	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 
-	if WireAddon ~= nil then
-		self:UpdateWireOutput()
-	end
-
 	self:UpdateMass()
-	self:NextThink(CurTime() + 1)
+
+	BaseClass.Think(self)
 
 	return true
 end
 
 function ENT:UpdateWireOutput()
-	local coolant = self:GetResourceAmount("water")
-	local maxcoolant = self:GetNetworkCapacity("water")
-	Wire_TriggerOutput(self, "Water", coolant)
-	Wire_TriggerOutput(self, "Max Water", maxcoolant)
+	self:DoUpdateWireOutput("Water", "water")
 end

@@ -115,7 +115,5 @@ function ENT:Think()
 		self.flashlight = nil
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end

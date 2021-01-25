@@ -201,8 +201,6 @@ function ENT:Think()
 		end
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end
 

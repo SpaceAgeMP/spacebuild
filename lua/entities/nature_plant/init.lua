@@ -132,7 +132,5 @@ function ENT:Think()
 		self:SetOOO(self.Active)
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end

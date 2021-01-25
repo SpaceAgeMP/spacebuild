@@ -228,7 +228,5 @@ function ENT:Think()
 		self:Pump_Air()
 	end
 
-	self:NextThink(CurTime() + 1)
-
 	return true
 end

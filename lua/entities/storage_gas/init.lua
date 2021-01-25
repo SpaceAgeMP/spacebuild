@@ -137,25 +137,17 @@ function ENT:UpdateMass()
 end
 
 function ENT:Think()
-	BaseClass.Think(self)
-
 	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 
-	if WireAddon ~= nil then
-		self:UpdateWireOutput()
-	end
-
 	self:UpdateMass()
-	self:NextThink(CurTime() + 1)
+
+	BaseClass.Think(self)
 
 	return true
 end
 
 function ENT:UpdateWireOutput()
-	local air = self:GetResourceAmount(self.caf.custom.resource)
-	local maxair = self:GetNetworkCapacity(self.caf.custom.resource)
-	Wire_TriggerOutput(self, "Storage", air)
-	Wire_TriggerOutput(self, "Max Storage", maxair)
+	self:DoUpdateWireOutput("Storage", self.caf.custom.resource)
 end

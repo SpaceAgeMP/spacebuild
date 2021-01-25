@@ -90,7 +90,6 @@ end
 
 function ENT:Think()
 	BaseClass.Think(self)
-	self:NextThink(CurTime() + 1)
 
 	local selfTemperature = self:GetTemperature()
 

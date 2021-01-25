@@ -102,24 +102,15 @@ function ENT:Leak()
 end
 
 function ENT:Think()
-	BaseClass.Think(self)
-
 	if self.damaged == 1 or self.vent then
 		self:Leak()
 	end
 
-	if WireAddon ~= nil then
-		self:UpdateWireOutput()
-	end
-
-	self:NextThink(CurTime() + 1)
+	BaseClass.Think(self)
 
 	return true
 end
 
 function ENT:UpdateWireOutput()
-	local energy = self:GetResourceAmount("energy")
-	local maxenergy = self:GetNetworkCapacity("energy")
-	Wire_TriggerOutput(self, "Energy", energy)
-	Wire_TriggerOutput(self, "Max Energy", maxenergy)
+	self:DoUpdateWireOutput("Energy", "energy")
 end

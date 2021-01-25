@@ -194,10 +194,3 @@ function ENT:OnRemove()
 	BaseClass.OnRemove(self)
 	self:StopSound("Airboat_engine_idle")
 end
-
-function ENT:Think()
-	BaseClass.Think(self)
-	self:NextThink(CurTime() + 1)
-
-	return true
-end

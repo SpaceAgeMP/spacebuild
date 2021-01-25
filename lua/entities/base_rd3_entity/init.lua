@@ -86,6 +86,10 @@ function ENT:Think()
 
 	self:NormalizeTemperatureTo(envTemperature, 0.1)
 
+	if self.UpdateWireOutput then
+		self:UpdateWireOutput()
+	end
+
 	return true
 end
 
@@ -219,4 +223,10 @@ function ENT:PostEntityPaste(Player, Ent, CreatedEntities)
 	if WireLib and Ent.EntityMods and Ent.EntityMods.WireDupeInfo then
 		WireLib.ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
 	end
+end
+
+function ENT:DoUpdateWireOutput(outputName, resourceName)
+	local amount, capacity = self:GetResourceData(resourceName)
+	Wire_TriggerOutput(self, outputName, amount)
+	Wire_TriggerOutput(self, "Max " .. outputName, capacity)
 end
