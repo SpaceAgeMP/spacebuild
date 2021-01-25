@@ -1,6 +1,8 @@
 ﻿include("caf/core/shared/caf_tools.lua")
 CAFEnts = {}
 
+CAFEnts.FORCE_REMOVE_TOOL = "DELETE THIS"
+
 function CAFEnts.MakeEnt(tool, ply, Ang, Pos, class, type, sub_type, model, frozen, Extra_Data, Data)
 	--Admin Check
 	if tool.AdminOnly and not ply:IsAdmin() then
@@ -88,7 +90,7 @@ function CAFEnts.MakeEnt(tool, ply, Ang, Pos, class, type, sub_type, model, froz
 
 	if devinfo.group.MakeFunc then
 		ent = devinfo.group.MakeFunc(tool, ply, Ang, Pos, class, type, sub_type, model, frozen, Extra_Data, devinfo)
-		if IsValid(ent) then return false end
+		if not IsValid(ent) then return false end
 		if devinfo.group.MakeFuncReturn then return ent end
 	else
 		ent = ents.Create(class)
@@ -115,6 +117,11 @@ function CAFEnts.MakeEnt(tool, ply, Ang, Pos, class, type, sub_type, model, froz
 
 	if devinfo.func then
 		mass, maxhealth = devinfo.func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
+	end
+
+	if mass == CAFEnts.FORCE_REMOVE_ENT then
+		ent:Remove()
+		return
 	end
 
 	if devinfo.group.func or devinfo.func then
