@@ -105,6 +105,11 @@ function ENT:DoNormalDraw(bDontDrawModel)
 			OverlayText = OverlayText .. "Mode: " .. runmode .. "\n"
 		end
 
+		local entTemperature = self:GetTemperature()
+		if entTemperature >= 0 then
+			OverlayText = OverlayText .. "Temperature: " .. math.floor(entTemperature) .. " K\n"
+		end
+
 		OverlayText = OverlayText .. "\n"
 		local resources = nettable.resources
 
