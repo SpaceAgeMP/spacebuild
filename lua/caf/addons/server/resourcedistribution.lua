@@ -96,36 +96,24 @@ function RD.GetNetTable(netid)
 end
 
 ]]
-local function RequestResourceData(ply, com, args)
-	if not args then
-		ply:ChatPrint("RD BUG: You forgot to provide arguments")
 
-		return
-	end
+local REQUEST_ENT = 1
+local REQUEST_NET = 2
 
-	if not args[1] then
-		ply:ChatPrint("RD BUG: You forgot to enter the type")
-
-		return
-	end
-
-	if not args[2] then
-		ply:ChatPrint("RD BUG: You forgot to enter the entid/netid")
-
-		return
-	end
+local function RequestResourceData(_, ply)
+	local typ = net.ReadUInt(8)
+	local id = net.ReadUInt(32)
+	local _needsUpdate = net.ReadBool()
 
 	local data, tmpdata
 
-	if args[1] == "ENT" then
-		data = rd_cache:get("entity_" .. args[2])
+	if typ == REQUEST_ENT then
+		data = rd_cache:get("entity_" .. id)
 
 		if not data then
-			tmpdata = ent_table[tonumber(args[2])]
+			tmpdata = ent_table[id]
 
 			if not tmpdata then
-				ply:ChatPrint("RD BUG: INVALID ENTID")
-
 				return
 			end
 
@@ -178,19 +166,17 @@ local function RequestResourceData(ply, com, args)
 				end
 			end
 
-			rd_cache:add("entity_" .. args[2], data)
+			rd_cache:add("entity_" .. id, data)
 		end
 
-		sendEntityData(ply, tonumber(args[2]), data)
-	elseif args[1] == "NET" then
-		data = rd_cache:get("network_" .. args[2])
+		sendEntityData(ply, id, data)
+	elseif typ == REQUEST_NET then
+		data = rd_cache:get("network_" .. id)
 
 		if not data then
-			tmpdata = nettable[tonumber(args[2])]
+			tmpdata = nettable[id]
 
 			if not tmpdata then
-				ply:ChatPrint("RD BUG: INVALID NETID")
-
 				return
 			end
 
@@ -198,8 +184,8 @@ local function RequestResourceData(ply, com, args)
 			data.resources = {}
 
 			for k, v in pairs(tmpdata.resources) do
-				local value, maxvalue, temperature = RD.GetNetResourceData(tonumber(args[2]), k)
-				local localvalue, localmaxvalue, localtemperature = RD.GetNetResourceData(tonumber(args[2]), k, false)
+				local value, maxvalue, temperature = RD.GetNetResourceData(id, k)
+				local localvalue, localmaxvalue, localtemperature = RD.GetNetResourceData(id, k, false)
 				data.resources[k] = {
 					value = value,
 					temperature = temperature,
@@ -216,16 +202,15 @@ local function RequestResourceData(ply, com, args)
 				table.insert(data.cons, v)
 			end
 
-			rd_cache:add("network_" .. args[2], data)
+			rd_cache:add("network_" .. id, data)
 		end
 
-		sendNetworkData(ply, tonumber(args[2]), data)
+		sendNetworkData(ply, id, data)
 	else
 		ply:ChatPrint("RD BUG: INVALID TYPE")
 	end
 end
-
-concommand.Add("RD_REQUEST_RESOURCE_DATA", RequestResourceData)
+net.Receive("RD_Network_Data", RequestResourceData)
 
 --Remove All Entities that are registered by RD, without RD they won't work anyways!
 local function ClearEntities()

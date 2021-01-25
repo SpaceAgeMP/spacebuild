@@ -13,6 +13,9 @@ RD_OverLay_Mode = CreateClientConVar("rd_overlay_mode", "-1", false, false)
 local client_chosen_number = CreateClientConVar("number_to_send", "1", false, false)
 local client_chosen_hold = CreateClientConVar("number_to_hold", "0", false, false)
 
+local REQUEST_ENT = 1
+local REQUEST_NET = 2
+
 ----------NetTable functions
 
 local function ClearNets()
@@ -276,7 +279,11 @@ function RD.GetEntityTable(ent)
 	if not data or needs_update and not requests[id] or requests[id] < CurTime() then
 		--Do (new) request
 		requests[id] = CurTime() + ttl
-		RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "ENT", entid, needs_update and "UPDATE")
+		net.Start("RD_Network_Data")
+			net.WriteUInt(REQUEST_ENT, 8)
+			net.WriteUInt(entid, 32)
+			net.WriteBool(needs_update)
+		net.SendToServer()
 	end
 	--PrintTable(data)
 
@@ -290,7 +297,11 @@ function RD.GetNetTable(netid)
 	if not data or needs_update and not requests[id] or requests[id] < CurTime() then
 		--Do (new) request
 		requests[id] = CurTime() + ttl
-		RunConsoleCommand("RD_REQUEST_RESOURCE_DATA", "NET", netid, needs_update and "UPDATE")
+		net.Start("RD_Network_Data")
+			net.WriteUInt(REQUEST_NET, 8)
+			net.WriteUInt(netid, 32)
+			net.WriteBool(needs_update)
+		net.SendToServer()
 	end
 
 	return data or {}
