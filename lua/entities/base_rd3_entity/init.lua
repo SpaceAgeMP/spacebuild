@@ -16,8 +16,16 @@ function ENT:Initialize()
 	self:SetTemperature(-1)
 	self.caf = self.caf or {}
 	self.caf.custom = self.caf.custom or {}
+end
 
-	self.ThermalMass = self:GetPhysicsObject():GetMass()
+function ENT:GetThermalMass()
+	if not self.ThermalMass then
+		local phys = self:GetPhysicsObject()
+		if phys:IsValid() then
+			self.ThermalMass = phys:GetMass()
+		end
+	end
+	return self.ThermalMass or 1
 end
 
 --use this to set self.active
@@ -53,12 +61,12 @@ function ENT:NormalizeTemperatureTo(otherTemperature, increment)
 		self:SetTemperature(otherTemperature)
 		return
 	end
-	self:SetTemperature(selfTemperature + ((otherTemperature - selfTemperature) * increment / self.ThermalMass))
+	self:SetTemperature(selfTemperature + ((otherTemperature - selfTemperature) * increment / self:GetThermalMass()))
 end
 
 function ENT:WarmUpWithEnergy(energy)
 	local usedEnergy = self:ConsumeResource("energy", energy)
-	self:SetTemperature(self:GetTemperature() + (usedEnergy * EnergyToTemperature_Increment / self.ThermalMass))
+	self:SetTemperature(self:GetTemperature() + (usedEnergy * EnergyToTemperature_Increment / self:GetThermalMass()))
 end
 
 function ENT:SetTemperature(temp)

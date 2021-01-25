@@ -82,7 +82,7 @@ function ENT:Extract_Energy(selfTemperature)
 
 		self:WarmUpWithEnergy(madeEnergy)
 	else
-		local energyUse = math.ceil(Energy_Increment * self.ThermalMass)
+		local energyUse = math.ceil(Energy_Increment * self:GetThermalMass())
 		self:WarmUpWithEnergy(energyUse)
 		WireLib.TriggerOutput(self, "Fusion", 0)
 	end
