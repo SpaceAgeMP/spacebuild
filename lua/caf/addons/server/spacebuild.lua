@@ -66,7 +66,7 @@ local function OnEntitySpawn(ent)
 	end
 end
 
-hook.Add("CAFOnEntitySpawn", OnEntitySpawn)
+hook.Add("CAFOnEntitySpawn", "SB_OnEntitySpawn", OnEntitySpawn)
 
 local function AllowAdminNoclip(ply)
 	if (ply:IsAdmin() or ply:IsSuperAdmin()) and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
