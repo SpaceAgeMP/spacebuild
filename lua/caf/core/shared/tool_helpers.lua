@@ -194,32 +194,6 @@ function CAFToolSetup.BaseCCVars()
 end
 
 local function BuildCPanel(tool, panel)
-	local function sortedByProperty(t, property_name, f)		-- takes a key,pair table and returns it sorted by v.property_name (https://www.lua.org/pil/19.3.html)
-		local a = {}
-		local keys = {}
-
-		for k,v in pairs(t) do
-			local value = v[property_name]
-			if value then
-				table.insert(a, value)
-				keys[value] = k
-			end
-		end
-
-		table.sort(a, f)
-		local i = 0
-		local iter = function ()
-			i = i + 1
-			if a[i] == nil then
-				return nil
-			else
-				local key = keys[a[i]]
-				return key, t[key]
-			end
-		end
-		return iter
-	end
-
 	panel:CheckBox("Don't Weld", tool.Mode .. "_DontWeld")
 	panel:CheckBox("Allow welding to world", tool.Mode .. "_AllowWorldWeld")
 	panel:CheckBox("Make Frozen", tool.Mode .. "_Frozen")
@@ -242,7 +216,7 @@ local function BuildCPanel(tool, panel)
 		local cur_type = GetConVar(ccv_type):GetString()
 		local cur_sub_type = GetConVar(ccv_sub_type):GetString()
 
-		for k, devlist in sortedByProperty(tool.Devices, "Name") do
+		for k, devlist in SortedPairsByMemberValue(tool.Devices, tool.sortBy or "Name", tool.sortDescending or false) do
 			if devlist.hide then
 				continue
 			end
@@ -250,7 +224,7 @@ local function BuildCPanel(tool, panel)
 			node.caftext = devlist.Name
 			node.var_type = devlist.type
 
-			for _, dev in sortedByProperty(devlist.devices, "Name") do
+			for _, dev in SortedPairsByMemberValue(devlist.devices, devlist.sortBy or "Name", devlist.sortDescending or false) do
 				if dev.hide then
 					continue
 				end
