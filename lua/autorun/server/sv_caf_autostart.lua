@@ -452,8 +452,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Loaded: Successfully\n")
 	end
 end
 
@@ -464,8 +462,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -476,8 +472,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -488,8 +482,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -498,8 +490,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -511,8 +501,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Loaded: Successfully\n")
 	end
 end
 
@@ -523,8 +511,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -535,8 +521,6 @@ for k, File in ipairs(Files) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 

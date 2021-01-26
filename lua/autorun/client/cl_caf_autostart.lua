@@ -722,8 +722,6 @@ for k, File in ipairs(coreFiles) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Loaded: Successfully\n")
 	end
 end
 
@@ -734,8 +732,6 @@ for k, File in ipairs(languageFiles) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Sent: Successfully\n")
 	end
 end
 
@@ -747,8 +743,6 @@ for k, File in ipairs(addonFiles) do
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
-	else
-		Msg("Loaded: Successfully\n")
 	end
 end
 
