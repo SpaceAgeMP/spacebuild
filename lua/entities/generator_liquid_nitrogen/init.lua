@@ -6,7 +6,6 @@ include("shared.lua")
 DEFINE_BASECLASS("base_rd3_entity")
 local Energy_Increment = 450
 local Nitrogen_Increment = 60
-local Liquid_Nitrogen_Increment = 45
 
 function ENT:Initialize()
 	BaseClass.Initialize(self)
