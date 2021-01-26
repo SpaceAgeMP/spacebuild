@@ -879,14 +879,14 @@ function RD.UnlinkNodes(netid, netid2)
 end
 
 --[[
-	linkNodes(netid, netid2)
+	LinkNodes(netid, netid2)
 	
 		This function will create a link between these 2 networks
 		
 		This is called by the Link tool(s)
 
 ]]
-function RD.linkNodes(netid, netid2)
+function RD.LinkNodes(netid, netid2)
 	if netid and netid2 and netid == netid2 then return end
 
 	if nettable[netid] and nettable[netid2] and not table.HasValue(nettable[netid].cons, netid2) then
@@ -1089,7 +1089,7 @@ function RD.ApplyDupeInfo(ent, CreatedEntities)
 				local ent2 = CreatedEntities[ent2ID]
 
 				if ent2 and ent2:IsValid() then
-					RD.linkNodes(ent.netid, ent2.netid)
+					RD.LinkNodes(ent.netid, ent2.netid)
 				end
 			end
 		end

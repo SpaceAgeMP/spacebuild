@@ -73,7 +73,7 @@ function TOOL:LeftClick(trace)
 
 		if Ent1.IsNode and Ent2.IsNode then
 			if length <= Ent1.range or length <= Ent2.range then
-				rd.linkNodes(Ent1.netid, Ent2.netid)
+				rd.LinkNodes(Ent1.netid, Ent2.netid)
 			else
 				CAF.NotifyOwner(self, "These 2 Nodes are too far apart!")
 				--clear beam points

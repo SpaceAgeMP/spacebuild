@@ -79,7 +79,7 @@ function TOOL:RightClick(trace)
 		---- node - pump
 		if Ent1.IsNode then
 			if length <= Ent1.range or length <= Ent2.range then
-				rd.linkNodes(Ent1.netid, Ent2.netid)
+				rd.LinkNodes(Ent1.netid, Ent2.netid)
 			else
 				CAF.NotifyOwner(self, "The two Nodes are too far apart!")
 			end

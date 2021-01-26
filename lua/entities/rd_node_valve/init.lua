@@ -43,7 +43,7 @@ function ENT:SetNode1(node1)
 		rd.UnlinkNodes(self.connected.node1.netid, self.connected.node2.netid)
 
 		if node1 then
-			rd.linkNodes(node1.netid, self.connected.node2.netid)
+			rd.LinkNodes(node1.netid, self.connected.node2.netid)
 		else
 			self:TurnOff()
 		end
@@ -65,7 +65,7 @@ function ENT:SetNode2(node2)
 		r.UnlinkNodes(self.connected.node1.netid, self.connected.node2.netid)
 
 		if node1 then
-			rd.linkNodes(self.connected.node1.netid, node2.netid)
+			rd.LinkNodes(self.connected.node1.netid, node2.netid)
 		else
 			self:TurnOff()
 		end
