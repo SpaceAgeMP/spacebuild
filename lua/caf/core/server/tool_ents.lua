@@ -1,7 +1,7 @@
 ﻿include("caf/core/shared/caf_tools.lua")
 CAFEnts = {}
 
-CAFEnts.FORCE_REMOVE_TOOL = "DELETE THIS"
+CAFEnts.FORCE_REMOVE_ENT = "DELETE THIS"
 
 function CAFEnts.MakeEnt(tool, ply, Ang, Pos, class, type, sub_type, model, frozen, Extra_Data, Data)
 	--Admin Check
