@@ -213,31 +213,28 @@ function ENT:Proc_Water()
 		Wire_TriggerOutput(self, "NitrogenUsage", math.Round(winc))
 	end
 
-	if energy >= einc and nitrogen >= winc then
-		if self.overdrive > 0 then
-			if CAF and CAF.GetAddon("Life Support") then
-				CAF.GetAddon("Life Support").DamageLS(self, math.random(2, 3))
-			else
-				self:SetHealth(self:Health() - math.Random(2, 3))
+	if energy < einc or nitrogen < winc then
+		self:TurnOff()
+		return
+	end
 
-				if self:Health() <= 0 then
-					self:Remove()
-				end
+	if self.overdrive > 0 then
+		if CAF and CAF.GetAddon("Life Support") then
+			CAF.GetAddon("Life Support").DamageLS(self, math.random(2, 3))
+		else
+			self:SetHealth(self:Health() - math.Random(2, 3))
+
+			if self:Health() <= 0 then
+				self:Remove()
 			end
 		end
-
-		local wprod = math.ceil((Liquid_Nitrogen_Increment + (self.overdrive * Liquid_Nitrogen_Increment)) * self:GetMultiplier()) * self.Multiplier
-
-		self:ConsumeResource("energy", einc)
-		self:ConsumeResource("nitrogen", winc)
-		self:SupplyResource("nitrogen", wprod, LIQUID_NITROGEN_TEMPERATURE)
-
-		if WireAddon ~= nil then
-			Wire_TriggerOutput(self, "LiquidNitrogenProduction", wprod)
-		end
-	else
-		self:TurnOff()
 	end
+
+	self:ConsumeResource("energy", einc)
+	self:ConsumeResource("nitrogen", winc)
+	self:SupplyResource("nitrogen", winc, LIQUID_NITROGEN_TEMPERATURE)
+
+	Wire_TriggerOutput(self, "LiquidNitrogenProduction", winc)
 end
 
 function ENT:Think()
