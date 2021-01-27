@@ -80,7 +80,7 @@ function ENT:Extract_Energy(selfTemperature)
 			madeEnergy = madeEnergy - waterEnergyDiff
 		end
 
-		self:WarmUpWithEnergy(madeEnergy)
+		self:WarmUpWithEnergy(madeEnergy, true)
 	else
 		local energyUse = math.ceil(Energy_Increment * self:GetThermalMass())
 		self:WarmUpWithEnergy(energyUse)

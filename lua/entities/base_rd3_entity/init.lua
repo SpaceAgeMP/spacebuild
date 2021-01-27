@@ -64,9 +64,11 @@ function ENT:NormalizeTemperatureTo(otherTemperature, increment)
 	self:SetTemperature(selfTemperature + ((otherTemperature - selfTemperature) * increment / self:GetThermalMass()))
 end
 
-function ENT:WarmUpWithEnergy(energy)
-	local usedEnergy = self:ConsumeResource("energy", energy)
-	self:SetTemperature(self:GetTemperature() + (usedEnergy * EnergyToTemperature_Increment / self:GetThermalMass()))
+function ENT:WarmUpWithEnergy(energy, dontconsume)
+	if not dontconsume then
+		energy = self:ConsumeResource("energy", energy)
+	end
+	self:SetTemperature(self:GetTemperature() + (energy * EnergyToTemperature_Increment / self:GetThermalMass()))
 end
 
 function ENT:SetTemperature(temp)
