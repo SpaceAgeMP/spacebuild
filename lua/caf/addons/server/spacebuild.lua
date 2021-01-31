@@ -211,7 +211,7 @@ function sb_space.Get()
 		--not implemented
 	end
 
-	function space:GetGravity()
+	function space:GetSBGravity()
 		return 0
 	end
 

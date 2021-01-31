@@ -472,7 +472,7 @@ function ENT:SetEnvironmentName(value)
 	self.sbenvironment.name = value
 end
 
-function ENT:GetGravity()
+function ENT:GetSBGravity()
 	return self.sbenvironment.gravity or 0
 end
 

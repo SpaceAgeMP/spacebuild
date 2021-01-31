@@ -108,7 +108,7 @@ function ENT:Sense()
 		Wire_TriggerOutput(self, "Empty Air Level", self.environment:GetEmptyAirPercentage())
 		Wire_TriggerOutput(self, "Pressure", self.environment:GetPressure())
 		Wire_TriggerOutput(self, "Temperature", self.environment:GetTemperature(self))
-		Wire_TriggerOutput(self, "Gravity", self.environment:GetGravity())
+		Wire_TriggerOutput(self, "Gravity", self.environment:GetSBGravity())
 	end
 
 	self:ConsumeResource("energy", Energy_Increment)
@@ -121,7 +121,7 @@ function ENT:ShowOutput()
 	self:SetNWInt(4, self.environment:GetHPercentage() or 0)
 	self:SetNWInt(5, self.environment:GetPressure() or 0)
 	self:SetNWInt(6, self.environment:GetTemperature(self) or 0)
-	self:SetNWInt(7, self.environment:GetGravity() or 0)
+	self:SetNWInt(7, self.environment:GetSBGravity() or 0)
 	self:SetNWString(8, self.environment:GetEnvironmentName() or "")
 	self:SetNWInt(9, self.environment:GetEmptyAirPercentage() or 0)
 end
