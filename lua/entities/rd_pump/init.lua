@@ -293,7 +293,7 @@ function ENT:TriggerInput(iname, value)
 			local ent2 = ents.GetByIndex(self.WireConnectPump)
 			if not ent2 then return end
 
-			self:LinkToPump(ent2)
+			self:LinkToPump(nil, ent2)
 		end
 	end
 end
