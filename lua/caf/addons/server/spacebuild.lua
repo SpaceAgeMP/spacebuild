@@ -836,6 +836,22 @@ function SB.PerformEnvironmentCheck()
 	end
 end
 
+concommand.Add("sb_toggle_space_noclip", function (ply, cmd, args)
+	if not IsValid(ply) then
+		return
+	end
+	if not ply:IsAdmin() then
+		ply:ChatPrint("You cannot use this command")
+		return
+	end
+	ply.EnableSpaceNoclip = not ply.EnableSpaceNoclip
+	if ply.EnableSpaceNoclip then
+		ply:ChatPrint("Space noclip now enabled!")
+	else
+		ply:ChatPrint("Space noclip now disabled!")
+	end
+end)
+
 function SB.PerformEnvironmentCheckOnEnt(ent)
 	if SB_InSpace == 0 then return end
 	if not ent then return end
