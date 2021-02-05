@@ -172,7 +172,7 @@ function ENT:OnEnvironment(ent, environment, space)
 	local cen = self:GetPos()
 	local size = self:GetSize()
 
-	--local dist = pos:Distance(self:GetPos())
+	local dist = (pos - self:GetPos()):LengthSqr()
 	if (pos.x < cen.x + size and pos.x > cen.x - size) and (pos.y < cen.y + size and pos.y > cen.y - size) and (pos.z < cen.z + size and pos.z > cen.z - size) then
 		--if dist < (self:GetSize()*1.5) then
 		--	local min = pos - Vector(self:GetSize(),self:GetSize(),self:GetSize())
@@ -187,10 +187,8 @@ function ENT:OnEnvironment(ent, environment, space)
 				if environment:GetSize() ~= 0 then
 					if self:GetSize() <= environment:GetSize() then
 						environment = self
-					else
-						if dist < pos:Distance(environment:GetPos()) then
-							environment = self
-						end
+					elseif dist < (pos - environment:GetPos()):LengthSqr() then
+						environment = self
 					end
 				else
 					environment = self

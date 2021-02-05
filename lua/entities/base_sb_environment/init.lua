@@ -1014,9 +1014,11 @@ function ENT:OnEnvironment(ent, environment, space)
 	if ent.IsInBrushEnv then return end --ignore those those are managed by the brush
 	if ent == self then return end
 	local pos = ent:GetPos()
-	local dist = pos:Distance(self:GetPos())
+	local dist2 = (pos - self:GetPos()):LengthSqr()
+	local size = self:GetSize()
+	local size2 = size * size
 
-	if dist >= self:GetSize() then
+	if dist2 >= size2 then
 		return environment
 	end
 	if environment == space then
@@ -1033,7 +1035,7 @@ function ENT:OnEnvironment(ent, environment, space)
 			--self:UpdateGravity(ent)
 		end
 
-		if dist < pos:Distance(environment:GetPos()) then
+		if dist2 < (pos - environment:GetPos()):LengthSqr() then
 			return self
 		end
 	end
