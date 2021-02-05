@@ -50,45 +50,46 @@ function ENT:SetFlags(flags)
 end
 
 function ENT:GetTemperature(ent)
-	if not ent then return end
-	local entpos = ent:GetPos()
-	local lit = false
-
-	local tr = util.TraceLine({
-		start = entpos - (SunAngle * 4096),
-		endpos = entpos -- + Vector(0,0,30)
-	})
-
-	if not tr.Hit or tr.Entity == ent then
-		lit = true
-	end
-
-	if not lit then
-		for k, v in pairs(TrueSun) do
-			local TrueSunAngle = (entpos - v)
-			TrueSunAngle:Normalize()
-
-			local tr2 = util.TraceLine({
-				start = entpos - (TrueSunAngle * 4096),
-				endpos = entpos -- + Vector(0,0,30)
-			})
-
-			if not tr2.Hit or tr2.Entity == ent then
-				lit = true
-				break
-			end
-		end
-	end
-
-	if lit and self.sbenvironment.sunburn and ent:IsPlayer() and ent:Health() > 0 then
-		ent:TakeDamage(5, 0)
-		ent:EmitSound("HL2Player.BurnPain")
-	end
-
 	local temperature = self.sbenvironment.temperature
 
-	if lit and self.sbenvironment.temperature2 then
-		temperature = self.sbenvironment.temperature2
+	if ent:IsPlayer() then
+		local entpos = ent:GetPos()
+		local lit = false
+
+		local tr = util.TraceLine({
+			start = entpos - (SunAngle * 4096),
+			endpos = entpos -- + Vector(0,0,30)
+		})
+
+		if not tr.Hit or tr.Entity == ent then
+			lit = true
+		end
+
+		if not lit then
+			for k, v in pairs(TrueSun) do
+				local TrueSunAngle = (entpos - v)
+				TrueSunAngle:Normalize()
+
+				local tr2 = util.TraceLine({
+					start = entpos - (TrueSunAngle * 4096),
+					endpos = entpos -- + Vector(0,0,30)
+				})
+
+				if not tr2.Hit or tr2.Entity == ent then
+					lit = true
+					break
+				end
+			end
+		end
+
+		if lit and self.sbenvironment.sunburn and ent:Health() > 0 then
+			ent:TakeDamage(5, 0)
+			ent:EmitSound("HL2Player.BurnPain")
+		end
+
+		if self.sbenvironment.temperature2 and lit then
+			temperature = self.sbenvironment.temperature2
+		end
 	end
 
 	if not temperature then return 0 end

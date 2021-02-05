@@ -7,12 +7,14 @@ CreateConVar("LS_AllowNukeEffect", "1") --Update to something changeable later o
 local SB_AIR_O2 = 0
 local SB_AIR_CO2 = 1
 
+local RD
+
 LS.generators = {}
 LS.generators.air = {}
 LS.generators.temperature = {}
 
 local function LS_Reg_Veh(ply, ent)
-	CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(ent)
+	RD.RegisterNonStorageDevice(ent)
 end
 
 local function LSSpawnFunc(ply)
@@ -72,7 +74,7 @@ end
 ]]
 function LS.__Construct()
 	if status then return false, CAF.GetLangVar("This Addon is already Active!") end
-	local RD = CAF.GetAddon("Resource Distribution")
+	RD = CAF.GetAddon("Resource Distribution")
 	if not RD or not RD.GetStatus() then return false, CAF.GetLangVar("Resource Distribution is Required and needs to be Active!") end
 	util.PrecacheSound("vehicles/v8/skid_lowfriction.wav")
 	util.PrecacheSound("NPC_Stalker.BurnFlesh")
@@ -82,17 +84,10 @@ function LS.__Construct()
 	LS.generators = {}
 	LS.generators.air = {}
 	LS.generators.temperature = {}
-	local SB = CAF.GetAddon("Spacebuild")
 
-	if SB then
-		--Msg("Adding Player override to SB\n")
-		SB.AddPlayerOverride()
-		SB.AddOverride_PlayerHeatDestroy()
-	end
-
-	--SB_PlayerOverride = true
-	--SB_Override_PlayerHeatDestroy = true
 	hook.Add("PlayerSpawnedVehicle", "LS_vehicle_spawn", LS_Reg_Veh)
+
+	CAF.GetAddon("Spacebuild").AddOverride_PressureDamage()
 
 	if SunAngle == nil then
 		SunAngle = Vector(0, 0, -1)
@@ -128,12 +123,8 @@ function LS.__Destruct()
 	hook.Remove("PlayerSpawnedVehicle", "LS_vehicle_spawn")
 	hook.Remove("CAFOnAddonDestruct", "LSAddonDisable")
 	timer.Remove("PlayerLSThink")
-	local SB = CAF.GetAddon("Spacebuild")
 
-	if SB then
-		SB.RemovePlayerOverride()
-		SB.RemoveOverride_PlayerHeatDestroy()
-	end
+	CAF.GetAddon("Spacebuild").RemoveOverride_PressureDamage()
 
 	LS.generators = {}
 	LS.generators.air = {}
@@ -385,44 +376,8 @@ function Ply:LsCheck()
 		return
 	end
 	local pod = self:GetParent()
-	local RD = CAF.GetAddon("Resource Distribution")
-	local SB = CAF.GetAddon("Spacebuild")
 
-	if SB and SB.GetStatus() then
-		local space = SB.GetSpace()
-		local environment = space --restore to default before doing the Environment checks
-		local oldenvironment = self.environment
-
-		for k, v in pairs(SB.GetPlanets()) do
-			if v and v:IsValid() then
-				--Msg("Checking planet\n")
-				environment = v:OnEnvironment(self, environment, space) or environment
-			end
-		end
-
-		if environment == space then
-			for k, v in pairs(SB.GetStars()) do
-				if v and v:IsValid() then
-					environment = v:OnEnvironment(self, environment, space) or environment
-				end
-			end
-		end
-
-		for k, v in pairs(SB.GetEnvironments()) do
-			if v and v:IsValid() then
-				environment = v:OnEnvironment(self, environment, space) or environment
-			end
-		end
-
-		if oldenvironment ~= environment then
-			self.environment = environment
-			SB.OnEnvironmentChanged(self)
-		elseif oldenvironment ~= self.environment then
-			self.environment = oldenvironment
-		end
-
-		self.environment:UpdateGravity(self)
-
+	if self.environment then
 		if self.environment:GetPressure() > 1.5 and not pod:IsValid() then
 			local pressure = self.environment:GetPressure() - 1.5
 
@@ -710,9 +665,7 @@ function Ply:LsCheck()
 end
 
 function Ply:UpdateLSClient()
-	local SB = CAF.GetAddon("Spacebuild")
-
-	if SB and SB.GetStatus() then
+	if self.environment then
 		net.Start("LS_umsg1")
 		net.WriteFloat(self.environment:GetO2Percentage() or -1)
 		net.WriteInt(self.suit.air or -1, 32)

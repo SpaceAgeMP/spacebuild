@@ -67,16 +67,10 @@ end
 
 hook.Add("CAFOnEntitySpawn", "SB_OnEntitySpawn", OnEntitySpawn)
 
-local function AllowAdminNoclip(ply)
-	if ply:IsAdmin() or ply:IsSuperAdmin() and GetConVar("SB_AdminSpaceNoclip"):GetBool() then return true end
-	if ply:IsSuperAdmin() and GetConVar("SB_SuperAdminSpaceNoclip"):GetBool() then return true end
-
-	return false
-end
-
 local function PlayerNoClip(ply, on)
-	if SB_InSpace == 1 and not game.SinglePlayer() and GetConVar("SB_NoClip"):GetBool() and not AllowAdminNoclip(ply) and GetConVar("SB_PlanetNoClipOnly"):GetBool() and ply.environment and ply.environment:IsSpace() then return false end
-	--return server_settings.Bool( "sbox_noclip" ) --Let the gamemode or other hooks take care of it
+	if SB_InSpace == 1 and not ply.EnableSpaceNoclip and ply.environment and ply.environment:IsSpace() then
+		return false
+	end
 end
 
 --Send the player info about the Stars and Planets for Effects
@@ -829,89 +823,50 @@ end
 
 CAF.RegisterAddon("Spacebuild", SB, "1")
 
---Thinks Checks
---local time_count = 0
---local time_amount = 0
 function SB.PerformEnvironmentCheck()
 	if SB_InSpace == 0 then return end
 
-	--local begintime = CAF.begintime()
-	--local amount = #sb_spawned_entities
 	for k, ent in ipairs(sb_spawned_entities) do
-		if ent and IsValid(ent) and not ent.IsEnvironment then
-			SB.PerformEnvironmentCheckOnEnt(ent)
+		if IsValid(ent) and not ent.SkipSBChecks and ent.environment and not ent.IsEnvironment then
+			ent.environment:UpdateGravity(ent)
+			ent.environment:UpdatePressure(ent)
 		else
 			table.remove(sb_spawned_entities, k)
 		end
 	end
-	--local endtime = CAF.endtime(begintime)
-	--time_count = time_count + endtime
-	--time_amount = time_amount + 1
-	--Msg("SB - Seconds to loop over "..tostring(amount).." entities: "..tostring(endtime).."s / "..tostring(time_count/time_amount).." ("..tostring(time_amount)..")\n")
 end
 
 function SB.PerformEnvironmentCheckOnEnt(ent)
+	if SB_InSpace == 0 then return end
 	if not ent then return end
 	if ent.SkipSBChecks then return end
 
-	if not ent:IsPlayer() or SB.PlayerOverride == 0 then
-		local space = sb_space.Get()
-		local environment = space --restore to default before doing the Environment checks
-		local oldenvironment = ent.environment
+	local environment = sb_space.Get() --restore to default before doing the Environment checks
 
-		for k, v in pairs(Planets) do
-			if v and v:IsValid() then
-				environment = v:OnEnvironment(ent, environment, space) or environment
-			else
-				table.remove(Planets, k)
-			end
+	for env, _ in pairs(ent.SBInEnvironments) do
+		if env ~= ent and env:IsPreferredOver(environment) then
+			environment = env
 		end
-
-		if environment == space then
-			for k, v in pairs(Stars) do
-				if v and v:IsValid() then
-					environment = v:OnEnvironment(ent, environment, space) or environment
-				else
-					table.remove(Stars, k)
-				end
-			end
-		end
-
-		for k, v in pairs(Environments) do
-			if v and v:IsValid() then
-				environment = v:OnEnvironment(ent, environment, space) or environment
-			else
-				table.remove(Environments, k)
-			end
-		end
-
-		if oldenvironment ~= environment then
-			ent.environment = environment
-			SB.OnEnvironmentChanged(ent)
-		elseif oldenvironment ~= ent.environment then
-			ent.environment = oldenvironment
-		end
-
-		ent.environment:UpdateGravity(ent)
-		ent.environment:UpdatePressure(ent)
 	end
 
-	if ent:IsPlayer() then
-		if (SB_InSpace == 1 and (ent.environment == sb_space.Get() or (ent.environment and ent.environment.IsPlanet and (not ent.environment:IsPlanet()) and ent.environment.environment and ent.environment.environment == sb_space.Get()))) and
-			(not ent:InVehicle() or not game.SinglePlayer()) and
-			not AllowAdminNoclip(ent) and
-			ent:GetMoveType() == MOVETYPE_NOCLIP
-		 then
-			ent:SetMoveType(MOVETYPE_WALK)
-		end
+	if ent.environment ~= environment then
+		ent.environment = environment
+		SB.OnEnvironmentChanged(ent)
+	end
 
-		if SB.PlayerOverride == 0 and SB.Override_PlayerHeatDestroy == 0 and ent.environment:GetTemperature(ent) > 10000 then
+	ent.environment:UpdateGravity(ent)
+	ent.environment:UpdatePressure(ent)
+
+	if ent:IsPlayer() and ent:GetMoveType() == MOVETYPE_NOCLIP and ent.environment and ent.environment:IsSpace() and not ent.EnableSpaceNoclip then
+		ent:SetMoveType(MOVETYPE_WALK)
+	end
+
+	if (not ent.IsEnvironment or not ent:IsEnvironment() or (ent:GetVolume() == 0 and not ent:IsPlanet() and not ent:IsStar())) and ent.environment and ent.environment:GetTemperature(ent) > 10000 then
+		if ent:IsPlayer() then
 			ent:SilentKill()
+		else
+			ent:Remove()
 		end
-		return
-	end
-	if (not ent.IsEnvironment or not ent:IsEnvironment() or (ent:GetVolume() == 0 and not ent:IsPlanet() and not ent:IsStar())) and ent.environment:GetTemperature(ent) > 10000 then
-		ent:Remove()
 	end
 end
 

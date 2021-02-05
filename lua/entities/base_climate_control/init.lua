@@ -250,6 +250,8 @@ function ENT:UpdateSize(oldsize, newsize)
 
 			self.sbenvironment.air.h = self.sbenvironment.air.max + tomuch
 		end
+
+		self:SBUpdatePhysics()
 	end
 end
 

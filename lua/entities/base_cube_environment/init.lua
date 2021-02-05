@@ -6,13 +6,11 @@ DEFINE_BASECLASS("base_sb_environment")
 
 function ENT:Initialize()
 	BaseClass.Initialize(self)
-	self:PhysicsInit(SOLID_NONE)
-	self:SetMoveType(MOVETYPE_NONE)
-	self:SetSolid(SOLID_NONE)
+
 	self.sbenvironment.temperature2 = 0
 	self.sbenvironment.sunburn = false
 	self.sbenvironment.unstable = false
-	self:SetNotSolid(true)
+
 	self:DrawShadow(false)
 
 	if CAF then
@@ -21,6 +19,15 @@ function ENT:Initialize()
 		self.caf.custom.canreceivedamage = false
 		self.caf.custom.canreceiveheatdamage = false
 	end
+end
+
+function ENT:SBEnvPhysics(ent)
+	local size = self:GetSize()
+	if size == 0 then
+		return false
+	end
+	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
+	ent:PhysicsInitBox(Vector(-size, -size, -size), Vector(size, size, size))
 end
 
 function ENT:GetSunburn()
@@ -37,65 +44,10 @@ function ENT:SetFlags(flags)
 	self.sbenvironment.sunburn = caf_util.isBitSet(flags, 2)
 end
 
-function ENT:GetTemperature(ent)
-	if not ent then return end
-	local entpos = ent:GetPos()
-	local lit = false
-	local SunAngle2 = SunAngle
-	local SunAngle
-
-	for k, v in pairs(TrueSun) do
-		SunAngle = (entpos - v)
-		SunAngle:Normalize()
-
-		local tr = util.TraceLine({
-			start = entpos - (SunAngle * 4096),
-			endpos = entpos -- + Vector(0,0,30)
-		})
-
-		if not tr.Hit then
-			lit = true
-			continue
-		end
-
-		if tr.Entity ~= ent then continue end
-		lit = true
-
-		if self.sbenvironment.sunburn and ent:IsPlayer() and ent:Health() > 0 then
-			ent:TakeDamage(5, 0)
-			ent:EmitSound("HL2Player.BurnPain")
-		end
-	end
-
-	local tr = util.TraceLine({
-		start = entpos - (SunAngle2 * 4096),
-		entpos
-	})
-
-	-- + Vector(0,0,30)
-	if tr.Hit then
-		if tr.Entity == ent then
-			lit = true
-
-			if self.sbenvironment.sunburn and ent:IsPlayer() and ent:Health() > 0 then
-				ent:TakeDamage(5, 0)
-				ent:EmitSound("HL2Player.BurnPain")
-			end
-		end
-	else
-		lit = true
-	end
-
-	if lit and self.sbenvironment.temperature2 then return self.sbenvironment.temperature2 + ((self.sbenvironment.temperature2 * ((self:GetCO2Percentage() - self.sbenvironment.air.co2per) / 100)) / 2) end
-	if not self.sbenvironment.temperature then return 0 end
-
-	return self.sbenvironment.temperature + ((self.sbenvironment.temperature * ((self:GetCO2Percentage() - self.sbenvironment.air.co2per) / 100)) / 2)
-end
-
 function ENT:Unstable()
-	if self.sbenvironment.unstable and math.random(1, 20) < 2 then
+	--if self.sbenvironment.unstable and math.random(1, 20) < 2 then
 		--self:GetParent():Fire("invalue", "shake", "0") --self:GetParent():Fire("invalue", "rumble", "0")
-	end
+	--end
 end
 
 function ENT:GetPriority()
@@ -165,33 +117,8 @@ function ENT:Think()
 	return true
 end
 
-function ENT:OnEnvironment(ent, environment, space)
-	if not ent then return end
-	if ent == self then return end
-	local pos = ent:GetPos()
-	local cen = self:GetPos()
-	local size = self:GetSize()
-
-	if (pos.x < cen.x + size and pos.x > cen.x - size) and (pos.y < cen.y + size and pos.y > cen.y - size) and (pos.z < cen.z + size and pos.z > cen.z - size) then
-		if environment == space then
-			return self
-		end
-
-		if environment:GetPriority() < self:GetPriority() then
-			return self
-		end
-
-		if environment:GetPriority() == self:GetPriority() and (environment:GetSize() == 0 or self:GetSize() <= environment:GetSize()) then
-			return self
-		end
-	end
-
-	return environment
-end
-
 function ENT:PosInEnvironment(pos, other)
 	if other and other == self then return other end
-	local pos = ent:GetPos()
 
 	if (pos.x < cen.x + size and pos.x > cen.x - size) and (pos.y < cen.y + size and pos.y > cen.y - size) and (pos.z < cen.z + size and pos.z > cen.z - size) then
 		if other then

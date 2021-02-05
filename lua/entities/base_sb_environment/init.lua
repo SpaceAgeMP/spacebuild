@@ -35,7 +35,26 @@ function ENT:Initialize()
 		name = "No Name"
 	}
 
+	self.physEnt = ents.Create("base_sb_environment_collider")
+	self.physEnt:Spawn()
+	self.physEnt:Activate()
+	self:DeleteOnRemove(self.physEnt)
+	self:SBUpdatePhysics()
+
 	CAF.GetAddon("Spacebuild").AddEnvironment(self)
+end
+
+function ENT:SBUpdatePhysics()
+	self.physEnt:SetEnvironment(self)
+end
+
+function ENT:SBEnvPhysics(ent)
+	local size = self:GetSize()
+	if size == 0 then
+		return false
+	end
+	ent:PhysicsInitSphere(size)
+	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
 end
 
 local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
@@ -772,6 +791,8 @@ function ENT:CreateEnvironment(gravity, atmosphere, pressure, temperature, o2, c
 	end
 
 	self.sbenvironment.air.max = math.Round(100 * 5 * (self:GetVolume() / 1000) * self.sbenvironment.atmosphere)
+
+	self:SBUpdatePhysics()
 end
 
 function ENT:UpdateSize(oldsize, newsize)
@@ -858,6 +879,8 @@ function ENT:UpdateSize(oldsize, newsize)
 				self.sbenvironment.air.h = self.sbenvironment.air.max + tomuch
 			end
 		end
+
+		self:SBUpdatePhysics()
 	end
 end
 
@@ -989,31 +1012,20 @@ function ENT:IsSpace()
 	return false
 end
 
-function ENT:OnEnvironment(ent, environment, space)
-	if not ent then return end
-	if ent.IsInBrushEnv then return end --ignore those those are managed by the brush
-	if ent == self then return end
-	local pos = ent:GetPos()
-	local dist2 = (pos - self:GetPos()):LengthSqr()
-	local size = self:GetSize()
-	local size2 = size * size
-
-	if dist2 >= size2 then
-		return environment
-	end
+function ENT:IsPreferredOver(environment)
 	if environment == space then
-		return self
+		return true
 	end
 
 	if environment:GetPriority() < self:GetPriority() then
-		return self
+		return true
 	end
 
 	if environment:GetPriority() == self:GetPriority() and (environment:GetSize() == 0 or self:GetSize() <= environment:GetSize()) then
-		return self
+		return true
 	end
 
-	return environment
+	return false
 end
 
 function ENT:PosInEnvironment(pos, other)

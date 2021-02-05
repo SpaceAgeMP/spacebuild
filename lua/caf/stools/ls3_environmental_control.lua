@@ -42,27 +42,6 @@ local function environmental_control_func(ent, type, sub_type, devinfo, Extra_Da
 
 	if type == "other_dispenser" then
 		base_volume = 4084 --This will need changed
-	elseif type == "base_air_exchanger" then
-		base_volume = 4084
-		base_mass = 100
-		base_health = 600
-
-		--TODO: MAke it volume based or a tool setting??
-		if sub_type == "small_air_exchanger" then
-			ent:SetRange(256)
-		else
-			ent:SetRange(768) --right value??
-		end
-	elseif type == "base_temperature_exchanger" then
-		base_volume = 4084 --Change to the actual base volume later on
-		base_mass = 100
-		base_health = 500
-
-		if sub_type == "small_temp_exchanger" then
-			ent:SetRange(256)
-		else
-			ent:SetRange(768) --right value??
-		end
 	elseif type == "base_climate_control" then
 		base_volume = 4084
 		base_mass = 1200
@@ -70,10 +49,6 @@ local function environmental_control_func(ent, type, sub_type, devinfo, Extra_Da
 	elseif type == "other_probe" then
 		base_volume = 4084
 		base_mass = 20
-		base_health = 1000
-	elseif type == "base_gravity_control" then
-		base_volume = 4084
-		base_mass = 1200
 		base_health = 1000
 	elseif type == "nature_plant" then
 		base_volume = 4084
@@ -120,47 +95,6 @@ TOOL.Devices = {
 			},
 		},
 	},
-	base_air_exchanger = {
-		Name = "Air Exchangers",
-		type = "base_air_exchanger",
-		class = "base_air_exchanger",
-		func = environmental_control_func,
-		devices = {
-			small_air_exchanger = {
-				Name = "Small Air Exchanger",
-				model = "models/props_combine/combine_light001a.mdl",
-				skin = 0,
-				legacy = false,
-			},
-			large_air_exchanger = {
-				Name = "Large Air Exchanger",
-				model = "models/props_combine/combine_light001b.mdl",
-				skin = 0,
-				legacy = false,
-			},
-		},
-	},
-	base_temperature_exchanger = {
-		Name = "Heat Exchangers",
-		type = "base_temperature_exchanger",
-		class = "base_temperature_exchanger",
-		func = environmental_control_func,
-		EnableFunc = sbCheck,
-		devices = {
-			small_temp_exchanger = {
-				Name = "Small Temperature Exchanger",
-				model = "models/props_c17/utilityconnecter006c.mdl",
-				skin = 0,
-				legacy = false,
-			},
-			large_temp_exchanger = {
-				Name = "Large Temperature Exchanger",
-				model = "models/props_c17/substation_transformer01d.mdl",
-				skin = 0,
-				legacy = false,
-			},
-		},
-	},
 	base_climate_control = {
 		Name = "Climate Regulators",
 		type = "base_climate_control",
@@ -185,21 +119,6 @@ TOOL.Devices = {
 		devices = {
 			normal = {
 				Name = "Atmospheric Probe",
-				model = "models/props_combine/combine_mine01.mdl",
-				skin = 0,
-				legacy = false,
-			},
-		},
-	},
-	base_gravity_control = {
-		Name = "Gravity Regulators",
-		type = "base_gravity_control",
-		class = "base_gravity_control",
-		func = environmental_control_func,
-		EnableFunc = sbCheck,
-		devices = {
-			normal = {
-				Name = "Gravity Regulator",
 				model = "models/props_combine/combine_mine01.mdl",
 				skin = 0,
 				legacy = false,
