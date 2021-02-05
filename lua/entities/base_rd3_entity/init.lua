@@ -80,9 +80,17 @@ function ENT:Think()
 
 	local envTemperature = -1
 	if self.environment then
-		envTemperature = self.environment:GetTemperature(self)
+		if self.environment.GetTemperature then
+			envTemperature = self.environment:GetTemperature(self)
+		elseif self.environment.environment and self.environment.environment.GetTemperature then
+			envTemperature = self.environment.environment:GetTemperature(self)
+		end
 	end
+
 	if envTemperature < 0 then
+		if self.UpdateWireOutput then
+			self:UpdateWireOutput()
+		end
 		return true
 	end
 
