@@ -35,24 +35,29 @@ function ENT:Initialize()
 		name = "No Name"
 	}
 
-	self.physEnt = ents.Create("base_sb_environment_collider")
-	self.physEnt:Spawn()
-	self.physEnt:Activate()
-	self:DeleteOnRemove(self.physEnt)
-	self:SBUpdatePhysics()
-
 	CAF.GetAddon("Spacebuild").AddEnvironment(self)
 end
 
 function ENT:SBUpdatePhysics()
+	if IsValid(self.physEnt) then
+		self:DontDeleteOnRemove(self.physEnt)
+		self.physEnt:Remove()
+		self.physEnt = nil
+	end
+
+	if self:GetSize() <= 0 then
+		return
+	end
+
+	self.physEnt = ents.Create("base_sb_environment_collider")
+	self.physEnt:Spawn()
+	self.physEnt:Activate()
+	self:DeleteOnRemove(self.physEnt)
 	self.physEnt:SetEnvironment(self)
 end
 
 function ENT:SBEnvPhysics(ent)
 	local size = self:GetSize()
-	if size == 0 then
-		return false
-	end
 	ent:PhysicsInitSphere(size)
 	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
 end

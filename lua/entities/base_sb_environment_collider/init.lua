@@ -11,23 +11,28 @@ function ENT:Initialize()
 	self.TouchTable = {}
 end
 
-function ENT:SetEnvironment(env)
-	self:SetPos(env:GetPos())
-	self:SetParent(env)
-	self.sbenv = env
-
+function ENT:ResetTouchTable()
 	for ent, _ in pairs(self.TouchTable) do
 		self:EndTouch(ent)
 	end
 	self.TouchTable = {}
 
-	if env:SBEnvPhysics(self) == false then
-		self:SetTrigger(false)
-		self:PhysicsDestroy()
-		return
-	end
+end
+
+function ENT:SetEnvironment(env)
+	self:SetPos(env:GetPos())
+	self:SetParent(env)
+	self.sbenv = env
+	env:SBEnvPhysics(self)
 	self:SetTrigger(true)
 	self:PhysWake()
+end
+
+function ENT:OnRemove()
+	for ent, _ in pairs(self.TouchTable) do
+		self:EndTouch(ent)
+	end
+	self.TouchTable = {}
 end
 
 function ENT:StartTouch(ent)

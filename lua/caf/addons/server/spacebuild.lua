@@ -844,6 +844,11 @@ function SB.PerformEnvironmentCheckOnEnt(ent)
 	local environment = sb_space.Get() --restore to default before doing the Environment checks
 
 	for env, _ in pairs(ent.SBInEnvironments) do
+		if not IsValid(env) then
+			ent.SBInEnvironments[env] = nil
+			continue
+		end
+
 		if env ~= ent and env:IsPreferredOver(environment) then
 			environment = env
 		end
