@@ -26,7 +26,6 @@ CreateConVar("SB_NoClip", "1")
 CreateConVar("SB_PlanetNoClipOnly", "1")
 CreateConVar("SB_AdminSpaceNoclip", "1")
 CreateConVar("SB_SuperAdminSpaceNoclip", "1")
-CreateConVar("SB_StaticEnvironment", "0")
 
 local VolCheckIterations = CreateConVar("SB_VolumeCheckIterations", "11", {FCVAR_CHEAT, FCVAR_ARCHIVE})
 
@@ -241,31 +240,15 @@ function sb_space.Get()
 
 	function space:UpdateGravity(ent)
 		if not ent then return end
+		if ent.gravity and ent.gravity == 0 then return end
+		ent.gravity = 0
+
 		local phys = ent:GetPhysicsObject()
 		if not phys:IsValid() then return end
-		local trace = {}
-		local pos = ent:GetPos()
-		trace.start = pos
-		trace.endpos = pos - Vector(0, 0, 512)
 
-		trace.filter = {ent}
-
-		local tr = util.TraceLine(trace)
-
-		if tr.Hit and tr.Entity.grav_plate == 1 and (not ent.grav_plate or ent.grav_plate ~= 1) then
-			ent:SetGravity(1)
-			ent.gravity = 1
-			phys:EnableGravity(true)
-			phys:EnableDrag(true)
-
-			return
-		end
-
-		if ent.gravity and ent.gravity == 0 then return end
 		phys:EnableGravity(false)
 		phys:EnableDrag(false)
 		ent:SetGravity(0.00001)
-		ent.gravity = 0
 	end
 
 	function space:GetPriority()
@@ -847,13 +830,13 @@ end
 CAF.RegisterAddon("Spacebuild", SB, "1")
 
 --Thinks Checks
---local time_count = 0;
---local time_amount = 0;
+--local time_count = 0
+--local time_amount = 0
 function SB.PerformEnvironmentCheck()
 	if SB_InSpace == 0 then return end
 
 	--local begintime = CAF.begintime()
-	--local amount = #sb_spawned_entities;
+	--local amount = #sb_spawned_entities
 	for k, ent in ipairs(sb_spawned_entities) do
 		if ent and IsValid(ent) and not ent.IsEnvironment then
 			SB.PerformEnvironmentCheckOnEnt(ent)
@@ -869,17 +852,15 @@ end
 
 function SB.PerformEnvironmentCheckOnEnt(ent)
 	if not ent then return end
+	if ent.SkipSBChecks then return end
 
 	if not ent:IsPlayer() or SB.PlayerOverride == 0 then
-		--if ent.environment ~= sb_space.Get() then
 		local space = sb_space.Get()
 		local environment = space --restore to default before doing the Environment checks
 		local oldenvironment = ent.environment
 
-		--end
 		for k, v in pairs(Planets) do
 			if v and v:IsValid() then
-				--Msg("Checking planet\n")
 				environment = v:OnEnvironment(ent, environment, space) or environment
 			else
 				table.remove(Planets, k)
@@ -905,15 +886,14 @@ function SB.PerformEnvironmentCheckOnEnt(ent)
 		end
 
 		if oldenvironment ~= environment then
-			--Msg("Changing environment\n")
 			ent.environment = environment
 			SB.OnEnvironmentChanged(ent)
 		elseif oldenvironment ~= ent.environment then
 			ent.environment = oldenvironment
 		end
 
-		ent.environment:UpdateGravity(ent) --Always update gravity!!
-		ent.environment:UpdatePressure(ent) -- Should pressure even be here (appart from for players?)
+		ent.environment:UpdateGravity(ent)
+		ent.environment:UpdatePressure(ent)
 	end
 
 	if ent:IsPlayer() then

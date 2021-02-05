@@ -172,30 +172,18 @@ function ENT:OnEnvironment(ent, environment, space)
 	local cen = self:GetPos()
 	local size = self:GetSize()
 
-	local dist = (pos - self:GetPos()):LengthSqr()
 	if (pos.x < cen.x + size and pos.x > cen.x - size) and (pos.y < cen.y + size and pos.y > cen.y - size) and (pos.z < cen.z + size and pos.z > cen.z - size) then
-		--if dist < (self:GetSize()*1.5) then
-		--	local min = pos - Vector(self:GetSize(),self:GetSize(),self:GetSize())
-		--	local max = pos + Vector(self:GetSize(),self:GetSize(),self:GetSize())
-		--	if table.HasValue(ents.FindInBox( min, max ), ent) then
 		if environment == space then
-			environment = self
-		else
-			if environment:GetPriority() < self:GetPriority() then
-				environment = self
-			elseif environment:GetPriority() == self:GetPriority() then
-				if environment:GetSize() ~= 0 then
-					if self:GetSize() <= environment:GetSize() then
-						environment = self
-					elseif dist < (pos - environment:GetPos()):LengthSqr() then
-						environment = self
-					end
-				else
-					environment = self
-				end
-			end
+			return self
 		end
-		--end
+
+		if environment:GetPriority() < self:GetPriority() then
+			return self
+		end
+
+		if environment:GetPriority() == self:GetPriority() and (environment:GetSize() == 0 or self:GetSize() <= environment:GetSize()) then
+			return self
+		end
 	end
 
 	return environment

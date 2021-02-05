@@ -476,10 +476,10 @@ function ENT:GetSBGravity()
 	return self.sbenvironment.gravity or 0
 end
 
+local SB = CAF.GetAddon("Spacebuild")
 function ENT:UpdatePressure(ent)
-	local sb = CAF.GetAddon("Spacebuild")
-	if not ent or sb.Override_PressureDamage > 0 then return end
-	if ent:IsPlayer() and sb.PlayerOverride > 0 then return end
+	if not ent or SB.Override_PressureDamage > 0 then return end
+	if ent:IsPlayer() and SB.PlayerOverride > 0 then return end
 
 	if self.sbenvironment.pressure and self.sbenvironment.pressure > 1.5 then
 		ent:TakeDamage((self.sbenvironment.pressure - 1.5) * 10)
@@ -498,7 +498,6 @@ function ENT:Convert(air1, air2, value)
 	if air2 < -1 or air2 > 3 then return 0 end
 	if air1 == air2 then return 0 end
 	if value < 1 then return 0 end
-	if GetConVar("SB_StaticEnvironment"):GetBool() then return value end --Don't do anything else anymore
 
 	if air1 == -1 then
 		if self.sbenvironment.air.empty < value then
@@ -587,39 +586,20 @@ end
 
 function ENT:UpdateGravity(ent)
 	if not ent then return end
+	if ent.gravity and ent.gravity == self.sbenvironment.gravity then
+		return
+	end
+	ent.gravity = self.sbenvironment.gravity or 0
+
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() or (ent.IgnoreGravity and ent.IgnoreGravity == true) then return end
 
-	if self.sbenvironment.gravity == 0 then
-		local trace = {}
-		local pos = ent:GetPos()
-		trace.start = pos
-		trace.endpos = pos - Vector(0, 0, 512)
-
-		trace.filter = {ent}
-
-		local tr = util.TraceLine(trace)
-
-		if tr.Hit and tr.Entity.grav_plate == 1 then
-			ent:SetGravity(1)
-			ent.gravity = 1
-			phys:EnableGravity(true)
-			phys:EnableDrag(true)
-
-			return
-		end
-	elseif ent.gravity and ent.gravity == self.sbenvironment.gravity then
-		return
-	end
-
-	if not self.sbenvironment.gravity or self.sbenvironment.gravity == 0 then
+	if ent.gravity == 0 then
 		phys:EnableGravity(false)
 		phys:EnableDrag(false)
 		ent:SetGravity(0.00001)
-		ent.gravity = 0
 	else
-		ent:SetGravity(self.sbenvironment.gravity)
-		ent.gravity = self.sbenvironment.gravity
+		ent:SetGravity(ent.gravity)
 		phys:EnableGravity(true)
 		phys:EnableDrag(true)
 	end
@@ -1028,16 +1008,9 @@ function ENT:OnEnvironment(ent, environment, space)
 	if environment:GetPriority() < self:GetPriority() then
 		return self
 	end
-		--self:UpdateGravity(ent)
-	if environment:GetPriority() == self:GetPriority() and environment:GetSize() ~= 0 then
-		if self:GetSize() <= environment:GetSize() then
-			return self
-			--self:UpdateGravity(ent)
-		end
 
-		if dist2 < (pos - environment:GetPos()):LengthSqr() then
-			return self
-		end
+	if environment:GetPriority() == self:GetPriority() and (environment:GetSize() == 0 or self:GetSize() <= environment:GetSize()) then
+		return self
 	end
 
 	return environment
@@ -1045,9 +1018,11 @@ end
 
 function ENT:PosInEnvironment(pos, other)
 	if other and other == self then return other end
-	local dist = pos:Distance(self:GetPos())
+	local dist2 = (pos - self:GetPos()):LengthSqr()
+	local size = self:GetSize()
+	local size2 = size * size
 
-	if dist < self:GetSize() then
+	if dist2 < size2 then
 		if other then
 			if other:GetPriority() < self:GetPriority() then
 				return self
