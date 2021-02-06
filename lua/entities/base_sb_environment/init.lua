@@ -58,8 +58,17 @@ end
 
 function ENT:SBEnvPhysics(ent)
 	local size = self:GetSize()
-	ent:PhysicsInitSphere(size)
+	local subdivisions = 0
+	if size > 2000 then
+		subdivisions = 2
+	elseif size > 1000 then
+		subdivisions = 1
+	end
+	ent:PhysicsInitConvex(icosphere(subdivisions, size))
 	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
+	ent:SetSolid(SOLID_VPHYSICS)
+	ent:EnableCustomCollisions(true)
+	ent:SetNotSolid(true)
 end
 
 local ignore = {"o2per", "co2per", "nper", "hper", "emptyper", "max"}
