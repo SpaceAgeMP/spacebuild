@@ -25,6 +25,7 @@ function ENT:SBEnvPhysics(ent)
 	local size = self:GetSize()
 	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
 	ent:PhysicsInitBox(Vector(-size, -size, -size), Vector(size, size, size))
+	ent:SetNotSolid(true)
 end
 
 function ENT:GetSunburn()
