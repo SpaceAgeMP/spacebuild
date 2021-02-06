@@ -11,6 +11,10 @@ function ENT:Initialize()
 	self.TouchTable = {}
 end
 
+function ENT:UpdateTransmitState()	
+	return TRANSMIT_NEVER
+end
+
 function ENT:ResetTouchTable()
 	for ent, _ in pairs(self.TouchTable) do
 		self:EndTouch(ent)
@@ -24,8 +28,14 @@ function ENT:SetEnvironment(env)
 	self:SetParent(env)
 	self.sbenv = env
 	env:SBEnvPhysics(self)
+
+	local phys = self:GetPhysicsObject()
+	phys:EnableMotion(false)
+	phys:EnableGravity(false)
+	phys:EnableDrag(false)
+	phys:Wake()
+
 	self:SetTrigger(true)
-	self:PhysWake()
 end
 
 function ENT:OnRemove()
