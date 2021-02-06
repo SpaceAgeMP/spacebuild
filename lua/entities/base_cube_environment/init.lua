@@ -23,9 +23,6 @@ end
 
 function ENT:SBEnvPhysics(ent)
 	local size = self:GetSize()
-	if size == 0 then
-		return false
-	end
 	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
 	ent:PhysicsInitBox(Vector(-size, -size, -size), Vector(size, size, size))
 end
