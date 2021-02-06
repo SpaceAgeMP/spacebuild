@@ -41,9 +41,13 @@ function ENT:Initialize()
 end
 
 function ENT:SBEnvPhysics(ent)
-	local size = self:GetSize()
+	local size = math.floor(self:GetSize())
+	local subdivisions = 0
+	local v = icosphere(subdivisions, size)
+	ent:PhysicsInitConvex(v)
 	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
-	ent:PhysicsInitBox(Vector(-size, -size, -size), Vector(size, size, size))
+	ent:SetSolid(SOLID_VPHYSICS)
+	ent:EnableCustomCollisions(true)
 	ent:SetNotSolid(true)
 end
 
