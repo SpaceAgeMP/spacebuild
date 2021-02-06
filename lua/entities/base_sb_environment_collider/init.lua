@@ -13,7 +13,7 @@ function ENT:Initialize()
 	self.TouchTable = {}
 end
 
-function ENT:UpdateTransmitState()	
+function ENT:UpdateTransmitState()
 	return TRANSMIT_NEVER
 end
 
