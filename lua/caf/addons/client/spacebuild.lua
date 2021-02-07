@@ -247,7 +247,6 @@ function SB.Space_Affect_Cl()
 
 		if plypos:Distance(ppos) < p.radius then
 			if not ply.planet or ply.planet ~= ent then
-				ply:ChatPrint("Entering " .. tostring(p.name))
 				SetBloom(p)
 				SetColor(p)
 				ply.planet = ent
