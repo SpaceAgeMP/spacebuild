@@ -76,11 +76,7 @@ function ENT:SBEnvPhysics(ent)
 		local subdivisions = 0
 		if not self.UserCreatedEnvironment then
 			print("[SB3] Map environment", self.sbenvironment.name, " with size", size, " needed custom mesh!")
-			if size > 2000 then
-				subdivisions = 2
-			elseif size > 1000 then
-				subdivisions = 1
-			end
+			subdivisions = 2
 		end
 		local v = icosphere(subdivisions, size)
 		ent:PhysicsInitConvex(v)
