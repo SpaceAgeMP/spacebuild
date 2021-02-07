@@ -56,19 +56,38 @@ function ENT:SBUpdatePhysics()
 	self.physEnt:SetEnvironment(self)
 end
 
+local HAVE_COLLIDER_MODELS = file.Exists("models/colliders/59_00/icosphere_5999.mdl", "GAME")
+if HAVE_COLLIDER_MODELS then
+	print("[SB3] Found collider model set!")
+else
+	print("[SB3] Did not find collider model set!")
+end
+
 function ENT:SBEnvPhysics(ent)
 	local size = math.floor(self:GetSize())
-	local subdivisions = 0
-	if size > 2000 then
-		subdivisions = 2
-	elseif size > 1000 then
-		subdivisions = 1
+	if size < 1 then
+		size = 1
 	end
-	local v = icosphere(subdivisions, size)
-	ent:PhysicsInitConvex(v)
-	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
+	if HAVE_COLLIDER_MODELS and size < 6000 then
+		local mdl = "models/colliders/" .. math.floor(size / 100) .. "_00/icosphere_" .. size .. ".mdl"
+		ent:SetModel(mdl)
+		ent:PhysicsInit(SOLID_VPHYSICS)
+	else
+		local subdivisions = 0
+		if not self.UserCreatedEnvironment then
+			print("[SB3] Map environment", self.sbenvironment.name, " with size", size, " needed custom mesh!")
+			if size > 2000 then
+				subdivisions = 2
+			elseif size > 1000 then
+				subdivisions = 1
+			end
+		end
+		local v = icosphere(subdivisions, size)
+		ent:PhysicsInitConvex(v)
+		ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
+		ent:EnableCustomCollisions(true)
+	end
 	ent:SetSolid(SOLID_VPHYSICS)
-	ent:EnableCustomCollisions(true)
 	ent:SetNotSolid(true)
 end
 
