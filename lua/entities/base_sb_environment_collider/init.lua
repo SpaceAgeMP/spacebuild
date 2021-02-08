@@ -5,10 +5,10 @@ include("shared.lua")
 local SB = CAF.GetAddon("Spacebuild")
 
 function ENT:Initialize()
-	self:AddEFlags(EFL_FORCE_CHECK_TRANSMIT)
-	self:AddEFlags(EFL_SERVER_ONLY)
 	self:DrawShadow(false)
 	self:SetNoDraw(true)
+	self:AddEFlags(EFL_FORCE_CHECK_TRANSMIT)
+	self:AddEFlags(EFL_SERVER_ONLY)
 	self:SetMoveType(MOVETYPE_NONE)
 	self.TouchTable = {}
 end
