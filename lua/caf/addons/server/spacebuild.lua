@@ -77,13 +77,17 @@ end
 local function PlayerInitialSpawn(ply)
 	if Planets then
 		for k, v in pairs(Planets) do
-			v:SendData(ply)
+			if IsValid(v) then
+				v:SendData(ply)
+			end
 		end
 	end
 
 	if Stars then
 		for k, v in pairs(Stars) do
-			v:SendSunBeam(ply)
+			if IsValid(v) then
+				v:SendSunBeam(ply)
+			end
 		end
 	end
 end
