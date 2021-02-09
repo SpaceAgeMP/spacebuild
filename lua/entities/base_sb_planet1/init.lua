@@ -183,7 +183,7 @@ function ENT:SendData(ply)
 	net.WriteString(self:GetEnvironmentName())
 	net.WriteFloat(self.sbenvironment.size)
 
-	if self.sbenvironment.bloom ~= nil then
+	if self.sbenvironment.bloom and self.sbenvironment.bloom.Col_r then
 		net.WriteBool(true)
 		net.WriteInt(self.sbenvironment.bloom.Col_r or 0, 16)
 		net.WriteInt(self.sbenvironment.bloom.Col_g or 0, 16)
@@ -198,7 +198,7 @@ function ENT:SendData(ply)
 		net.WriteBool(false)
 	end
 
-	if self.sbenvironment.color ~= nil then
+	if self.sbenvironment.color and self.sbenvironment.color.Color then
 		net.WriteBool(true)
 		net.WriteInt(self.sbenvironment.color.AddColor_r or 0, 16)
 		net.WriteInt(self.sbenvironment.color.AddColor_g or 0, 16)
