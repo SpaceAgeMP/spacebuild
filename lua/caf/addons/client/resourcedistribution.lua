@@ -1,13 +1,17 @@
 ﻿local RD = {}
 --local ent_table = {};
-local resourcenames = {}
-local resources = {}
+
 local status = false
 local rd_cache = cache.create(1, false) --Store data for 1 second
 --[[
 
 ]]
 --local functions
+
+_G.RD = RD
+include("caf/addons/shared/resourcedistribution.lua")
+_G.RD = nil
+
 RD_OverLay_Distance = CreateClientConVar("rd_overlay_distance", "512", false, false)
 RD_OverLay_Mode = CreateClientConVar("rd_overlay_mode", "-1", false, false)
 local client_chosen_number = CreateClientConVar("number_to_send", "1", false, false)
@@ -34,6 +38,14 @@ end
 
 local function ReadLong()
 	return net.ReadInt(32)
+end
+
+local function ReadResource()
+	local id = net.ReadUInt(8)
+	if id == 0 then
+		return net.ReadString()
+	end
+	return RD.GetResourceNameByID(id)
 end
 
 local dev = GetConVar("developer")
@@ -64,7 +76,7 @@ local function AddEntityToCache(nrofbytes)
 
 		for i = 1, nr_of_resources do
 			--print(i)
-			resource = net.ReadString()
+			resource = ReadResource()
 			maxvalue = ReadLong()
 			value = ReadLong()
 			temperature = net.ReadFloat()
@@ -93,6 +105,7 @@ local function AddNetworkToCache(nrofbytes)
 
 	if up_to_date then
 		rd_cache:update("network_" .. tostring(data.netid))
+		return
 	end
 
 	data.resources = {}
@@ -104,27 +117,18 @@ local function AddNetworkToCache(nrofbytes)
 		local maxvalue
 		local value
 		local temperature
-		local localmaxvalue
-		local localvalue
-		local localtemperature
 
 		for _ = 1, nr_of_resources do
 			--print(i)
-			resource = net.ReadString()
+			resource = ReadResource()
 			maxvalue = ReadLong()
 			value = ReadLong()
 			temperature = net.ReadFloat()
-			localmaxvalue = ReadLong()
-			localvalue = ReadLong()
-			localtemperature = net.ReadFloat()
 
 			data.resources[resource] = {
 				value = value,
 				maxvalue = maxvalue,
 				temperature = temperature,
-				localvalue = localvalue,
-				localmaxvalue = localmaxvalue,
-				localtemperature = localtemperature
 			}
 		end
 	end
@@ -153,7 +157,7 @@ net.Receive("RD_Network_Data", AddNetworkToCache)
 ]]
 function RD.__Construct()
 	status = true
-	--return false , "No Implementation yet"
+	RD:__AddResources()
 
 	return true
 end
@@ -163,7 +167,6 @@ end
 ]]
 function RD.__Destruct()
 	status = false
-	--return false , "No Implementation yet"
 
 	return true
 end
@@ -308,33 +311,6 @@ function RD.GetNetTable(netid)
 end
 
 --TODO UPDATE TO HERE
-function RD.AddProperResourceName(resource, name)
-	if not resource or not name then return end
-
-	if not table.HasValue(resources, resource) then
-		table.insert(resources, resource)
-	end
-
-	resourcenames[resource] = name
-end
-
-function RD.GetProperResourceName(resource)
-	if not resource then return "" end
-	if resourcenames[resource] then return resourcenames[resource] end
-
-	return resource
-end
-
-function RD.GetAllRegisteredResources()
-	if not resourcenames or table.Count(resourcenames) < 0 then return {} end
-
-	return table.Copy(resourcenames)
-end
-
-function RD.GetRegisteredResources()
-	return table.Copy(resources)
-end
-
 
 function RD.PrintDebug(ent)
 	if ent then

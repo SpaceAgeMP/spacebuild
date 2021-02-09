@@ -97,13 +97,6 @@ function LS.__Construct()
 		LSSpawnFunc(ply)
 	end
 
-	RD.AddProperResourceName("energy", CAF.GetLangVar("Energy"))
-	RD.AddProperResourceName("water", CAF.GetLangVar("Water"))
-	RD.AddProperResourceName("nitrogen", CAF.GetLangVar("Nitrogen"))
-	RD.AddProperResourceName("hydrogen", CAF.GetLangVar("Hydrogen"))
-	RD.AddProperResourceName("oxygen", CAF.GetLangVar("Oxygen"))
-	RD.AddProperResourceName("carbon dioxide", CAF.GetLangVar("Carbon Dioxide"))
-	RD.AddProperResourceName("heavy water", CAF.GetLangVar("Heavy Water"))
 	hook.Add("PlayerInitialSpawn", "LS_Core_SpawnFunc", LSSpawnFunc)
 	hook.Add("PlayerSpawn", "LS_Core_ResetSpawnFunc", LSResetSpawnFunc)
 	hook.Add("CAFOnAddonDestruct", "LSAddonDisable", AddonDisabled)

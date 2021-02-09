@@ -1,6 +1,8 @@
 ﻿include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+local RD = CAF.GetAddon("Resource Distribution")
+
 surface.CreateFont("ConflictText", {
 	font = "Verdana",
 	size = 60,
@@ -16,7 +18,7 @@ surface.CreateFont("Flavour", {
 function ENT:Draw(bDontDrawModel)
 	self:DoNormalDraw()
 	--draw beams by MadDog
-	CAF.GetAddon("Resource Distribution").Beam_Render(self)
+	RD.Beam_Render(self)
 
 	if Wire_Render then
 		Wire_Render(self)
@@ -61,8 +63,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	end
 
 	local netid = self:GetNWInt("netid")
-	local rd = CAF.GetAddon("Resource Distribution")
-	local nettable = rd.GetNetTable(netid)
+	local nettable = RD.GetNetTable(netid)
 	local range = self:GetNWInt("range")
 	local playername = self:GetPlayerName()
 	local nodename = self:GetNWString("rd_node_name")
@@ -104,7 +105,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 
 			if table.Count(resources) > 0 then
 				for k, v in pairs(resources) do
-					OverlayText = OverlayText .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
+					OverlayText = OverlayText .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "\n"
 				end
 			else
 				OverlayText = OverlayText .. "No Resources Connected\n"
@@ -205,7 +206,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 					surface.SetTextColor(200, 200, 255, 255)
 					local amt = v.value / v.maxvalue
 					surface.SetTextPos(textStartPos + 15, TempY)
-					surface.DrawText("   " .. rd.GetProperResourceName(k))
+					surface.DrawText("   " .. RD.GetProperResourceName(k))
 					surface.DrawOutlinedRect(-20, TempY - 5, -2 * textStartPos + 20, 40)
 					surface.DrawRect(-20, TempY - 5, ((-2 * textStartPos) + 20) * amt, 40)
 					TempY = TempY + 50
@@ -220,7 +221,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 						surface.DrawText(v.value)
 					end
 				else
-					stringUsage = stringUsage .. "[" .. rd.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
+					stringUsage = stringUsage .. "[" .. RD.GetProperResourceName(k) .. ": " .. v.value .. "/" .. v.maxvalue .. "] "
 					i = i + 1
 
 					if i == 3 then

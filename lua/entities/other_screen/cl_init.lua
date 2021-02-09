@@ -2,13 +2,13 @@
 language.Add("other_screen", "Life Support Screen")
 local MainFrames = {}
 
+local RD = CAF.GetAddon("Resource Distribution")
+
 function ENT:Initialize()
 	self.resources = {}
 end
 
 local function loadSelectedResourcesTree(ent)
-	local RD = CAF.GetAddon("Resource Distribution")
-
 	if MainFrames[ent:EntIndex()] and MainFrames[ent:EntIndex()]:IsVisible() then
 		local LeftTree = MainFrames[ent:EntIndex()].lefttree
 		LeftTree:Clear()
@@ -36,7 +36,6 @@ local function OpenMenu()
 	MainFrame:SetTitle("LS Screen Control Panel")
 	MainFrame:SetSize(600, 350)
 	MainFrame:Center()
-	local RD = CAF.GetAddon("Resource Distribution")
 	local resources = RD.GetRegisteredResources()
 	local res2 = RD.GetAllRegisteredResources()
 
@@ -186,9 +185,7 @@ function ENT:DoNormalDraw(bDontDrawModel)
 		return
 	end
 
-	local rd = CAF.GetAddon("Resource Distribution")
-
-	local enttable = rd.GetEntityTable(self)
+	local enttable = RD.GetEntityTable(self)
 	local TempY = 0
 	local mul_up = 5.2
 	local mul_ri = -16.5
@@ -237,35 +234,19 @@ function ENT:DoNormalDraw(bDontDrawModel)
 	surface.SetFont("Flavour")
 	surface.SetTextColor(200, 200, 255, 255)
 	surface.SetTextPos(textStartPos + 15, TempY)
-	surface.DrawText("Resource: amount/maxamount\t[amount/maxamount in other nodes]")
+	surface.DrawText("Resource: amount/maxamount")
 	TempY = TempY + (70 / mul)
 
 
 	if table.Count(self.resources) > 0 then
 		local i = 0
 
-		local nettable = enttable.network and enttable.network ~= 0 and rd.GetNetTable(enttable.network)
-
 		for k, v in pairs(self.resources) do
 			surface.SetTextPos(textStartPos + 15, TempY)
-			local firstNetworkCapacity = 0
-			local firstNetworkAmount = 0
-			local otherNetworksCapacity = 0
-			local otherNetworksAmount = 0
+			local networkCapacity = RD.GetNetNetworkCapacity(enttable.network, v)
+			local networkAmount = RD.GetNetResourceAmount(enttable.network, v)
 
-			if nettable then
-				if nettable.resources and nettable.resources[v] then
-					firstNetworkCapacity = nettable.resources[v].localmaxvalue or 0
-					firstNetworkAmount = nettable.resources[v].localvalue or 0
-					otherNetworksCapacity = rd.GetNetNetworkCapacity(enttable.network, v) - firstNetworkCapacity
-					otherNetworksAmount = rd.GetNetResourceAmount(enttable.network, v) - firstNetworkAmount
-				else
-					otherNetworksCapacity = rd.GetNetNetworkCapacity(enttable.network, v)
-					otherNetworksAmount = rd.GetNetResourceAmount(enttable.network, v)
-				end
-			end
-
-			surface.DrawText(tostring(rd.GetProperResourceName(v)) .. ": " .. tostring(firstNetworkAmount) .. "/" .. tostring(firstNetworkCapacity) .. "\t[" .. tostring(otherNetworksAmount) .. "/" .. tostring(otherNetworksCapacity) .. "]")
+			surface.DrawText(tostring(RD.GetProperResourceName(v)) .. ": " .. tostring(networkAmount) .. "/" .. tostring(networkCapacity))
 			TempY = TempY + (70 / mul)
 			i = i + 1
 			if i >= 8 * mul then break end

@@ -2,9 +2,14 @@
 local nettable = {}
 local ent_table = {}
 local resourcenames = {}
+local resourceids = {}
 local resources = {}
 local status = false
 local rd_cache = cache.create(1, true) --Store data for 1 second
+
+_G.RD = RD
+include("caf/addons/shared/resourcedistribution.lua")
+_G.RD = nil
 
 --Local functions/variables
 --Precache some sounds for snapping
@@ -27,6 +32,14 @@ local function WriteLong(long)
 	return net.WriteInt(long, 32)
 end
 
+local function WriteResource(name)
+	local id = RD.GetResourceID(name) or 0
+	net.WriteUInt(id, 8)
+	if id == 0 then
+		net.WriteString(name)
+	end
+end
+
 util.AddNetworkString("RD_Entity_Data")
 
 local function sendEntityData(ply, entid, rddata)
@@ -37,7 +50,7 @@ local function sendEntityData(ply, entid, rddata)
 	WriteShort(table.Count(rddata.resources)) --How many resources are going to be send?
 
 	for l, w in pairs(rddata.resources) do
-		net.WriteString(l)
+		WriteResource(l)
 		WriteLong(w.maxvalue)
 		WriteLong(w.value)
 		net.WriteFloat(w.temperature)
@@ -55,17 +68,14 @@ util.AddNetworkString("RD_Network_Data")
 local function sendNetworkData(ply, netid, rddata)
 	net.Start("RD_Network_Data")
 	WriteShort(netid) --send key to update
-	WriteBool(false) --Update
+	WriteBool(false) --Up to date
 	WriteShort(table.Count(rddata.resources)) --How many resources are going to be send?
 
 	for l, w in pairs(rddata.resources) do
-		net.WriteString(l)
+		WriteResource(l)
 		WriteLong(w.maxvalue)
 		WriteLong(w.value)
 		net.WriteFloat(w.temperature)
-		WriteLong(w.localmaxvalue)
-		WriteLong(w.localvalue)
-		net.WriteFloat(w.localtemperature)
 	end
 
 	local nr_of_cons = #rddata.cons
@@ -185,14 +195,10 @@ local function RequestResourceData(_, ply)
 
 			for k, v in pairs(tmpdata.resources) do
 				local value, maxvalue, temperature = RD.GetNetResourceData(id, k)
-				local localvalue, localmaxvalue, localtemperature = RD.GetNetResourceData(id, k, false)
 				data.resources[k] = {
 					value = value,
 					temperature = temperature,
-					maxvalue = maxvalue,
-					localvalue = localvalue,
-					localtemperature = localtemperature,
-					localmaxvalue = localmaxvalue
+					maxvalue = maxvalue
 				}
 			end
 
@@ -241,6 +247,8 @@ function RD.__Construct()
 	ClearEntities()
 	nettable = {}
 	ent_table = {}
+
+	RD:__AddResources()
 
 	for k, ply in pairs(player.GetAll()) do
 		SendEntireNetWorkToClient(ply)
@@ -1265,33 +1273,6 @@ end
 
 function RD.GetNetTable(netid)
 	return nettable[netid] or {}
-end
-
-function RD.AddProperResourceName(resource, name)
-	if not resource or not name then return end
-
-	if not table.HasValue(resources, resource) then
-		table.insert(resources, resource)
-	end
-
-	resourcenames[resource] = name
-end
-
-function RD.GetProperResourceName(resource)
-	if not resource then return "" end
-	if resourcenames[resource] then return resourcenames[resource] end
-
-	return resource
-end
-
-function RD.GetAllRegisteredResources()
-	if not resourcenames or table.Count(resourcenames) < 0 then return {} end
-
-	return table.Copy(resourcenames)
-end
-
-function RD.GetRegisteredResources()
-	return table.Copy(resources)
 end
 
 function RD.GetNetworkIDs()
