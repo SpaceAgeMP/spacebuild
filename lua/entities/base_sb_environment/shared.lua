@@ -8,3 +8,4 @@ ENT.Purpose = "Base for all Spacebuild Environment"
 ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
+ENT.DoNotDuplicate = true

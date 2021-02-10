@@ -6,3 +6,4 @@ ENT.Purpose = "Collider"
 ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
+ENT.DoNotDuplicate = true
