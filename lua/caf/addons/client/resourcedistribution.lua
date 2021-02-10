@@ -366,16 +366,16 @@ function RD.Beam_Render(ent)
 		--loop through all beams
 		for i = 1, intBeams do
 			--get beam data
-			local beam, ent = ent:GetNWVector("Beam" .. tostring(i)), ent:GetNWEntity("BeamEnt" .. tostring(i))
+			local beam, subent = ent:GetNWVector("Beam" .. tostring(i)), ent:GetNWEntity("BeamEnt" .. tostring(i))
 
 			--if no beam break for statement
-			if not beam or not ent or not ent:IsValid() then
+			if not beam or not subent or not subent:IsValid() then
 				ent:SetNWInt("Beams", 0)
 				break
 			end
 
 			--get beam world vector
-			local pos = ent:LocalToWorld(beam)
+			local pos = subent:LocalToWorld(beam)
 			--update scroll
 			scroll = scroll - (pos - start):Length() / 10
 			-- add point

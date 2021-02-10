@@ -962,7 +962,6 @@ end
 local function MyRestoreFunction(restore)
 	print("Calling RD Restore method")
 	local data = saverestore.ReadTable(restore)
-	PrintTable(data)
 	nettable = data.net
 	ent_table = data.ents
 
@@ -992,11 +991,11 @@ function RD.BuildDupeInfo(ent)
 
 	if ent.IsPump then
 		if ent.netid ~= 0 then
-			local nettable = RD.GetNetTable(ent.netid)
+			local nettable1 = RD.GetNetTable(ent.netid)
 
-			if nettable.nodeent then
+			if nettable1.nodeent then
 				local info = {}
-				info.node = nettable.nodeent:EntIndex()
+				info.node = nettable1.nodeent:EntIndex()
 				duplicator.ClearEntityModifier(ent, "RDPumpDupeInfo")
 				duplicator.StoreEntityModifier(ent, "RDPumpDupeInfo", info)
 			end
@@ -1030,10 +1029,10 @@ function RD.BuildDupeInfo(ent)
 
 		--store node info
 		if ent.connected.node and ent.connected.node.netid ~= 0 then
-			local nettable = RD.GetNetTable(ent.connected.node.netid)
+			local nettable1 = RD.GetNetTable(ent.connected.node.netid)
 
-			if nettable.nodeent then
-				info.node = nettable.nodeent:EntIndex()
+			if nettable1.nodeent then
+				info.node = nettable1.nodeent:EntIndex()
 			end
 		end
 
@@ -1049,18 +1048,18 @@ function RD.BuildDupeInfo(ent)
 	end
 
 	if not ent.IsNode then return end
-	local nettable = RD.GetNetTable(ent.netid)
+	local nettable1 = RD.GetNetTable(ent.netid)
 	local info = {}
 	--info.resources = table.Copy(nettable.resources)
 	local entids = {}
 
-	for k, v in pairs(nettable.entities) do
+	for k, v in pairs(nettable1.entities) do
 		table.insert(entids, v:EntIndex())
 	end
 
 	local cons = {}
 
-	for k, v in pairs(nettable.cons) do
+	for k, v in pairs(nettable1.cons) do
 		local nettab = RD.GetNetTable(v)
 
 		if nettab and nettab.nodeent and IsValid(nettab.nodeent) then
