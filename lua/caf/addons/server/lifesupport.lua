@@ -659,10 +659,12 @@ end
 
 function Ply:UpdateLSClient()
 	if self.environment then
+		local co2 = self.environment:GetO2Percentage() or -1
+		local temp = self.environment:GetTemperature(self) or -1
 		net.Start("LS_umsg1")
-		net.WriteFloat(self.environment:GetO2Percentage() or -1)
+		net.WriteFloat(co2)
 		net.WriteInt(self.suit.air or -1, 32)
-		net.WriteInt(self.environment:GetTemperature(self) or -1, 32)
+		net.WriteInt(temp, 32)
 		net.WriteInt(self.suit.coolant or -1, 32)
 		net.WriteInt(self.suit.energy or -1, 32)
 		net.Send(self)
