@@ -279,6 +279,10 @@ local requests = {}
 local ttl = 0.2 --Wait 0.2 second before doing a new request
 
 function RD.GetEntityTable(ent)
+	if not IsValid(ent) then
+		return {}
+	end
+
 	local entid = ent:EntIndex()
 	local id = "entity_" .. tostring(entid)
 	local data, needs_update = rd_cache:get(id)
@@ -298,6 +302,10 @@ function RD.GetEntityTable(ent)
 end
 
 function RD.GetNetTable(netid)
+	if not netid then
+		return {}
+	end
+
 	local id = "network_" .. tostring(netid)
 	local data, needs_update = rd_cache:get(id)
 
