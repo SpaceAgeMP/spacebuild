@@ -4,18 +4,6 @@ require("caf_util")
 require("cache")
 local meta = FindMetaTable("Entity")
 
---[[meta.caf = {}
-meta.caf.custom = {}
-meta.caf.custom.canreceivedamage = true
-meta.caf.custom.canreceiveheatdamage = true]]
-function meta:getCustomArmor()
-	return self.caf.custom.armor
-end
-
-function meta:setCustomArmor(armor)
-	self.caf.custom.armor = armor
-end
-
 function meta:WaterLevel2()
 	local waterlevel = self:WaterLevel()
 
