@@ -13,15 +13,6 @@ TOOL.Limit = 10
 CAFToolSetup.SetLang("RD Resource Valves", "Create Resource Valves attached to any surface.", "Left-Click: Spawn a Device.  Reload: Repair Device.")
 TOOL.ExtraCCVars = {}
 
-function TOOL.ExtraCCVarsCP(tool, panel)
-end
-
-function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-
-	return Extra_Data
-end
-
 local function resource_valve_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1 --Change to be 0 by default later on
 	local base_volume = 2272
