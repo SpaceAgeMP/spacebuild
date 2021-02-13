@@ -115,7 +115,7 @@ function ENT:AddExtraResource(res, start, ispercentage)
 				start = available
 			end
 
-			self:ConvertResource(-1, res, start)
+			self:Convert(-1, res, start)
 		end
 	end
 end
@@ -142,86 +142,6 @@ end
 
 function ENT:Repair()
 	self:SetHealth(self:GetMaxHealth())
-end
-
---[[
-	Will try to convert resource 1 to resource 2 for a certain amount
-]]
-function ENT:ConvertResource(res1, res2, amount)
-
-	if not res1 or not res2 or not amount or type(amount) ~= "number" then return 0 end
-
-	if type(res1) == "number" and type(res2) == "number" then
-		return self:Convert(res1, res2, amount)
-	end
-	if type(res1) == "number" then
-		if table.HasValue(ignore, res2) then return 0 end
-
-		if not self.sbenvironment.air[res2] then
-			self:AddExtraResource(res2)
-		end
-
-		if res1 ~= -1 then
-			amount = self:Convert(res1, -1, amount)
-		else
-			local available = self:GetEmptyAir()
-
-			if available < amount then
-				amount = available
-			end
-
-			self.sbenvironment.air.empty = self.sbenvironment.air.empty - amount
-		end
-
-		self.sbenvironment.air[res2] = self.sbenvironment.air[res2] + amount
-	end
-	if type(res2) == "number" then
-		if table.HasValue(ignore, res1) then return 0 end
-
-		if not self.sbenvironment.air[res1] then
-			self:AddExtraResource(res1)
-		end
-
-		local avail = self:GetResourceAmount(res1)
-
-		if avail < amount then
-			amount = avail
-		end
-
-		self.sbenvironment.air[res1] = self.sbenvironment.air[res1] - amount
-		self.sbenvironment.air.empty = self.sbenvironment.air.empty + amount
-
-		if res2 ~= -1 then
-			local amount2 = amount
-			amount = self:Convert(-1, res2, amount)
-
-			if amount2 > amount then
-				self.sbenvironment.air.empty = self.sbenvironment.air.empty - (amount2 - amount)
-				self.sbenvironment.air[res1] = self.sbenvironment.air[res1] + (amount2 - amount)
-			end
-		end
-
-		return amount
-	end
-
-	if table.HasValue(ignore, res2) or table.HasValue(ignore, res1) then return 0 end
-
-	if not self.sbenvironment.air[res1] then
-		self:AddExtraResource(res1)
-	end
-
-	if not self.sbenvironment.air[res2] then
-		self:AddExtraResource(res2)
-	end
-
-	if self.sbenvironment.air[res1] < amount then
-		amount = self.sbenvironment.air[res1]
-	end
-
-	self.sbenvironment.air[res1] = self.sbenvironment.air[res1] - amount
-	self.sbenvironment.air[res2] = self.sbenvironment.air[res2] + amount
-
-	return amount
 end
 
 function ENT:GetResourceAmount(res)
