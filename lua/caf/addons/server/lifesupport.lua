@@ -618,11 +618,10 @@ function Ply:LsCheck()
 end
 
 function Ply:UpdateLSClient()
+	local temp = self.environment:GetTemperature(self) or -1 -- this cannot be inlined due to side effects..
 	if self.environment then
-		local co2 = self.environment:GetO2Percentage() or -1
-		local temp = self.environment:GetTemperature(self) or -1
 		net.Start("LS_umsg1")
-		net.WriteFloat(co2)
+		net.WriteFloat(self.environment:GetO2Percentage() or -1)
 		net.WriteInt(self.suit.air or -1, 32)
 		net.WriteInt(temp, 32)
 		net.WriteInt(self.suit.coolant or -1, 32)

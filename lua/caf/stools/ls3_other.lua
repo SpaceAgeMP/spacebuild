@@ -22,15 +22,6 @@ end
 
 TOOL.ExtraCCVars = {}
 
-function TOOL.ExtraCCVarsCP(tool, panel)
-end
-
-function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-
-	return Extra_Data
-end
-
 local function screen_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1 --Change to be 0 by default later on
 	local base_volume = 11829 --Change to the actual base volume later on

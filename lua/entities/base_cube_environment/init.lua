@@ -23,8 +23,10 @@ end
 
 function ENT:SBEnvPhysics(ent)
 	local size = self:GetSize()
-	ent:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
-	ent:PhysicsInitBox(Vector(-size, -size, -size), Vector(size, size, size))
+	local min = Vector(-size, -size, -size)
+	local max = Vector(size, size, size)
+	ent:SetCollisionBounds(min, max)
+	ent:PhysicsInitBox(min, max)
 	ent:SetNotSolid(true)
 end
 
