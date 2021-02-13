@@ -134,7 +134,7 @@ function ENT:Think()
 	if self.thinkcount == 10 then
 		local SB = CAF.GetAddon("Spacebuild")
 
-		if SB and SB.GetStatus() then
+		if SB then
 			if self.environment then
 				local planet = self.environment:IsOnPlanet()
 

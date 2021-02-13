@@ -1,5 +1,4 @@
 ﻿local LS = {}
-local status = false
 --Stuff that can't be disabled
 CreateConVar("LS_AllowNukeEffect", "1") --Update to something changeable later on
 --end
@@ -60,22 +59,13 @@ local function PlayerLSThink()
 	end
 end
 
-local function AddonDisabled(addon)
-	if not addon then return false end
-
-	if addon == "Resource Distribution" then
-		CAF.Destruct("Life Support")
-	end
-end
-
 -- End Local Functions
 --[[
 	The Constructor for this Custom Addon Class
 ]]
 function LS.__Construct()
-	if status then return false, CAF.GetLangVar("This Addon is already Active!") end
 	RD = CAF.GetAddon("Resource Distribution")
-	if not RD or not RD.GetStatus() then return false, CAF.GetLangVar("Resource Distribution is Required and needs to be Active!") end
+	if not RD then return false, "Resource Distribution is Required and needs to be Active!" end
 	util.PrecacheSound("vehicles/v8/skid_lowfriction.wav")
 	util.PrecacheSound("NPC_Stalker.BurnFlesh")
 	util.PrecacheModel("models/player/charple.mdl")
@@ -99,30 +89,7 @@ function LS.__Construct()
 
 	hook.Add("PlayerInitialSpawn", "LS_Core_SpawnFunc", LSSpawnFunc)
 	hook.Add("PlayerSpawn", "LS_Core_ResetSpawnFunc", LSResetSpawnFunc)
-	hook.Add("CAFOnAddonDestruct", "LSAddonDisable", AddonDisabled)
 	timer.Create("PlayerLSThink", 1, 0, PlayerLSThink)
-	status = true
-
-	return true
-end
-
---[[
-	The Destructor for this Custom Addon Class
-]]
-function LS.__Destruct()
-	if not status then return false, CAF.GetLangVar("This addon wasn't on in the first place") end
-	hook.Remove("PlayerInitialSpawn", "LS_Core_SpawnFunc")
-	hook.Remove("PlayerSpawn", "LS_Core_ResetSpawnFunc")
-	hook.Remove("PlayerSpawnedVehicle", "LS_vehicle_spawn")
-	hook.Remove("CAFOnAddonDestruct", "LSAddonDisable")
-	timer.Remove("PlayerLSThink")
-
-	CAF.GetAddon("Spacebuild").RemoveOverride_PressureDamage()
-
-	LS.generators = {}
-	LS.generators.air = {}
-	LS.generators.temperature = {}
-	status = false
 
 	return true
 end
@@ -135,17 +102,10 @@ function LS.GetRequiredAddons()
 end
 
 --[[
-	Get the Boolean Status from this Addon Class
-]]
-function LS.GetStatus()
-	return status
-end
-
---[[
 	Get the Version of this Custom Addon Class
 ]]
 function LS.GetVersion()
-	return 3.08, CAF.GetLangVar("Beta")
+	return 3.08, "Beta"
 end
 
 function LS.AddResourcesToSend()
@@ -365,7 +325,7 @@ function Ply:LsResetSuit()
 end
 
 function Ply:LsCheck()
-	if not self:IsValid() or not self:Alive() or not LS.GetStatus() then
+	if not self:IsValid() or not self:Alive() then
 		return
 	end
 	local pod = self:GetParent()
@@ -658,8 +618,8 @@ function Ply:LsCheck()
 end
 
 function Ply:UpdateLSClient()
-	local temp = self.environment:GetTemperature(self) or -1 -- this cannot be inlined due to side effects..
 	if self.environment then
+		local temp = self.environment:GetTemperature(self) or -1 -- this cannot be inlined due to side effects..
 		net.Start("LS_umsg1")
 		net.WriteFloat(self.environment:GetO2Percentage() or -1)
 		net.WriteInt(self.suit.air or -1, 32)

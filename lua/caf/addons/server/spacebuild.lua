@@ -10,7 +10,6 @@ util.PrecacheModel("models/player/samzanemesis/MarineSpecial.mdl")
 util.PrecacheModel("models/player/samzanemesis/MarineOfficer.mdl")
 util.PrecacheModel("models/player/samzanemesis/MarineTech.mdl")
 local SB = {}
-local status = false
 --local NextUpdateTime
 local SB_InSpace = 0
 --SetGlobalInt("InSpace", 0)
@@ -26,8 +25,6 @@ CreateConVar("SB_NoClip", "1")
 CreateConVar("SB_PlanetNoClipOnly", "1")
 CreateConVar("SB_AdminSpaceNoclip", "1")
 CreateConVar("SB_SuperAdminSpaceNoclip", "1")
-
-local VolCheckIterations = CreateConVar("SB_VolumeCheckIterations", "11", {FCVAR_CHEAT, FCVAR_ARCHIVE})
 
 local ForceModel = CreateConVar("SB_Force_Model", "0", {FCVAR_ARCHIVE})
 
@@ -705,8 +702,6 @@ end
 	Return false, the reason of why it wasn't able to start
 ]]
 function SB.__Construct()
-	if status then return false, CAF.GetLangVar("This Addon is already Active!") end
-
 	if SB_InSpace == 1 then
 		hook.Add("PlayerNoClip", "SB_PlayerNoClip_Check", PlayerNoClip)
 		hook.Add("PlayerFullLoad", "SB_PlayerInitialSpawn_Check", PlayerInitialSpawn)
@@ -718,30 +713,10 @@ function SB.__Construct()
 			PlayerInitialSpawn(v)
 		end
 
-		status = true
-
 		return true
 	end
 
-	return false, CAF.GetLangVar("Not on a Spacebuild Map!")
-end
-
---[[
-	The Destructor for this Custom Addon Class
-	Required
-	Return true if disabled correctly
-	Return false + the reason if disabling failed
-]]
-function SB.__Destruct()
-	if not status then return false, CAF.GetLangVar("This Addon is already disabled!") end
-	hook.Remove("PlayerNoClip", "SB_PlayerNoClip_Check")
-	hook.Remove("PlayerFullLoad", "SB_PlayerInitialSpawn_Check")
-	hook.Remove("PlayerSetModel", "SB_Force_Model_Check")
-	timer.Remove("SBEnvironmentCheck")
-	ResetGravity()
-	status = false
-
-	return true
+	return false, "Not on a Spacebuild Map!"
 end
 
 --[[
@@ -758,19 +733,11 @@ function SB.GetRequiredAddons()
 end
 
 --[[
-	Get the Boolean Status from this Addon Class
-	Required, used to know if this addon is active or not
-]]
-function SB.GetStatus()
-	return status
-end
-
---[[
 	Get the Version of this Custom Addon Class
 	Optional (but should be put it in most cases!)
 ]]
 function SB.GetVersion()
-	return 3.1, CAF.GetLangVar("Beta")
+	return 3.1, "Beta"
 end
 
 --[[
@@ -977,6 +944,10 @@ function SB.GetEnvironments()
 	return tmp
 end
 
+function SB.AddOverride_PressureDamage()
+	SB.Override_PressureDamage = SB.Override_PressureDamage + 1
+end
+
 --Volume Functions
 --[[
 * @param name
@@ -990,20 +961,16 @@ end
 
 function SB.FindClosestPlanet(pos, starsto)
 	local closestplanet = nil
-	local closestDist
+	local closestDist = 99999999999999
 
 	for k, v in pairs(Planets) do
 		if not IsValid(v) then
 			continue
 		end
-		if not closestplanet then
+		local dist = v:GetPos():Distance(pos) - v:GetSize()
+		if dist < closestDist then
 			closestplanet = v
-		else
-			local dist = v:GetPos():Distance(pos) - v:GetSize()
-			if dist < closestDist then
-				closestplanet = v
-				closestDist = dist
-			end
+			closestDist = dist
 		end
 	end
 

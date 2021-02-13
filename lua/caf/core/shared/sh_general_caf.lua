@@ -67,23 +67,6 @@ function CAF2.LoadVar(name, defaultvalue)
 	return defaultvalue
 end
 
--- END CAF Custom Status Saving
-CAF2.currentlanguage = CAF2.LoadVar("CAF_LANGUAGE", DefaultLang)
-
---[[
-	Returns the boolean status of an Addon
-]]
-function CAF2.GetAddonStatus(AddonName)
-	if not AddonName then return nil, "No AddonName given" end
-
-	if Addons[AddonName] then
-		local ok, status = pcall(Addons[AddonName].GetStatus)
-		if ok then return status end
-	end
-
-	return nil, "No Status Info Found"
-end
-
 --[[
 	Returns the reference to the Custom Addon, nil if not existant
 ]]
@@ -120,10 +103,5 @@ function CAF2.RegisterAddon(AddonName, AddonClass, level)
 end
 
 function CAF2.GetLangVar(name)
-	if CAF2.LANGUAGE then
-		if CAF2.LANGUAGE[CAF.currentlanguage] then return CAF2.LANGUAGE[CAF.currentlanguage][name] or name or "Unknown" end
-		if CAF2.LANGUAGE[DefaultLang] then return CAF2.LANGUAGE[DefaultLang][name] or name or "Unknown" end
-	end
-
-	return name or "Unknown"
+	return CAF2.LANGUAGE[name] or name
 end

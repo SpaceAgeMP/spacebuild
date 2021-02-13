@@ -21,7 +21,6 @@ function PANEL:PerformLayout(w)
 end
 
 function PANEL:Setup(name, addon)
-	local status = false
 	local statustext = "Disabled"
 	self.Status:SetTextColor(Color(255, 0, 0, 200))
 	self.Button:SetText("Enable")
@@ -36,20 +35,6 @@ function PANEL:Setup(name, addon)
 
 	if addon.GetVersion then
 		version, stringversion = addon.GetVersion()
-	end
-
-	if addon.GetStatus then
-		status = addon.GetStatus()
-
-		if status then
-			statustext = "Enabled"
-			self.Status:SetTextColor(Color(0, 255, 0, 200))
-			self.Button:SetText("Disable")
-
-			function self.Button:DoClick()
-				RunConsoleCommand("CAF_Addon_Destruct", name)
-			end
-		end
 	end
 
 	if addon.GetCustomStatus then

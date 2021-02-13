@@ -170,7 +170,7 @@ function ENT:UpdateSize(oldsize, newsize)
 	if oldsize == newsize or (not oldsize) or (not newsize) or (oldsize < 0) or (newsize < 0) then return end
 
 	local sbenvironment = self.sbenvironment
-	local environment = environment
+	local environment = self.environment
 
 	if oldsize == 0 then
 		sbenvironment.size = newsize
@@ -285,7 +285,7 @@ function ENT:Climate_Control()
 	end
 	local energy = self:GetResourceAmount("energy")
 
-	local sizeMultiplier = calcSizeMultiplier(ent)
+	local sizeMultiplier = calcSizeMultiplier(self)
 
 	--Don't have enough power to keep the controler's think process running, shut it all down
 	if energy == 0 or energy < sizeMultiplier * 3  then
