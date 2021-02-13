@@ -49,8 +49,6 @@ end
 CAF2.CAF3 = CAF3
 include("caf/core/shared/sh_general_caf.lua")
 CAF2.CAF3 = nil
--- Synchronize language with gmod interface
-CAF2.SaveVar("CAF_LANGUAGE", GetConVar("gmod_language"):GetString())
 
 local function OnAddonConstruct(name)
 	if not name then return end
@@ -75,13 +73,13 @@ end
 
 --Global function
 function CAF2.WriteToDebugFile(filename, message)
-	if not filename or not message then return nil, CAF.GetLangVar("Missing Argument") end
+	if not filename or not message then return nil, "Missing Argument" end
 
 	print("Filename: " .. tostring(filename) .. ", Message: " .. tostring(message))
 end
 
 function CAF2.ClearDebugFile(filename)
-	if not filename then return nil, CAF.GetLangVar("Missing Argument") end
+	if not filename then return nil, "Missing Argument" end
 	local contents = file.Read("CAF_Debug/client/" .. filename .. ".txt")
 	contents = contents or ""
 	file.Write("CAF_Debug/client/" .. filename .. ".txt", "")
@@ -315,24 +313,6 @@ local function GetClientMenu(contentpanel)
 	lblTitle:SizeToContents()
 	lblTitle:SetPos(x, y)
 	y = y + 20
-	-- Language Selection
-	local lbl = vgui.Create("DLabel", panel)
-	lbl:SetText(CAF2.GetLangVar("Language") .. ":")
-	lbl:SizeToContents()
-	lbl:SetPos(x, y)
-	x = x + lbl:GetWide() + 2
-	--[[local selection = vgui.Create("DMultiChoice", panel)
-	selection:SetPos(x, y);
-	for k, v in pairs(CAF.LANGUAGE) do
-		selection:AddChoice( k ) 
-	end
-	function selection:OnSelect( index, value, data ) 
-		CAF2.currentlanguage = value;
-		CAF2.SaveVar("CAF_LANGUAGE", value)
-		CAF2.Notice(CAF2.GetLangVar("Some Language Changes will only Show after a map reload!"));
-	end
-	selection:SetWide( 150 )
-	
 	
 	y = y + 15
 	x = x - lbl:GetWide() - 5
