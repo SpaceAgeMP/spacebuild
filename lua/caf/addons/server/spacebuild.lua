@@ -738,7 +738,7 @@ function SB.__Construct()
 		return true
 	end
 
-	return false, CAF.GetLangVar("Not on a Spacebuild Map!")
+	return false, "Not on a Spacebuild Map!"
 end
 
 --[[
@@ -759,7 +759,7 @@ end
 	Optional (but should be put it in most cases!)
 ]]
 function SB.GetVersion()
-	return 3.1, CAF.GetLangVar("Beta")
+	return 3.1, "Beta"
 end
 
 --[[

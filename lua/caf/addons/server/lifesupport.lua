@@ -65,7 +65,7 @@ end
 ]]
 function LS.__Construct()
 	RD = CAF.GetAddon("Resource Distribution")
-	if not RD then return false, CAF.GetLangVar("Resource Distribution is Required and needs to be Active!") end
+	if not RD then return false, "Resource Distribution is Required and needs to be Active!" end
 	util.PrecacheSound("vehicles/v8/skid_lowfriction.wav")
 	util.PrecacheSound("NPC_Stalker.BurnFlesh")
 	util.PrecacheModel("models/player/charple.mdl")
@@ -105,7 +105,7 @@ end
 	Get the Version of this Custom Addon Class
 ]]
 function LS.GetVersion()
-	return 3.08, CAF.GetLangVar("Beta")
+	return 3.08, "Beta"
 end
 
 function LS.AddResourcesToSend()

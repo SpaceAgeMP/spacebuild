@@ -387,7 +387,7 @@ end
 	Get the Version of this Custom Addon Class
 ]]
 function LS.GetVersion()
-	return 3.1, CAF.GetLangVar("Beta")
+	return 3.1, "Beta"
 end
 
 local isuptodatecheck
