@@ -108,108 +108,113 @@ end
 local REQUEST_ENT = 1
 local REQUEST_NET = 2
 
-local function RequestResourceData(_, ply)
-	local typ = net.ReadUInt(8)
-	local id = net.ReadUInt(32)
-	local _needsUpdate = net.ReadBool()
+local function requestEntityData(ply, id)
+	local data = rd_cache:get("entity_" .. id)
+	local tmpdata
+	if not data then
+		tmpdata = ent_table[id]
 
-	local data, tmpdata
-
-	if typ == REQUEST_ENT then
-		data = rd_cache:get("entity_" .. id)
-
-		if not data then
-			tmpdata = ent_table[id]
-
-			if not tmpdata then
-				return
-			end
-
-			data = {}
-			data.network = tmpdata.network
-			data.resources = {}
-			local OverlaySettings = list.Get("LSEntOverlayText")[tmpdata.ent:GetClass()]
-			local storage = true
-
-			if OverlaySettings then
-				local num = OverlaySettings.num or 0
-				local resnames = OverlaySettings.resnames
-				local genresnames = OverlaySettings.genresnames
-
-				if num ~= -1 then
-					storage = false
-
-					if resnames then
-						for _, k in pairs(resnames) do
-							local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
-							data.resources[k] = {
-								value = value,
-								temperature = temperature,
-								maxvalue = maxvalue
-							}
-						end
-					end
-
-					if genresnames then
-						for _, k in pairs(genresnames) do
-							local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
-							data.resources[k] = {
-								value = value,
-								temperature = temperature,
-								maxvalue = maxvalue
-							}
-						end
-					end
-				end
-			end
-
-			if storage then
-				for k, v in pairs(tmpdata.resources) do
-					local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
-					data.resources[k] = {
-						value = value,
-						temperature = temperature,
-						maxvalue = maxvalue
-					}
-				end
-			end
-
-			rd_cache:add("entity_" .. id, data)
+		if not tmpdata then
+			return
 		end
 
-		sendEntityData(ply, id, data)
-	elseif typ == REQUEST_NET then
-		data = rd_cache:get("network_" .. id)
+		data = {}
+		data.network = tmpdata.network
+		data.resources = {}
+		local OverlaySettings = list.Get("LSEntOverlayText")[tmpdata.ent:GetClass()]
+		local storage = true
 
-		if not data then
-			tmpdata = nettable[id]
+		if OverlaySettings then
+			local num = OverlaySettings.num or 0
+			local resnames = OverlaySettings.resnames
+			local genresnames = OverlaySettings.genresnames
 
-			if not tmpdata then
-				return
+			if num ~= -1 then
+				storage = false
+
+				if resnames then
+					for _, k in pairs(resnames) do
+						local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
+						data.resources[k] = {
+							value = value,
+							temperature = temperature,
+							maxvalue = maxvalue
+						}
+					end
+				end
+
+				if genresnames then
+					for _, k in pairs(genresnames) do
+						local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
+						data.resources[k] = {
+							value = value,
+							temperature = temperature,
+							maxvalue = maxvalue
+						}
+					end
+				end
 			end
+		end
 
-			data = {}
-			data.resources = {}
-
+		if storage then
 			for k, v in pairs(tmpdata.resources) do
-				local value, maxvalue, temperature = RD.GetNetResourceData(id, k)
+				local value, maxvalue, temperature = RD.GetResourceData(tmpdata.ent, k)
 				data.resources[k] = {
 					value = value,
 					temperature = temperature,
 					maxvalue = maxvalue
 				}
 			end
-
-			data.cons = {}
-
-			for k, v in pairs(tmpdata.cons) do
-				table.insert(data.cons, v)
-			end
-
-			rd_cache:add("network_" .. id, data)
 		end
 
-		sendNetworkData(ply, id, data)
+		rd_cache:add("entity_" .. id, data)
+	end
+
+	sendEntityData(ply, id, data)
+end
+
+local function requestNetwork(ply, id)
+	local data = rd_cache:get("network_" .. id)
+	local tmpdata
+	if not data then
+		tmpdata = nettable[id]
+
+		if not tmpdata then
+			return
+		end
+
+		data = {}
+		data.resources = {}
+
+		for k, v in pairs(tmpdata.resources) do
+			local value, maxvalue, temperature = RD.GetNetResourceData(id, k)
+			data.resources[k] = {
+				value = value,
+				temperature = temperature,
+				maxvalue = maxvalue
+			}
+		end
+
+		data.cons = {}
+
+		for k, v in pairs(tmpdata.cons) do
+			table.insert(data.cons, v)
+		end
+
+		rd_cache:add("network_" .. id, data)
+	end
+
+	sendNetworkData(ply, id, data)
+end
+
+local function RequestResourceData(_, ply)
+	local typ = net.ReadUInt(8)
+	local id = net.ReadUInt(32)
+
+	if typ == REQUEST_ENT then
+		requestEntityData(ply, id)
+	elseif typ == REQUEST_NET then
+		requestNetwork(ply, id)
 	else
 		ply:ChatPrint("RD BUG: INVALID TYPE")
 	end

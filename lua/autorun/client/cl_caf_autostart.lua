@@ -109,11 +109,12 @@ local displaypopups = {}
 local popups = {}
 --PopupSettings
 local Font = "GModCAFNotify"
+local clHudVersionCVar = GetConVar("cl_hudversion")
 
 --End popupsettings
 local function DrawPopups(w, h)
 	local obj = displaypopups.top or displaypopups.left or displaypopups.right or displaypopups.bottom
-	if GetConVarString("cl_hudversion") ~= "" or not obj then
+	if clHudVersionCVar:GetBool() or not obj then
 		return
 	end
 	surface.SetFont(Font)
@@ -312,9 +313,7 @@ local function GetClientMenu(contentpanel)
 	lblTitle:SetText(CAF2.GetLangVar("Clientside CAF Options"))
 	lblTitle:SizeToContents()
 	lblTitle:SetPos(x, y)
-	y = y + 20
-	
-	y = y + 15
+	y = y + 35
 	x = x - lbl:GetWide() - 5
 	--Other options here]]
 	panel:SetSize(contentpanel:GetWide(), y + 10)
@@ -329,23 +328,23 @@ local function AddCAFInfoToStatus(List)
 		descriptiontxt = GetDescription()
 	end
 
-	local v = {}
+	local cafAddon = {}
 
-	function v.GetVersion()
+	function cafAddon.GetVersion()
 		return CAF2.version, "Core"
 	end
 
-	function v.CanChangeStatus()
+	function cafAddon.CanChangeStatus()
 		return false
 	end
 
-	function v.GetDisplayImage()
+	function cafAddon.GetDisplayImage()
 		--Change to something else later on?
 		return "icon16/application.png"
 	end
 
 	local cat = vgui.Create("DCAFCollapsibleCategory")
-	cat:Setup("Custom Addon Framework", v)
+	cat:Setup("Custom Addon Framework", cafAddon)
 	--cat:SetExtraButtonAction(function() frame:Close()  end)
 	local contentpanel = vgui.Create("DPanelList", cat)
 	contentpanel:SetWide(List:GetWide())
@@ -433,33 +432,33 @@ local function GetStatusPanel(frame)
 
 	AddCAFInfoToStatus(List)
 
-	for k, v in pairs(Addons) do
-		if not v.IsVisible or not v.IsVisible() then
+	for addonName, addon in pairs(Addons) do
+		if not addon.IsVisible or not addon.IsVisible() then
 			continue
 		end
 		local descriptiontxt = nil
 
-		if v.GetDescription then
-			descriptiontxt = v.GetDescription()
+		if addon.GetDescription then
+			descriptiontxt = addon.GetDescription()
 			--else
 			--	descriptiontxt = {CAF.GetLangVar("No Description")};
 		end
 
 		local cat = vgui.Create("DCAFCollapsibleCategory")
-		cat:Setup(k, v)
+		cat:Setup(addonName, addon)
 		--cat:SetExtraButtonAction(function() frame:Close()  end)
 		local contentpanel = vgui.Create("DPanelList", cat)
 		contentpanel:SetWide(List:GetWide())
 		local clientMenu = nil
 
-		if v.GetClientMenu then
-			clientMenu = v.GetClientMenu(contentpanel)
+		if addon.GetClientMenu then
+			clientMenu = addon.GetClientMenu(contentpanel)
 		end
 
 		local serverMenu = nil
 
-		if v.GetServerMenu then
-			serverMenu = v.GetServerMenu(contentpanel)
+		if addon.GetServerMenu then
+			serverMenu = addon.GetServerMenu(contentpanel)
 		end
 
 		--Start Add Custom Stuff

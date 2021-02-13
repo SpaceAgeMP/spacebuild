@@ -91,9 +91,10 @@ function CAFToolSetup.RegEnts()
 				--gorup exists, add new devices only
 				if TOOL.Devices[DEVICEGROUP.type] then
 					for sub_type, dev in pairs(DEVICEGROUP.devices) do
-						if not TOOL.Devices[DEVICEGROUP.type].devices[sub_type] then
-							TOOL.Devices[DEVICEGROUP.type].devices[sub_type] = dev
+						if TOOL.Devices[DEVICEGROUP.type].devices[sub_type] then
+							continue
 						end
+						TOOL.Devices[DEVICEGROUP.type].devices[sub_type] = dev
 					end
 				else
 					TOOL.Devices[DEVICEGROUP.type] = DEVICEGROUP

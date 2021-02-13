@@ -1,4 +1,4 @@
-﻿--[[ Serverside Custom Addon file Base ]]
+--[[ Serverside Custom Addon file Base ]]
 --
 --require("sb_space")
 player_manager.AddValidModel("MedicMarine", "models/player/samzanemesis/MarineMedic.mdl")

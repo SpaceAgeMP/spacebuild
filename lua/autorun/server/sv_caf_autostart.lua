@@ -372,9 +372,8 @@ CAF = CAF2
 ]]
 --Send Client and Shared files to the client and Include the ServerAddons
 --Core files
-local Files = file.Find("caf/core/server/*.lua", "LUA")
 
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("caf/core/server/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(include, "caf/core/server/" .. File)
 
 	if not ErrorCheck then
@@ -382,9 +381,7 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("CAF/Core/client/*.lua", "LUA")
-
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("CAF/Core/client/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/client/" .. File)
 
 	if not ErrorCheck then
@@ -392,9 +389,7 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("CAF/Core/shared/*.lua", "LUA")
-
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("CAF/Core/shared/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/core/shared/" .. File)
 
 	if not ErrorCheck then
@@ -402,28 +397,23 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("caf/languagevars/*.lua", "LUA")
-
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("caf/languagevars/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/languagevars/" .. File)
 
 	if not ErrorCheck then
 		ErrorOffStuff(PCallError)
 	end
-end
 
-for k, File in ipairs(Files) do
-	local ErrorCheck, PCallError = pcall(include, "caf/languagevars/" .. File)
+	local ErrorCheck2, PCallError2 = pcall(include, "caf/languagevars/" .. File)
 
-	if not ErrorCheck then
-		ErrorOffStuff(PCallError)
+	if not ErrorCheck2 then
+		ErrorOffStuff(PCallError2)
 	end
 end
 
---Main Addon
-local Files = file.Find("caf/addons/server/*.lua", "LUA")
 
-for k, File in ipairs(Files) do
+--Main Addon
+for k, File in ipairs(file.Find("caf/addons/server/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(include, "caf/addons/server/" .. File)
 
 	if not ErrorCheck then
@@ -431,9 +421,7 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("caf/addons/client/*.lua", "LUA")
-
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("caf/addons/client/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/client/" .. File)
 
 	if not ErrorCheck then
@@ -441,9 +429,7 @@ for k, File in ipairs(Files) do
 	end
 end
 
-Files = file.Find("caf/addons/shared/*.lua", "LUA")
-
-for k, File in ipairs(Files) do
+for k, File in ipairs(file.Find("caf/addons/shared/*.lua", "LUA")) do
 	local ErrorCheck, PCallError = pcall(AddCSLuaFile, "caf/addons/shared/" .. File)
 
 	if not ErrorCheck then
