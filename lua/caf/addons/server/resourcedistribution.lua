@@ -1265,9 +1265,7 @@ function RD.GetNetworkCapacity(...)
 end
 
 function RD.GetEntityTable(ent)
-	local entid = ent:EntIndex()
-
-	return ent_table[entid] or {}
+	return ent_table[ent:EntIndex()] or {}
 end
 
 function RD.GetNetTable(netid)
