@@ -253,13 +253,11 @@ local function lifesupport_HUDPaint()
 		--top = top + 2
 		draw.DrawText(CAF.GetLangVar("Pressure"), hud.Font2, hud.Left + hud.HalfWidth + 16, top, colors.White, 0)
 		top = top + 16
-		local Energy = ls_suit.energy / MaxAmountsDivide
 		top = top + 4
 		draw.RoundedBox(0, hud.Left + 16 + hud.HalfWidth, top, 8, 10, colors.Hot) -- 0 -> 10
 		draw.RoundedBox(0, hud.Left + 24 + hud.HalfWidth, top, 12, 10, colors.Warn) -- 10 -> 25
 		draw.RoundedBox(0, hud.Left + 36 + hud.HalfWidth, top, 60, 10, colors.Green) -- 25 -> 100
 		surface.SetFont(hud.Font3)
-		local energy_text = tostring(Energy) .. "%"
 		width, height = surface.GetTextSize(energy_text)
 		draw.DrawText(energy_text, hud.Font3, hud.Left + hud.HalfWidth + 16 + 40 - math.floor(width / 2), top, colors.White, 0)
 
@@ -267,7 +265,7 @@ local function lifesupport_HUDPaint()
 			Energy = 100
 		end
 
-		local energy_pos = hud.Left + hud.HalfWidth + 16 + math.Round(Energy * 0.8)
+		energy_pos = hud.Left + hud.HalfWidth + 16 + math.Round(Energy * 0.8)
 		draw.RoundedBox(0, energy_pos, top, 1, 10, colors.Grey)
 		draw.RoundedBox(2, energy_pos - 3, top - 4, 6, 6, colors.Grey)
 		top = top + 8

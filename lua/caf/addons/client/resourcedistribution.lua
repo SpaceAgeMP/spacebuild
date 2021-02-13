@@ -275,7 +275,6 @@ function RD.GetEntityTable(ent)
 		net.Start("RD_Network_Data")
 			net.WriteUInt(REQUEST_ENT, 8)
 			net.WriteUInt(entid, 32)
-			net.WriteBool(needs_update)
 		net.SendToServer()
 	end
 	--PrintTable(data)

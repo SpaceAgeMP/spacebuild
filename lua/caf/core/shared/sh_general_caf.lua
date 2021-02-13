@@ -2,8 +2,6 @@
 local CAF3 = CAF2.CAF3
 local Addons = CAF3.Addons
 local addonlevel = CAF3.addonlevel
---Language Settings
-local DefaultLang = "english"
 
 function CAF2.begintime()
 	return os.clock()
@@ -13,7 +11,6 @@ function CAF2.endtime(begintime)
 	return CAF2.begintime() - begintime
 end
 
---END Language Settings
 CAF2.version = 0.5
 --COLOR Settings
 CAF2.colors = {}

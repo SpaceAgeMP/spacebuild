@@ -256,7 +256,7 @@ function ENT:TurnOn(ply)
 	return true
 end
 
-function ENT:TurnOff()
+function ENT:TurnOff(ply)
 	if not self:CheckPlayerOK(ply) then
 		return false, "You are not allowed to control this pump!"
 	end
