@@ -1,5 +1,4 @@
 ﻿local LS = {}
-local status = false
 --Local Stuff
 local Display_temperature = CreateClientConVar("LS_Display_Temperature", "K", true, false)
 local Display_hud = CreateClientConVar("LS_Display_HUD", "1", true, false)
@@ -94,7 +93,7 @@ local function lifesupport_HUDPaint()
 	end
 	local ls_sb_mode = false
 
-	if CAF.GetAddon("Spacebuild") and CAF.GetAddon("Spacebuild").GetStatus() then
+	if CAF.GetAddon("Spacebuild") then
 		ls_sb_mode = true
 	end
 
@@ -373,17 +372,6 @@ net.Receive("LS_umsg2", LS_umsg_hook2)
 ]]
 function LS.__Construct()
 	hook.Add("HUDPaint", "LS_Core_HUDPaint", lifesupport_HUDPaint)
-	status = true
-
-	return true
-end
-
---[[
-	The Destructor for this Custom Addon Class
-]]
-function LS.__Destruct()
-	hook.Remove("HUDPaint", "LS_Core_HUDPaint")
-	status = false
 
 	return true
 end
@@ -396,17 +384,10 @@ function LS.GetRequiredAddons()
 end
 
 --[[
-	Get the Boolean Status from this Addon Class
-]]
-function LS.GetStatus()
-	return status
-end
-
---[[
 	Get the Version of this Custom Addon Class
 ]]
 function LS.GetVersion()
-	return 3.1, CAF.GetLangVar("Beta")
+	return 3.1, "Beta"
 end
 
 local isuptodatecheck

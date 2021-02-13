@@ -15,7 +15,7 @@ CAFToolSetup.SetLang(CAF.GetLangVar("sb_dev_plants_title"), CAF.GetLangVar("sb_d
 
 function TOOL.EnableFunc()
 	local SB = CAF.GetAddon("Spacebuild")
-	if not SB or not SB.GetStatus() then return false end
+	if not SB then return false end
 
 	return true
 end
@@ -29,10 +29,9 @@ function TOOL.ExtraCCVarsCP(tool, panel)
 end
 
 function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-	Extra_Data.rate = self:GetClientNumber("rate")
-
-	return Extra_Data
+	return {
+		rate = self:GetClientNumber("rate")
+	}
 end
 
 local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)

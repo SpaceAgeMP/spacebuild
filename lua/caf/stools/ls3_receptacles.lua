@@ -19,7 +19,7 @@ TOOL.ExtraCCVars = {
 
 function TOOL.EnableFunc()
 	if not CAF then return false end
-	if not CAF.GetAddon("Resource Distribution") or not CAF.GetAddon("Resource Distribution").GetStatus() then return false end
+	if not CAF.GetAddon("Resource Distribution") then return false end
 
 	return true
 end
@@ -30,11 +30,10 @@ function TOOL.ExtraCCVarsCP(tool, panel)
 end
 
 function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-	Extra_Data.extra_num = self:GetClientNumber("extra_num")
-	Extra_Data.extra_bool = self:GetClientNumber("extra_bool") == 1
-
-	return Extra_Data
+	return {
+		extra_num = self:GetClientNumber("extra_num"),
+		extra_bool = self:GetClientNumber("extra_bool") == 1
+	}
 end
 
 TOOL.Renamed = {

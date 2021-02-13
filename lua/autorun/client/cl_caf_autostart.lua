@@ -49,37 +49,11 @@ end
 CAF2.CAF3 = CAF3
 include("caf/core/shared/sh_general_caf.lua")
 CAF2.CAF3 = nil
--- Synchronize language with gmod interface
-CAF2.SaveVar("CAF_LANGUAGE", GetConVar("gmod_language"):GetString())
-
-local function OnAddonDestruct(name)
-	if not name then return end
-
-	if CAF2.GetAddonStatus(name) then
-		local ok, err = pcall(Addons[name].__Destruct)
-
-		if not ok then
-			CAF2.WriteToDebugFile("CAF_Destruct", "Couldn't call destructor for " .. name .. " error: " .. err .. "\n")
-			AddPopup(CAF.GetLangVar("Error unloading Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-		else
-			if err then
-				AddPopup(CAF.GetLangVar("Addon") .. ": " .. CAF.GetLangVar(name) .. " " .. CAF.GetLangVar("got disabled"), "top", CAF2.colors.green)
-			else
-				AddPopup(CAF.GetLangVar("An error occured when trying to disable Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-			end
-		end
-	end
-
-	if not CAF2.StartingUp then
-		hook.Call("CAFOnAddonDestruct", name)
-		CAF2.RefreshMainMenu()
-	end
-end
 
 local function OnAddonConstruct(name)
 	if not name then return end
 
-	if not CAF2.GetAddonStatus(name) and Addons[name] then
+	if Addons[name] then
 		local test, err = pcall(Addons[name].__Construct)
 
 		if not test then
@@ -99,13 +73,13 @@ end
 
 --Global function
 function CAF2.WriteToDebugFile(filename, message)
-	if not filename or not message then return nil, CAF.GetLangVar("Missing Argument") end
+	if not filename or not message then return nil, "Missing Argument" end
 
 	print("Filename: " .. tostring(filename) .. ", Message: " .. tostring(message))
 end
 
 function CAF2.ClearDebugFile(filename)
-	if not filename then return nil, CAF.GetLangVar("Missing Argument") end
+	if not filename then return nil, "Missing Argument" end
 	local contents = file.Read("CAF_Debug/client/" .. filename .. ".txt")
 	contents = contents or ""
 	file.Write("CAF_Debug/client/" .. filename .. ".txt", "")
@@ -119,14 +93,6 @@ function CAF2.ConstructAddon(len, client)
 end
 
 net.Receive("CAF_Addon_Construct", CAF2.ConstructAddon)
-
-function CAF2.DestructAddon(len, client)
-	local name = net.ReadString()
-	OnAddonDestruct(name)
-	--RunConsoleCommand("Main_CAF_Menu");
-end
-
-net.Receive("CAF_Addon_Destruct", CAF2.DestructAddon)
 
 function CAF2.Start(len, client)
 	CAF2.StartingUp = true
@@ -347,24 +313,6 @@ local function GetClientMenu(contentpanel)
 	lblTitle:SizeToContents()
 	lblTitle:SetPos(x, y)
 	y = y + 20
-	-- Language Selection
-	local lbl = vgui.Create("DLabel", panel)
-	lbl:SetText(CAF2.GetLangVar("Language") .. ":")
-	lbl:SizeToContents()
-	lbl:SetPos(x, y)
-	x = x + lbl:GetWide() + 2
-	--[[local selection = vgui.Create("DMultiChoice", panel)
-	selection:SetPos(x, y);
-	for k, v in pairs(CAF.LANGUAGE) do
-		selection:AddChoice( k ) 
-	end
-	function selection:OnSelect( index, value, data ) 
-		CAF2.currentlanguage = value;
-		CAF2.SaveVar("CAF_LANGUAGE", value)
-		CAF2.Notice(CAF2.GetLangVar("Some Language Changes will only Show after a map reload!"));
-	end
-	selection:SetWide( 150 )
-	
 	
 	y = y + 15
 	x = x - lbl:GetWide() - 5
@@ -385,10 +333,6 @@ local function AddCAFInfoToStatus(List)
 
 	function v.GetVersion()
 		return CAF2.version, "Core"
-	end
-
-	function v.GetStatus()
-		return true
 	end
 
 	function v.CanChangeStatus()

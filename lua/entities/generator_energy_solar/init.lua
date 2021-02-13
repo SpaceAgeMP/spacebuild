@@ -62,7 +62,7 @@ function ENT:Extract_Energy(mul)
 	local inc = 0
 	local SB = CAF.GetAddon("Spacebuild")
 
-	if SB and SB.GetStatus() then
+	if SB then
 		if not self.environment then return end
 		inc = math.ceil(Energy_Increment / ((self.environment:GetAtmosphere()) + 1))
 	else

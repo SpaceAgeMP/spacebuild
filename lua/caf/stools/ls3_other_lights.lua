@@ -13,23 +13,12 @@ TOOL.Limit = 10
 CAFToolSetup.SetLang("Life Support Special Light Devices", "Create Special Light Devices attached to any surface.", "Left-Click: Spawn a Device.  Reload: Repair Device.")
 
 function TOOL.EnableFunc()
-	if not CAF then return false end
-	local rd = CAF.GetAddon("Resource Distribution")
-	if not rd or not rd.GetStatus() then return false end
+	if CAF or not CAF.GetAddon("Resource Distribution") then return false end
 
 	return true
 end
 
 TOOL.ExtraCCVars = {}
-
-function TOOL.ExtraCCVarsCP(tool, panel)
-end
-
-function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-
-	return Extra_Data
-end
 
 local function light_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1 --Change to be 0 by default later on

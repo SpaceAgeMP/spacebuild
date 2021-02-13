@@ -15,21 +15,12 @@ CAFToolSetup.SetLang("Life Support Special Devices", "Create Special Devices att
 function TOOL.EnableFunc()
 	if not CAF then return false end
 	local rd = CAF.GetAddon("Resource Distribution")
-	if not rd or not rd.GetStatus() then return false end
+	if not rd then return false end
 
 	return true
 end
 
 TOOL.ExtraCCVars = {}
-
-function TOOL.ExtraCCVarsCP(tool, panel)
-end
-
-function TOOL:GetExtraCCVars()
-	local Extra_Data = {}
-
-	return Extra_Data
-end
 
 local function screen_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local volume_mul = 1 --Change to be 0 by default later on

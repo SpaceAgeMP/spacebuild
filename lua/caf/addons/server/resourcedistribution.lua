@@ -2,9 +2,7 @@
 local nettable = {}
 local ent_table = {}
 local resourcenames = {}
-local resourceids = {}
 local resources = {}
-local status = false
 local rd_cache = cache.create(1, true) --Store data for 1 second
 
 _G.RD = RD
@@ -218,74 +216,26 @@ local function RequestResourceData(_, ply)
 end
 net.Receive("RD_Network_Data", RequestResourceData)
 
---Remove All Entities that are registered by RD, without RD they won't work anyways!
-local function ClearEntities()
-	for k, v in pairs(ent_table) do
-		local ent = ents.GetByIndex(k)
-
-		if ent and IsValid(ent) and ent ~= NULL then
-			ent:Remove()
-		end
-	end
-end
-
-local function ClearNets()
-	net.Start("RD_ClearNets")
-	net.Broadcast()
-end
-
-util.AddNetworkString("RD_ClearNets")
-
 --End local functions
 --[[
 	The Constructor for this Custom Addon Class
 ]]
 function RD.__Construct()
-	if status then return false, CAF.GetLangVar("This Addon is already Active!") end
 	nextnetid = 1
-	ClearNets()
-	ClearEntities()
 	nettable = {}
 	ent_table = {}
 
 	RD:__AddResources()
 
-	for k, ply in pairs(player.GetAll()) do
-		SendEntireNetWorkToClient(ply)
-	end
-
-	status = true
-
 	return true
 end
 
---[[
-	The Destructor for this Custom Addon Class
-]]
-function RD.__Destruct()
-	if not status then return false, CAF.GetLangVar("This Addon is already disabled!") end
-	nextnetid = 1
-	ClearNets()
-	ClearEntities()
-	nettable = {}
-	ent_table = {}
-	status = false
-
-	return true
-end
 
 --[[
 	Get the required Addons for this Addon Class
 ]]
 function RD.GetRequiredAddons()
 	return {}
-end
-
---[[
-	Get the Boolean Status from this Addon Class
-]]
-function RD.GetStatus()
-	return status
 end
 
 --[[
@@ -1265,9 +1215,7 @@ function RD.GetNetworkCapacity(...)
 end
 
 function RD.GetEntityTable(ent)
-	local entid = ent:EntIndex()
-
-	return ent_table[entid] or {}
+	return ent_table[ent:EntIndex()] or {}
 end
 
 function RD.GetNetTable(netid)
