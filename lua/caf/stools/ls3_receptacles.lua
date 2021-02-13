@@ -103,10 +103,8 @@ local function gas_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_extra
 	local base_health = 100
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	local res = ""
@@ -138,10 +136,8 @@ local function energy_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local base_health = 200
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	CAF.GetAddon("Resource Distribution").AddResource(ent, "energy", math.Round(3600 * volume_mul))
@@ -160,10 +156,8 @@ local function liquid_tank_func(ent, type, sub_type, devinfo, Extra_Data, ent_ex
 	local base_health = 150
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	CAF.GetAddon("Resource Distribution").AddResource(ent, "water", math.Round(3600 * volume_mul))
@@ -182,10 +176,8 @@ local function heavywater_tank_func(ent, type, sub_type, devinfo, Extra_Data, en
 	local base_health = 180
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	CAF.GetAddon("Resource Distribution").AddResource(ent, "heavy water", math.Round(3600 * volume_mul))
@@ -204,10 +196,8 @@ local function cache_func(ent, type, sub_type, devinfo, Extra_Data, ent_extras)
 	local base_health = 250
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	local RD = CAF.GetAddon("Resource Distribution")

@@ -103,10 +103,8 @@ local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_
 	CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(ent)
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	ent:SetMultiplier(volume_mul)
@@ -145,10 +143,8 @@ local function liquid_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 	CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(ent)
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	ent:SetMultiplier(volume_mul)
@@ -167,7 +163,7 @@ local function energy_generator_func(ent, type, sub_type, devinfo, Extra_Data, e
 	local phys = ent:GetPhysicsObject()
 	local volume = -1
 
-	if phys:IsValid() and phys.GetVolume then
+	if phys:IsValid() then
 		local vol = phys:GetVolume()
 		volume = math.Round(vol)
 	end
