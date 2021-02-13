@@ -1,7 +1,6 @@
 ﻿local RD = {}
 --local ent_table = {};
 
-local status = false
 local rd_cache = cache.create(1, false) --Store data for 1 second
 --[[
 
@@ -160,17 +159,7 @@ net.Receive("RD_Network_Data", AddNetworkToCache)
 	The Constructor for this Custom Addon Class
 ]]
 function RD.__Construct()
-	status = true
 	RD:__AddResources()
-
-	return true
-end
-
---[[
-	The Destructor for this Custom Addon Class
-]]
-function RD.__Destruct()
-	status = false
 
 	return true
 end
@@ -180,13 +169,6 @@ end
 ]]
 function RD.GetRequiredAddons()
 	return {}
-end
-
---[[
-	Get the Boolean Status from this Addon Class
-]]
-function RD.GetStatus()
-	return status
 end
 
 --[[

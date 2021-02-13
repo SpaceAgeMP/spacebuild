@@ -3,7 +3,6 @@ list.Set("PlayerOptionsModel", "SpecialMarine", "models/player/samzanemesis/Mari
 list.Set("PlayerOptionsModel", "OfficerMarine", "models/player/samzanemesis/MarineOfficer.mdl")
 list.Set("PlayerOptionsModel", "TechMarine", "models/player/samzanemesis/MarineTech.mdl")
 local SB = {}
-local status = false
 --Local functions
 -- used for sun effects
 local stars = {}
@@ -219,18 +218,6 @@ net.Receive("AddStar", recvSun)
 function SB.__Construct()
 	hook.Add("RenderScreenspaceEffects", "SB_VFX_Render", Render)
 	timer.Create("SBPlayerEnvUpdate", 0.5, 0, SB.Space_Affect_Cl)
-	status = true
-
-	return true
-end
-
---[[
-	The Destructor for this Custom Addon Class
-]]
-function SB.__Destruct()
-	hook.Remove("RenderScreenspaceEffects", "SB_VFX_Render")
-	timer.Remove("SBPlayerEnvUpdate")
-	status = false
 
 	return true
 end
@@ -264,12 +251,6 @@ function SB.Space_Affect_Cl()
 end
 
 --End
---[[
-	Get the Boolean Status from this Addon Class
-]]
-function SB.GetStatus()
-	return status
-end
 
 function SB.GetPlanets()
 	return planets

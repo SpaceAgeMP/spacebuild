@@ -6,7 +6,7 @@ end
 
 local net = net
 
-local net_pools = {"CAF_Addon_Construct", "CAF_Addon_Destruct", "CAF_Start_true", "CAF_Start_false", "CAF_Addon_POPUP"}
+local net_pools = {"CAF_Addon_Construct", "CAF_Start_true", "CAF_Start_false", "CAF_Addon_POPUP"}
 
 for _, v in pairs(net_pools) do
 	util.AddNetworkString(v)
@@ -112,17 +112,6 @@ local function OnEntitySpawn(ent, enttype, ply)
 	end
 
 	hook.Call("CAFOnEntitySpawn", nil, ent, enttype, ply)
-end
-
-local function OnAddonDestruct(name)
-	if not name then return end
-	net.Start("CAF_Addon_Destruct")
-	net.WriteString(name)
-	net.Broadcast()
-
-	if not CAF2.StartingUp then
-		hook.Call("CAFOnAddonDestruct", name)
-	end
 end
 
 local function OnAddonConstruct(name)
@@ -232,41 +221,39 @@ function CAF2.Start()
 				end
 			end
 
-			if Addons[v].GetStatus and not Addons[v].GetStatus() then
-				local ok = true
+			local ok = true
 
-				if Addons[v].GetRequiredAddons and Addons[v].GetRequiredAddons() then
-					for l, w in pairs(Addons[v].GetRequiredAddons()) do
-						if Addons[w] then
-							continue
-						end
-						ok = false
+			if Addons[v].GetRequiredAddons and Addons[v].GetRequiredAddons() then
+				for l, w in pairs(Addons[v].GetRequiredAddons()) do
+					if Addons[w] then
+						continue
 					end
+					ok = false
 				end
-				if not ok then
-					continue
+			end
+			if not ok then
+				continue
+			end
+
+			local state = CAF2.GetSavedAddonStatus(v, Addons[v].DEFAULTSTATUS)
+
+			if Addons[v].__AutoStart then
+				local ok2, err = pcall(Addons[v].__AutoStart, state)
+
+				if not ok2 then
+					CAF2.WriteToDebugFile("CAF_AutoStart", "Couldn't call AutoStart for " .. v .. ": " .. err .. "\n")
+				else
+					OnAddonConstruct(v)
+					print("-->", "Auto Started Addon: " .. v .. "\n")
 				end
+			elseif state then
+				local ok2, err = pcall(Addons[v].__Construct)
 
-				local state = CAF2.GetSavedAddonStatus(v, Addons[v].DEFAULTSTATUS)
-
-				if Addons[v].__AutoStart then
-					local ok2, err = pcall(Addons[v].__AutoStart, state)
-
-					if not ok2 then
-						CAF2.WriteToDebugFile("CAF_AutoStart", "Couldn't call AutoStart for " .. v .. ": " .. err .. "\n")
-					else
-						OnAddonConstruct(v)
-						print("-->", "Auto Started Addon: " .. v .. "\n")
-					end
-				elseif state then
-					local ok2, err = pcall(Addons[v].__Construct)
-
-					if not ok2 then
-						CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. v .. ": " .. err .. "\n")
-					else
-						OnAddonConstruct(v)
-						print("-->", "Loaded addon: " .. v .. "\n")
-					end
+				if not ok2 then
+					CAF2.WriteToDebugFile("CAF_Construct", "Couldn't call constructor for " .. v .. ": " .. err .. "\n")
+				else
+					OnAddonConstruct(v)
+					print("-->", "Loaded addon: " .. v .. "\n")
 				end
 			end
 		end
@@ -278,22 +265,6 @@ function CAF2.Start()
 end
 
 hook.Add("InitPostEntity", "CAF_Start", CAF2.Start)
-
---[[
-	This function will call the destruct function of an addon  and return if it's was succesfull or not (+ the errormessage)
-]]
-function CAF2.Destruct(addon)
-	if not addon then return false, "No Addon Name Given" end
-	if not Addons[addon] then return false, "No Addon Registered With This Name" end
-	local ok, mes = Addons[addon].__Destruct()
-
-	if ok then
-		OnAddonDestruct(addon)
-		UpdateAddonStatus(addon, 0)
-	end
-
-	return ok, mes
-end
 
 --[[
 	This function will call the construct function of an addon  and return if it's was succesfull or not (+ the errormessage)
@@ -354,57 +325,13 @@ end
 concommand.Add("CAF_Addon_Construct", AddonConstruct)
 
 --[[
-	This function will receive the destruct info from the clientside VGUI menu
-]]
-local function AddonDestruct(ply, com, args)
-	if not ply:IsAdmin() then
-		ply:ChatPrint("You are not allowed to Destruct a Custom Addon")
-
-		return
-	end
-
-	if not args then
-		ply:ChatPrint("You forgot to provide arguments")
-
-		return
-	end
-
-	if not args[1] then
-		ply:ChatPrint("You forgot to enter the Addon Name")
-
-		return
-	end
-
-	--Construct the Addon name if it had spaces in it
-	if table.Count(args) > 1 then
-		for k, v in pairs(args) do
-			if k ~= 1 then
-				args[1] = args[1] .. " " .. v
-			end
-		end
-	end
-
-	local ok, mes = CAF2.Destruct(args[1])
-
-	if ok then
-		ply:ChatPrint("Addon Succesfully Disabled")
-	else
-		ply:ChatPrint("Couldn't Disable the Addon for the following reason: " .. tostring(mes))
-	end
-end
-
-concommand.Add("CAF_Addon_Destruct", AddonDestruct)
-
---[[
 	This function will update the Client with all active addons
 ]]
 function CAF2.PlayerSpawn(ply)
 	for k, v in pairs(Addons) do
-		if v.GetStatus and v.GetStatus() then
-			net.Start("CAF_Addon_Construct")
-			net.WriteString(k)
-			net.Send(ply)
-		end
+		net.Start("CAF_Addon_Construct")
+		net.WriteString(k)
+		net.Send(ply)
 	end
 end
 

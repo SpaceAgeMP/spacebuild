@@ -190,9 +190,9 @@ function ENT:Pump_Air()
 	local mul = 1
 	local SB = CAF.GetAddon("Spacebuild")
 
-	if SB and SB.GetStatus() and self.environment and (self.environment:IsSpace() or self.environment:IsStar()) then
+	if SB and self.environment and (self.environment:IsSpace() or self.environment:IsStar()) then
 		mul = 0 --Make the device still absorb energy, but not produce any gas anymore
-	elseif SB and SB.GetStatus() and self.environment and self.environment:IsEnvironment() and not self.environment:IsPlanet() then
+	elseif SB and self.environment and self.environment:IsEnvironment() and not self.environment:IsPlanet() then
 		mul = 0.5
 	end
 
@@ -231,9 +231,7 @@ function ENT:Pump_Air()
 
 			local sb_resources = {"oxygen", "carbon dioxide", "hydrogen", "nitrogen"}
 
-			local SB = CAF.GetAddon("Spacebuild")
-
-			if SB and SB.GetStatus() and table.HasValue(sb_resources, self.caf.custom.resource) then
+			if SB and table.HasValue(sb_resources, self.caf.custom.resource) then
 				local usage = ainc
 
 				if self.environment then

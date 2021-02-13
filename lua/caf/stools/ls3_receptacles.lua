@@ -19,7 +19,7 @@ TOOL.ExtraCCVars = {
 
 function TOOL.EnableFunc()
 	if not CAF then return false end
-	if not CAF.GetAddon("Resource Distribution") or not CAF.GetAddon("Resource Distribution").GetStatus() then return false end
+	if not CAF.GetAddon("Resource Distribution") then return false end
 
 	return true
 end

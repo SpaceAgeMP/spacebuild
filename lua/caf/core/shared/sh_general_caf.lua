@@ -71,20 +71,6 @@ end
 CAF2.currentlanguage = CAF2.LoadVar("CAF_LANGUAGE", DefaultLang)
 
 --[[
-	Returns the boolean status of an Addon
-]]
-function CAF2.GetAddonStatus(AddonName)
-	if not AddonName then return nil, "No AddonName given" end
-
-	if Addons[AddonName] then
-		local ok, status = pcall(Addons[AddonName].GetStatus)
-		if ok then return status end
-	end
-
-	return nil, "No Status Info Found"
-end
-
---[[
 	Returns the reference to the Custom Addon, nil if not existant
 ]]
 function CAF2.GetAddon(AddonName)

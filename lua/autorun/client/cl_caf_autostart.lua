@@ -52,34 +52,10 @@ CAF2.CAF3 = nil
 -- Synchronize language with gmod interface
 CAF2.SaveVar("CAF_LANGUAGE", GetConVar("gmod_language"):GetString())
 
-local function OnAddonDestruct(name)
-	if not name then return end
-
-	if CAF2.GetAddonStatus(name) then
-		local ok, err = pcall(Addons[name].__Destruct)
-
-		if not ok then
-			CAF2.WriteToDebugFile("CAF_Destruct", "Couldn't call destructor for " .. name .. " error: " .. err .. "\n")
-			AddPopup(CAF.GetLangVar("Error unloading Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-		else
-			if err then
-				AddPopup(CAF.GetLangVar("Addon") .. ": " .. CAF.GetLangVar(name) .. " " .. CAF.GetLangVar("got disabled"), "top", CAF2.colors.green)
-			else
-				AddPopup(CAF.GetLangVar("An error occured when trying to disable Addon") .. ": " .. CAF.GetLangVar(name), "top", CAF2.colors.red)
-			end
-		end
-	end
-
-	if not CAF2.StartingUp then
-		hook.Call("CAFOnAddonDestruct", name)
-		CAF2.RefreshMainMenu()
-	end
-end
-
 local function OnAddonConstruct(name)
 	if not name then return end
 
-	if not CAF2.GetAddonStatus(name) and Addons[name] then
+	if Addons[name] then
 		local test, err = pcall(Addons[name].__Construct)
 
 		if not test then
@@ -119,14 +95,6 @@ function CAF2.ConstructAddon(len, client)
 end
 
 net.Receive("CAF_Addon_Construct", CAF2.ConstructAddon)
-
-function CAF2.DestructAddon(len, client)
-	local name = net.ReadString()
-	OnAddonDestruct(name)
-	--RunConsoleCommand("Main_CAF_Menu");
-end
-
-net.Receive("CAF_Addon_Destruct", CAF2.DestructAddon)
 
 function CAF2.Start(len, client)
 	CAF2.StartingUp = true
@@ -385,10 +353,6 @@ local function AddCAFInfoToStatus(List)
 
 	function v.GetVersion()
 		return CAF2.version, "Core"
-	end
-
-	function v.GetStatus()
-		return true
 	end
 
 	function v.CanChangeStatus()
