@@ -152,7 +152,7 @@ function sb_space.Get()
 		Msg("No Values for Space\n")
 	end
 
-	function space:ConvertResource(res1, res2, amount)
+	function space:Convert(res1, res2, amount)
 		return 0
 	end
 
