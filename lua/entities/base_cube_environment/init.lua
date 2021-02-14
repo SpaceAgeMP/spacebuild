@@ -2,66 +2,13 @@
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 require("caf_util")
-DEFINE_BASECLASS("base_sb_environment")
-
-function ENT:Initialize()
-	BaseClass.Initialize(self)
-
-	self.sbenvironment.temperature2 = 0
-	self.sbenvironment.sunburn = false
-	self.sbenvironment.unstable = false
-
-	self:DrawShadow(false)
-
-	if CAF then
-		self.caf = self.caf or {}
-		self.caf.custom = self.caf.custom or {}
-		self.caf.custom.canreceivedamage = false
-		self.caf.custom.canreceiveheatdamage = false
-	end
-end
-
-function ENT:SBEnvPhysics(ent)
-	local size = self:GetSize()
-	local min = Vector(-size, -size, -size)
-	local max = Vector(size, size, size)
-	ent:SetCollisionBounds(min, max)
-	ent:PhysicsInitBox(min, max)
-	ent:SetNotSolid(true)
-end
-
-function ENT:GetSunburn()
-	return self.sbenvironment.sunburn
-end
-
-function ENT:GetUnstable()
-	return self.sbenvironment.unstable
-end
-
-function ENT:SetFlags(flags)
-	if not flags or type(flags) ~= "number" then return end
-	self.sbenvironment.unstable = caf_util.isBitSet(flags, 1)
-	self.sbenvironment.sunburn = caf_util.isBitSet(flags, 2)
-end
-
-function ENT:Unstable()
-	--if self.sbenvironment.unstable and math.random(1, 20) < 2 then
-		--self:GetParent():Fire("invalue", "shake", "0") --self:GetParent():Fire("invalue", "rumble", "0")
-	--end
-end
-
-function ENT:GetPriority()
-	return 1
-end
+DEFINE_BASECLASS("base_box_environment")
 
 function ENT:CreateEnvironment(ent, radius, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
 	--needs a parent!
 	if not ent then
 		self:Remove()
 	end
-
-	self:SetParent(ent)
-	self:SetFlags(flags)
 
 	--set Radius if one is given
 	if radius and type(radius) == "number" then
@@ -72,26 +19,21 @@ function ENT:CreateEnvironment(ent, radius, gravity, atmosphere, pressure, tempe
 		self.sbenvironment.size = radius
 	end
 
-	--set temperature2 if given
-	if temperature2 and type(temperature2) == "number" then
-		self.sbenvironment.temperature2 = temperature2
-	end
-
-	BaseClass.CreateEnvironment(self, gravity, atmosphere, pressure, temperature, o2, co2, n, h, name)
+	BaseClass.CreateEnvironment(self, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, name)
 end
 
 function ENT:UpdateEnvironment(radius, gravity, atmosphere, pressure, temperature, o2, co2, n, h, temperature2, flags)
 	if radius and type(radius) == "number" then
-		self:SetFlags(flags)
 		self:UpdateSize(self.sbenvironment.size, radius)
 	end
 
-	--set temperature2 if given
-	if temperature2 and type(temperature2) == "number" then
-		self.sbenvironment.temperature2 = temperature2
-	end
+	BaseClass.UpdateEnvironment(self, gravity, atmosphere, pressure, temperature, o2, co2, n, h, temperature2, flags)
+end
 
-	BaseClass.UpdateEnvironment(self, gravity, atmosphere, pressure, temperature, o2, co2, n, h)
+function ENT:UpdateSize(oldsize, newsize)
+	self.mins = Vector(-newsize, -newsize, -newsize)
+	self.maxs = Vector(newsize, newsize, newsize)
+	BaseClass.UpdateSize(oldsize, newsize)
 end
 
 function ENT:IsPlanet()

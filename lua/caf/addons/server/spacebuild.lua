@@ -1,4 +1,4 @@
---[[ Serverside Custom Addon file Base ]]
+﻿--[[ Serverside Custom Addon file Base ]]
 --
 --require("sb_space")
 player_manager.AddValidModel("MedicMarine", "models/player/samzanemesis/MarineMedic.mdl")
@@ -617,24 +617,6 @@ local function Register_Environments()
 			if Planetscolor[k] then
 				Planetscolor[k]:ColorEffect(v.AddColor_r, v.AddColor_g, v.AddColor_b, v.MulColor_r, v.MulColor_g, v.MulColor_b, v.Brightness, v.Contrast, v.Color)
 			end
-		end
-
-		-- compatibility patch, since this map does not convert to sb3 properly. ~Dubby
-		if game.GetMap() == "gm_interplaneteryfunk" then
-			local p = Entity(40):GetParent()
-			Entity(40):Remove()
-			Entity(41):GetParent():Remove()
-			Entity(42):GetParent():Remove()
-			Entity(43):GetParent():Remove()
-			Entity(44):GetParent():Remove()
-			local e = ents.Create("base_cube_environment")
-			e:SetModel("models/props_lab/huladoll.mdl")
-			e:SetAngles(Angle(0, 0, 0))
-			e:SetPos(Vector(0, 0, -17400))
-			e:Spawn()
-			e:CreateEnvironment(p, 15344, 1, 1, 1, 289, 300, 21, 0.45, 78, 0.55, 0, "Earth")
-			e.Active = true
-			--lua_run local e = ents.Create("base_cube_environment") e:SetModel("models/props_lab/huladoll.mdl") e:SetAngles(Angle(0,0,0)) e:SetPos(Vector(0,0,-14472)) e:Spawn() e:CreateEnvironment(Entity(41):GetParent(),15000,1,1,1,289,300,21,0.45,78,0.55,0,"Earth")
 		end
 
 		if SB_InSpace == 1 then
