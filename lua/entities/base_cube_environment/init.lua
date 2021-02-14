@@ -31,9 +31,8 @@ function ENT:UpdateEnvironment(radius, gravity, atmosphere, pressure, temperatur
 end
 
 function ENT:UpdateSize(oldsize, newsize)
-	self.mins = Vector(-newsize, -newsize, -newsize)
-	self.maxs = Vector(newsize, newsize, newsize)
-	BaseClass.UpdateSize(oldsize, newsize)
+	BaseClass.UpdateOBB(self, Vector(-newsize, -newsize, -newsize), Vector(newsize, newsize, newsize))
+	BaseClass.UpdateSize(self, oldsize, newsize)
 end
 
 function ENT:IsPlanet()

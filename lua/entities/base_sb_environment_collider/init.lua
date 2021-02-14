@@ -27,6 +27,7 @@ end
 
 function ENT:SetEnvironment(env)
 	self:SetPos(env:GetPos())
+	self:SetAngles(env:GetAngles())
 	self:SetParent(env)
 	self.sbenv = env
 	env:SBEnvPhysics(self)

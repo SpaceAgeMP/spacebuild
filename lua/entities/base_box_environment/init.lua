@@ -49,7 +49,7 @@ function ENT:GetPriority()
 	return 1
 end
 
-function ENT:CreateEnvironment(ent, mins, maxs, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
+function ENT:CreateEnvironment(ent, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
 	--needs a parent!
 	if not ent then
 		self:Remove()
@@ -57,9 +57,6 @@ function ENT:CreateEnvironment(ent, mins, maxs, gravity, atmosphere, pressure, t
 
 	self:SetParent(ent)
 	self:SetFlags(flags)
-
-	self.mins = mins
-	self.maxs = maxs
 
 	--set temperature2 if given
 	if temperature2 and type(temperature2) == "number" then
@@ -69,12 +66,8 @@ function ENT:CreateEnvironment(ent, mins, maxs, gravity, atmosphere, pressure, t
 	BaseClass.CreateEnvironment(self, gravity, atmosphere, pressure, temperature, o2, co2, n, h, name)
 end
 
-function ENT:UpdateEnvironment(radius, gravity, atmosphere, pressure, temperature, o2, co2, n, h, temperature2, flags)
+function ENT:UpdateEnvironment(gravity, atmosphere, pressure, temperature, o2, co2, n, h, temperature2, flags)
 	self:SetFlags(flags)
-
-	if radius and type(radius) == "number" then
-		self:UpdateSize(self.sbenvironment.size, radius)
-	end
 
 	--set temperature2 if given
 	if temperature2 and type(temperature2) == "number" then
@@ -82,6 +75,11 @@ function ENT:UpdateEnvironment(radius, gravity, atmosphere, pressure, temperatur
 	end
 
 	BaseClass.UpdateEnvironment(self, gravity, atmosphere, pressure, temperature, o2, co2, n, h)
+end
+
+function ENT:UpdateOBB(mins, maxs)
+	self.mins = mins
+	self.maxs = maxs
 end
 
 function ENT:IsPlanet()
@@ -110,8 +108,10 @@ end
 function ENT:PosInEnvironment(pos, other)
 	if other and other == self then return other end
 
-	local min = self.mins + self:GetPos()
-	local max = self.maxs + self:GetPos()
+	pos = self:WorldToLocal(pos)
+
+	local min = self.mins
+	local max = self.maxs
 
 	if (pos.x < max.x and pos.x > min.x) and (pos.y < max.y and pos.y > min.y) and (pos.z < max.z and pos.z > min.z) then
 		if other then
