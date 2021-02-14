@@ -98,28 +98,3 @@ function ENT:Think()
 
 	return true
 end
-
-function ENT:PosInEnvironment(pos, other)
-	if other and other == self then return other end
-
-	pos = self:WorldToLocal(pos)
-
-	local min = self.mins
-	local max = self.maxs
-
-	if (pos.x < max.x and pos.x > min.x) and (pos.y < max.y and pos.y > min.y) and (pos.z < max.z and pos.z > min.z) then
-		if other then
-			if other:GetPriority() < self:GetPriority() then
-				return self
-			elseif other:GetPriority() == self:GetPriority() then
-				if self:GetSize() > other:GetSize() then return other end
-			else
-				return other
-			end
-		end
-
-		return self
-	end
-
-	return other
-end

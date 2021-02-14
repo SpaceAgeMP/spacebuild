@@ -978,29 +978,6 @@ function ENT:IsPreferredOver(environment)
 	return false
 end
 
-function ENT:PosInEnvironment(pos, other)
-	if other and other == self then return other end
-	local dist2 = (pos - self:GetPos()):LengthSqr()
-	local size = self:GetSize()
-	local size2 = size * size
-
-	if dist2 < size2 then
-		if other then
-			if other:GetPriority() < self:GetPriority() then
-				return self
-			elseif other:GetPriority() == self:GetPriority() then
-				if self:GetSize() > other:GetSize() then return other end
-			else
-				return other
-			end
-		end
-
-		return self
-	end
-
-	return other
-end
-
 function ENT:Remove()
 	CAF.GetAddon("Spacebuild").RemoveEnvironment(self)
 end

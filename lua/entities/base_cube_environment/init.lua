@@ -52,23 +52,3 @@ function ENT:Think()
 
 	return true
 end
-
-function ENT:PosInEnvironment(pos, other)
-	if other and other == self then return other end
-
-	if (pos.x < cen.x + size and pos.x > cen.x - size) and (pos.y < cen.y + size and pos.y > cen.y - size) and (pos.z < cen.z + size and pos.z > cen.z - size) then
-		if other then
-			if other:GetPriority() < self:GetPriority() then
-				return self
-			elseif other:GetPriority() == self:GetPriority() then
-				if self:GetSize() > other:GetSize() then return other end
-			else
-				return other
-			end
-		end
-
-		return self
-	end
-
-	return other
-end
