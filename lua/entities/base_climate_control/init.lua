@@ -166,6 +166,10 @@ function ENT:OnRemove()
 	self:StopSound("apc_engine_start")
 end
 
+function ENT:GetPriority()
+	return 10
+end
+
 function ENT:UpdateSize(oldsize, newsize)
 	if oldsize == newsize or (not oldsize) or (not newsize) or (oldsize < 0) or (newsize < 0) then return end
 
