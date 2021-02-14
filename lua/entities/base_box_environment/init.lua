@@ -49,13 +49,7 @@ function ENT:GetPriority()
 	return 1
 end
 
-function ENT:CreateEnvironment(ent, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
-	--needs a parent!
-	if not ent then
-		self:Remove()
-	end
-
-	self:SetParent(ent)
+function ENT:CreateEnvironment(gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
 	self:SetFlags(flags)
 
 	--set temperature2 if given

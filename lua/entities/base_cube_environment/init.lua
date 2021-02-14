@@ -4,12 +4,7 @@ include("shared.lua")
 require("caf_util")
 DEFINE_BASECLASS("base_box_environment")
 
-function ENT:CreateEnvironment(ent, radius, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
-	--needs a parent!
-	if not ent then
-		self:Remove()
-	end
-
+function ENT:CreateEnvironment(radius, gravity, atmosphere, pressure, temperature, temperature2, o2, co2, n, h, flags, name)
 	--set Radius if one is given
 	if radius and type(radius) == "number" then
 		if radius < 0 then
