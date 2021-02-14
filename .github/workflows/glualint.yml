@@ -1,0 +1,27 @@
+name: GLuaLint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: npm for Lua lint
+      run: |
+        export PATH=$PATH:/tmp/bin
+        mkdir -p /tmp/bin
+        pushd /tmp/bin
+        wget -q https://github.com/FPtje/GLuaFixer/releases/download/1.16.4/glualint-1.16.4-linux-stripped.zip -O glualint.zip
+        unzip glualint.zip
+        chmod +x glualint
+        popd
+        echo "Running linter..."
+        node gluaLintEx.js
+      env:
+        CI: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
