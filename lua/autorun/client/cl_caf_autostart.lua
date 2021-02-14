@@ -114,7 +114,7 @@ local clHudVersionCVar = GetConVar("cl_hudversion")
 --End popupsettings
 local function DrawPopups(w, h)
 	local obj = displaypopups.top or displaypopups.left or displaypopups.right or displaypopups.bottom
-	if clHudVersionCVar:GetBool() or not obj then
+	if (clHudVersionCVar and clHudVersionCVar:GetBool()) or not obj then
 		return
 	end
 	surface.SetFont(Font)
