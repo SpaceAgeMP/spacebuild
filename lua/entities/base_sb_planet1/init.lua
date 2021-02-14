@@ -212,8 +212,6 @@ function ENT:BloomEffect(Col_r, Col_g, Col_b, SizeX, SizeY, Passes, Darken, Mult
 	if Color then
 		self.sbenvironment.bloom.Color = Color
 	end
-
-	self:SendData()
 end
 
 function ENT:ColorEffect(AddColor_r, AddColor_g, AddColor_b, MulColor_r, MulColor_g, MulColor_b, Brightness, Contrast, Color)
@@ -255,7 +253,4 @@ function ENT:ColorEffect(AddColor_r, AddColor_g, AddColor_b, MulColor_r, MulColo
 	end
 
 	Msg("Sending color update\n")
-	self:SendData()
 end
-
-util.AddNetworkString("AddPlanet")

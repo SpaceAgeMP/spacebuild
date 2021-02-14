@@ -72,14 +72,6 @@ end
 
 --Send the player info about the Stars and Planets for Effects
 local function PlayerInitialSpawn(ply)
-	if Planets then
-		for k, v in pairs(Planets) do
-			if IsValid(v) then
-				v:SendData(ply)
-			end
-		end
-	end
-
 	if Stars then
 		for k, v in pairs(Stars) do
 			if IsValid(v) then
