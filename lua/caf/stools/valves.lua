@@ -20,10 +20,8 @@ local function resource_valve_func(ent, type, sub_type, devinfo, Extra_Data, ent
 	local base_health = 50
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	local mass = math.Round(base_mass * volume_mul)

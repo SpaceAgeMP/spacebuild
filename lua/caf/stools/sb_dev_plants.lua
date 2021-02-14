@@ -41,10 +41,8 @@ local function gas_generator_func(ent, type, sub_type, devinfo, Extra_Data, ent_
 	local base_health = 600
 	local phys = ent:GetPhysicsObject()
 
-	if phys:IsValid() and phys.GetVolume then
-		local vol = phys:GetVolume()
-		vol = math.Round(vol)
-		volume_mul = vol / base_volume
+	if phys:IsValid() then
+		volume_mul = math.Round(phys:GetVolume()) / base_volume
 	end
 
 	ent:SetRate(Extra_Data.rate)
