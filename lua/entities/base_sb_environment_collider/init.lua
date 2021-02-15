@@ -22,7 +22,6 @@ function ENT:ResetTouchTable()
 		self:EndTouch(ent)
 	end
 	self.TouchTable = {}
-
 end
 
 function ENT:SetEnvironment(env)
