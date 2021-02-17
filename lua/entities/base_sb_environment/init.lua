@@ -569,10 +569,15 @@ function ENT:UpdateGravity(ent)
 		phys:EnableGravity(false)
 		phys:EnableDrag(false)
 		ent:SetGravity(0.00001)
+
 	else
 		ent:SetGravity(ent.gravity)
 		phys:EnableGravity(true)
 		phys:EnableDrag(true)
+	end
+
+	if ent:IsPlayer() then
+		ent:SetNWFloat("gravity", ent.gravity)
 	end
 end
 

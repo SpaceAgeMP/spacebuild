@@ -215,6 +215,9 @@ function sb_space.Get()
 		phys:EnableGravity(false)
 		phys:EnableDrag(false)
 		ent:SetGravity(0.00001)
+		if ent:IsPlayer() then
+			ent:SetNWFloat("gravity", ent.gravity)
+		end
 	end
 
 	function space:GetPriority()
@@ -660,6 +663,9 @@ local function ResetGravity()
 			if phys:IsValid() and not (ent.IgnoreGravity and ent.IgnoreGravity == true) then
 				ent:SetGravity(1)
 				ent.gravity = 1
+				if ent:IsPlayer() then
+					ent:SetNWFloat("gravity", ent.gravity)
+				end
 				phys:EnableGravity(true)
 				phys:EnableDrag(true)
 			end
