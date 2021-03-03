@@ -122,6 +122,7 @@ e2function array entity:lsGetResources()
 end
 
 __e2setcost(5)
+
 e2function string lsGetName(string key)
 	return RD.GetProperResourceName(key)
 end
@@ -239,3 +240,30 @@ e2function table entity:lsGetData(string key)
 		size=3
 	}
 end
+
+
+-- NODE LINKING FUNCTIONS
+e2function number entity:lsLink(entity node)
+	if not IsValid(this) or not IsValid(node) or not node.IsNode then
+		return nil
+	end
+
+	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canTool then
+		local range = node.range
+		local distance = this:GetPos():Distance(node:GetPos())
+		if distance <= range then
+			print("in range")
+			local networkID = ls_get_ent_netid(node)
+			RD.Link(this, networkID)
+			return 1
+		end
+		print("not in range")
+	end
+	return 0
+end
+
+e2function number entity:lsUnlink(entity node)
+	
+end
+-- END NODE LINKING FUNCTIONS

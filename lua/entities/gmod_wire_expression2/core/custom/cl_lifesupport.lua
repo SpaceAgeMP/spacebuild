@@ -15,3 +15,5 @@ E2Helper.Descriptions["lsPumpSetName(e:s)"] = "will set the name of pump e to s"
 E2Helper.Descriptions["lsPumpGetName(e:)"] = "will return the name of pump e"
 E2Helper.Descriptions["lsPumpGetConnectedPump(e:)"] = "will return entity of the pump that pump e is connected to"
 E2Helper.Descriptions["lsPumpGetResources(e:)"] = "will return table of all resources avaliable for pump e to send."
+
+E2Helper.Descriptions["lsLink(e:e)"] = "links entity e1 to node e2"
