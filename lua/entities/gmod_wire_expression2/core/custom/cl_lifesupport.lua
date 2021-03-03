@@ -1,5 +1,5 @@
-E2Helper.Descriptions["lsInfo(e:)"] = "who knows... not me"
-E2Helper.Descriptions["lsInfo"] = "im gussing somthing similar to lsInfo(e:)"
+E2Helper.Descriptions["lsInfo(e:)"] = "returns a table of atmosphere info from position of e, much like an atmospheric probe"
+E2Helper.Descriptions["lsInfo"] = "returns a table of atmosphere info from E2 position, much like an atmospheric probe"
 
 E2Helper.Descriptions["lsGetResources(e:)"] = "returns an array (of strings) of avaliable resource types avaliable on the network that node E is connected to."
 E2Helper.Descriptions["lsGetName(s)"] = "takes resource name and converts to propper ls name, example: 'carbon dioxide' would be converted to 'Carbon Dioxide'"
