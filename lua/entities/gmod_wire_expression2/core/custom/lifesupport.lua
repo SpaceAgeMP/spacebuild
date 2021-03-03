@@ -122,7 +122,6 @@ e2function array entity:lsGetResources()
 end
 
 __e2setcost(5)
-
 e2function string lsGetName(string key)
 	return RD.GetProperResourceName(key)
 end
