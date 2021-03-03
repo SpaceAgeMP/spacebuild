@@ -251,9 +251,8 @@ e2function number entity:lsLink(entity node)
 	local canToolThis = this:CPPICanTool(self.player, "toolgun") and 1 or 0
 	local canToolNode = node:CPPICanTool(self.player, "toolgun") and 1 or 0
 	if canToolThis and canToolNode then
-		local range = node.range
 		local distance = this:GetPos():Distance(node:GetPos())
-		if distance <= range then
+		if distance <= node.range then
 			local netid = ls_get_ent_netid(node)
 			RD.Link(this, netid)
 			return 1
@@ -297,9 +296,12 @@ e2function number entity:lsLinkNodes(entity node)
 	local canToolThis = this:CPPICanTool(self.player, "toolgun") and 1 or 0
 	local canToolNode = node:CPPICanTool(self.player, "toolgun") and 1 or 0
 	if canToolThis and canToolNode then
-		local netidThis = ls_get_ent_netid(this)
-		local netidNode = ls_get_ent_netid(node)
-		RD.LinkNodes(netidThis, netidNode)
+		local distance = this:GetPos():Distance(node:GetPos())
+		if distance <= this.range and distance <= node.range then
+			local netidThis = ls_get_ent_netid(this)
+			local netidNode = ls_get_ent_netid(node)
+			RD.LinkNodes(netidThis, netidNode)
+		end
 	end
 end
 
