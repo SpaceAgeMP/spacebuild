@@ -6,7 +6,6 @@ local function bool_to_number(val)
 	return val and 1 or 0
 end
 
-
 local E2_MAX_ARRAY_SIZE = 64
 
 local function e2defaulttable()
