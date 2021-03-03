@@ -53,7 +53,7 @@ local function e2_ls_info(ent)
 	local retTab = e2defaulttable()
 	if ent.sbenvironment then
 		retTab = ls_table_to_e2_table(ent.sbenvironment)
-		if SA.ValidEntity(ent) then
+		if IsValid(ent) then
 			retTab.s.entity = ent
 			retTab.stypes.entity = "e"
 			retTab.size = retTab.size + 1
@@ -61,14 +61,14 @@ local function e2_ls_info(ent)
 	end
 	if ent.environment and ent.environment.sbenvironment then
 		if ent.sbenvironment then
-			if ent.environment ~= ent and SA.ValidEntity(ent.environment) then
+			if ent.environment ~= ent and IsValid(ent.environment) then
 				retTab.s.parent = ent.environment
 				retTab.stypes.parent = "e"
 				retTab.size = retTab.size + 1
 			end
 		else
 			retTab = ls_table_to_e2_table(ent.environment.sbenvironment)
-			if SA.ValidEntity(ent.environment) then
+			if IsValid(ent.environment) then
 				retTab.s.entity = ent.environment
 				retTab.stypes.entity = "e"
 				retTab.size = retTab.size + 1
@@ -79,7 +79,7 @@ local function e2_ls_info(ent)
 end
 
 local function ls_get_ent_netid(this)
-	if not SA.ValidEntity(this) then return nil end
+	if not IsValid(this) then return nil end
 	local netid = this.netid
 	if netid <= 0 then return nil end
 	return netid
@@ -102,7 +102,7 @@ end
 
 __e2setcost(10)
 e2function table entity:lsInfo()
-	if not SA.ValidEntity(this) then return e2defaulttable() end
+	if not IsValid(this) then return e2defaulttable() end
 	return e2_ls_info(this)
 end
 
