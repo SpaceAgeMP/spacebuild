@@ -2,7 +2,10 @@
 local RD = CAF.GetAddon("Resource Distribution")
 E2Lib.RegisterExtension("lifesupport", false)
 
-local bool_to_number = SA.bool_to_number
+local function bool_to_number(val)
+	return val and 1 or 0
+end
+
 
 local E2_MAX_ARRAY_SIZE = 64
 
