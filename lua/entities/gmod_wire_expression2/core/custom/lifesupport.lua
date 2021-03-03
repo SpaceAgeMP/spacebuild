@@ -301,8 +301,10 @@ e2function number entity:lsLinkNodes(entity node)
 			local netidThis = ls_get_ent_netid(this)
 			local netidNode = ls_get_ent_netid(node)
 			RD.LinkNodes(netidThis, netidNode)
+			return 1
 		end
 	end
+	return 0
 end
 
 e2function number entity:lsUnlinkNodes(entity node)
@@ -316,6 +318,8 @@ e2function number entity:lsUnlinkNodes(entity node)
 		local netidThis = ls_get_ent_netid(this)
 		local netidNode = ls_get_ent_netid(node)
 		RD.UnlinkNodes(netidThis, netidNode)
+		return 1
 	end
+	return 0
 end
 -- END NODE LINKING FUNCTIONS
