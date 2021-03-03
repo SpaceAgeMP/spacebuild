@@ -243,27 +243,78 @@ end
 
 
 -- NODE LINKING FUNCTIONS
+__e2setcost(10)
 e2function number entity:lsLink(entity node)
 	if not IsValid(this) or not IsValid(node) or not node.IsNode then
 		return nil
 	end
 
-	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
-	if canTool then
+	local canToolThis = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	local canToolNode = node:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canToolThis and canToolNode then
 		local range = node.range
 		local distance = this:GetPos():Distance(node:GetPos())
 		if distance <= range then
-			print("in range")
-			local networkID = ls_get_ent_netid(node)
-			RD.Link(this, networkID)
+			local netid = ls_get_ent_netid(node)
+			RD.Link(this, netid)
 			return 1
 		end
-		print("not in range")
 	end
 	return 0
 end
 
-e2function number entity:lsUnlink(entity node)
-	
+e2function number entity:lsUnlink()
+	if not IsValid(this) then
+		return nil
+	end
+
+	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canTool then
+		RD.Unlink(this)
+		return 1
+	end
+	return 0
+end
+
+e2function number entity:lsUnlinkAll()
+	if not IsValid(this) or not this.IsNode then
+		return nil
+	end
+
+	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canTool then
+		local netid = ls_get_ent_netid(this)
+		RD.UnlinkAllFromNode(netid)
+		return 1
+	end
+	return 0
+end
+
+e2function number entity:lsLinkNodes(entity node)
+	if not IsValid(this) or not this.IsNode or not IsValid(node) or not node.IsNode then
+		return nil
+	end
+
+	local canToolThis = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	local canToolNode = node:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canToolThis and canToolNode then
+		local netidThis = ls_get_ent_netid(this)
+		local netidNode = ls_get_ent_netid(node)
+		RD.LinkNodes(netidThis, netidNode)
+	end
+end
+
+e2function number entity:lsUnlinkNodes(entity node)
+	if not IsValid(this) or not this.IsNode or not IsValid(node) or not node.IsNode then
+		return nil
+	end
+
+	local canToolThis = this:CPPICanTool(self.player, "toolgun") and 1 or 0
+	local canToolNode = node:CPPICanTool(self.player, "toolgun") and 1 or 0
+	if canToolThis and canToolNode then
+		local netidThis = ls_get_ent_netid(this)
+		local netidNode = ls_get_ent_netid(node)
+		RD.UnlinkNodes(netidThis, netidNode)
+	end
 end
 -- END NODE LINKING FUNCTIONS
