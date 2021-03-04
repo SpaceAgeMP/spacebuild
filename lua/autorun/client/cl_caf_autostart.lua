@@ -314,10 +314,8 @@ local function GetClientMenu(contentpanel)
 	lblTitle:SizeToContents()
 	lblTitle:SetPos(x, y)
 	y = y + 35
-	x = x - lbl:GetWide() - 5
-	--Other options here]]
+	x = x - lblTitle:GetWide() - 5
 	panel:SetSize(contentpanel:GetWide(), y + 10)
-
 	return panel
 end
 

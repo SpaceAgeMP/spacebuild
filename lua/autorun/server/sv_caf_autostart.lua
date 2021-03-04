@@ -99,7 +99,10 @@ local function LoadAddonStatus(addon, defaultstatus)
 end
 
 local function OnEntitySpawn(ent, enttype, ply)
-	if ent == NULL then return end
+	if not IsValid(ent) then
+		return
+	end
+
 	ent.caf = ent.caf or {}
 	ent.caf.custom = ent.caf.custom or {}
 

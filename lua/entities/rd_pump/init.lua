@@ -23,7 +23,7 @@ function ENT:CheckPlayerOK(ply)
 end
 
 local function HandleConCmdError(ply, ok, err)
-	if not ok then
+	if not ok and IsValid(ply) then
 		ply:ChatPrint(err)
 	end
 	return ok
