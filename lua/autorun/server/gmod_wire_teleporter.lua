@@ -6,16 +6,15 @@ hook.Add("InitPostEntity", "WireTeleporterPatch", function()
 
     local ENT = scripted_ents.GetStored("gmod_wire_teleporter").t
     local RD = CAF.GetAddon("Resource Distribution")
-    
+
     ENT.RealJump = ENT.Jump
     ENT.RealJump_Part2 = ENT.Jump_Part2
-    ENT.RealTriggerInput = ENT.TriggerInput
 
     function ENT:Jump(withangles)
         if (self.Jumping) then
             return
         end
-        
+
         self:CalculateEnergy()
 
         if RD.GetResourceAmount(self, "energy") < self.EnergyRequired then
@@ -54,7 +53,7 @@ hook.Add("InitPostEntity", "WireTeleporterPatch", function()
                 mass = mass + 1
             end
         end
-        
+
         self.EnergyRequired = math.ceil(distance * mass)
     end
 end)
