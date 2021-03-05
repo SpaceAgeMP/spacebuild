@@ -51,6 +51,7 @@ end
 
 local function e2_ls_info(ent)
 	local retTab = e2defaulttable()
+
 	if ent.sbenvironment then
 		retTab = ls_table_to_e2_table(ent.sbenvironment)
 		if IsValid(ent) then
@@ -58,23 +59,19 @@ local function e2_ls_info(ent)
 			retTab.stypes.entity = "e"
 			retTab.size = retTab.size + 1
 		end
+		return retTab
 	end
+
 	if ent.environment and ent.environment.sbenvironment then
-		if ent.sbenvironment then
-			if ent.environment ~= ent and IsValid(ent.environment) then
-				retTab.s.parent = ent.environment
-				retTab.stypes.parent = "e"
-				retTab.size = retTab.size + 1
-			end
-		else
-			retTab = ls_table_to_e2_table(ent.environment.sbenvironment)
-			if IsValid(ent.environment) then
-				retTab.s.entity = ent.environment
-				retTab.stypes.entity = "e"
-				retTab.size = retTab.size + 1
-			end
+		retTab = ls_table_to_e2_table(ent.environment.sbenvironment)
+		if IsValid(ent.environment) then
+			retTab.s.entity = ent.environment
+			retTab.stypes.entity = "e"
+			retTab.size = retTab.size + 1
 		end
+		return retTab
 	end
+
 	return retTab
 end
 
@@ -107,7 +104,11 @@ e2function table entity:lsInfo()
 end
 
 e2function table lsInfo()
-	return e2_ls_info(self.entity)
+	local ent = self.entity
+	if ent.environment == nil then
+		ent:PhysWake()
+	end
+	return e2_ls_info(ent)
 end
 
 e2function array entity:lsGetResources()
