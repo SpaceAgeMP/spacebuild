@@ -40,16 +40,7 @@ hook.Add("InitPostEntity", "WireTeleporterPatch", function()
             ents = constraint.GetAllConstrainedEntities( self:GetParent() )
         end
 
-        local mass = 0
-        for k, v in pairs( ents ) do
-            if v:GetPhysicsObjectCount() ~= 0 then
-                mass = mass + v:GetPhysicsObject():GetMass()
-            else
-                mass = mass + 1
-            end
-        end
-
-        self.EnergyRequired = math.ceil(distance * mass)
+        self.EnergyRequired = math.ceil((distance * 4) * table.Count(ents))
     end
 end)
 
