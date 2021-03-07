@@ -1,9 +1,4 @@
 hook.Add("InitPostEntity", "WireTeleporterPatch", function()
-    list.Set("LSEntOverlayText", "gmod_wire_teleporter", {
-        HasOOO = true,
-        resnames = {"energy"}
-    })
-
     local ENT = scripted_ents.GetStored("gmod_wire_teleporter").t
     local RD = CAF.GetAddon("Resource Distribution")
 
