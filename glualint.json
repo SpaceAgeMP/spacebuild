@@ -25,5 +25,7 @@
     "prettyprint_spaceAfterComma":      true,
     "prettyprint_semicolons":           false,
     "prettyprint_cStyle":               false,
-    "prettyprint_indentation":          "\t"
+    "prettyprint_indentation":          "\t",
+
+    "log_format":                       "standard"
 }

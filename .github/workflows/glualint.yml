@@ -16,7 +16,7 @@ jobs:
         export PATH=$PATH:/tmp/bin
         mkdir -p /tmp/bin
         pushd /tmp/bin
-        wget -q https://github.com/FPtje/GLuaFixer/releases/download/1.16.4/glualint-1.16.4-linux-stripped.zip -O glualint.zip
+        wget -q https://github.com/FPtje/GLuaFixer/releases/download/1.17.3/glualint-1.17.3-linux-stripped.zip -O glualint.zip
         unzip glualint.zip
         chmod +x glualint
         popd

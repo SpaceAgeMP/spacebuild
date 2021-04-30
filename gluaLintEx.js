@@ -82,7 +82,7 @@ let errorCount = 0, warningCount = 0;
 const annotations = [];
 
 function endCheck() {
-    defineCheck({
+    return defineCheck({
         status: 'completed',
         completed_at: new Date(),
         conclusion: (errorCount > 0) ? 'failure' : 'success',
@@ -113,7 +113,7 @@ if (res.status !== 1) {
 }
 
 const errRegExp = /^(.+): \[(Warning|Error)\] line (\d+), column (\d+) - line (\d+), column (\d+): (.+)$/;
-const output = res.stdout.toString().split(/\r?\n/).filter(l => !!l).map(l => l.match(errRegExp)).map(m => ({
+const output = res.stdout.toString().trim().split(/\r?\n/).filter(l => !!l).map(l => l.match(errRegExp)).map(m => ({
     file: normalize(m[1]),
     type: m[2].toLowerCase(),
     lineStart: parseInt(m[3], 10),
