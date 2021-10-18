@@ -128,6 +128,10 @@ local function AddNetworkToCache(nrofbytes)
 			value = ReadLong()
 			temperature = net.ReadFloat()
 
+			if not resource then
+				continue
+			end
+
 			data.resources[resource] = {
 				value = value,
 				maxvalue = maxvalue,
