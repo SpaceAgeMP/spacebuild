@@ -31,12 +31,15 @@ TOOL.ClientConVar["color_b"] = "255"
 TOOL.ClientConVar["color_a"] = "255"
 
 local function link_in_range(ent, range)
+	if not IsValid(ent) then
+		return
+	end
 	local rd = CAF.GetAddon("Resource Distribution")
-
 	for k, v in pairs(ents.FindInSphere(ent:GetPos(), range)) do
 		local enttable = rd.GetEntityTable(v)
 
-		if table.Count(enttable) > 0 and enttable.network == 0 and ent:GetPlayerName() == v:GetPlayerName() then
+		if IsValid(v) and enttable.network == 0 and (CPPI and CPPI.GetOwner and CPPI.GetOwner(ent) ~= CPPI.GetOwner(v)) or (ent.GetPlayerName and v.GetPlayerName and ent:GetPlayerName() == v:GetPlayerName()) then
+			-- try CPPI first, fallback if CPPI is not available
 			rd.Link(v, ent.netid)
 		end
 	end

@@ -24,7 +24,7 @@ end
 
 local function HandleConCmdError(ply, ok, err)
 	if not ok and IsValid(ply) then
-		ply:ChatPrint(err)
+		ply:ChatPrint(err or "Unknown pump control error")
 	end
 	return ok
 end
@@ -231,6 +231,7 @@ function ENT:SetPumpName(ply, name)
 	end
 
 	self:SetNWString("name", name)
+	return true
 end
 
 function ENT:SetNetwork(netid)
