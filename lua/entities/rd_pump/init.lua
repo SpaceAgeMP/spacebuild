@@ -94,7 +94,7 @@ function ENT:LinkToPump(ply, ent)
 		return false, "You are not allowed to control this pump!"
 	end
 
-	if not (IsValid(ent) and ent.IsRDPump and ent:IsRDPump()) then
+	if not (IsValid(ent) and ent.IsPump) then
 		return false, "The other entity is not a pump"
 	end
 
