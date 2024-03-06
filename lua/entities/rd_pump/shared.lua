@@ -13,3 +13,7 @@ ENT.IsPump = true
 list.Set("LSEntOverlayText", "rd_pump", {
 	HasOOO = true
 })
+
+function ENT:IsRDPump()
+	return true
+end
