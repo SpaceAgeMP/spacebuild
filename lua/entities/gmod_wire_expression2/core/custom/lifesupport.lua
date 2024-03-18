@@ -293,14 +293,8 @@ e2function number entity:lsUnlinkAll()
 
 	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
 	if canTool then
-		if this.IsPump then
-			this.node = nil
-			this:SetNetwork(0)
-			RD.Beam_clear(this)
-		else
-			local netid = ls_get_ent_netid(this)
-			RD.UnlinkAllFromNode(netid)
-		end
+		local netid = ls_get_ent_netid(this)
+		RD.UnlinkAllFromNode(netid)
 		return 1
 	end
 	return 0
