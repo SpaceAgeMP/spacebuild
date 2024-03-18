@@ -254,8 +254,13 @@ e2function number entity:lsLink(entity node)
 	if canToolThis and canToolNode then
 		local distance = this:GetPos():Distance(node:GetPos())
 		if distance <= node.range then
-			local netid = ls_get_ent_netid(node)
-			RD.Link(this, netid)
+			if this.IsPump then
+				this:SetNetwork(node.netid)
+				this.node = node
+			else
+				local netid = ls_get_ent_netid(node)
+				RD.Link(this, netid)
+			end
 			return 1
 		end
 	end
@@ -269,7 +274,13 @@ e2function number entity:lsUnlink()
 
 	local canTool = this:CPPICanTool(self.player, "toolgun") and 1 or 0
 	if canTool then
-		RD.Unlink(this)
+		if this.IsPump then
+			this.node = nil
+			this:SetNetwork(0)
+			RD.Beam_clear(this)
+		else
+			RD.Unlink(this)
+		end
 		return 1
 	end
 	return 0
