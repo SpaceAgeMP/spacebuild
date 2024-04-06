@@ -1,4 +1,4 @@
-﻿local gmod_version_required = 145
+local gmod_version_required = 145
 
 if VERSION < gmod_version_required then
 	error("CAF: Your gmod is out of date: found version ", VERSION, "required ", gmod_version_required)
@@ -102,7 +102,6 @@ local function OnEntitySpawn(ent, enttype, ply)
 	if not IsValid(ent) then
 		return
 	end
-
 	ent.caf = ent.caf or {}
 	ent.caf.custom = ent.caf.custom or {}
 
