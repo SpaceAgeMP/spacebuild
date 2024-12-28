@@ -1,4 +1,4 @@
-﻿local gmod_version_required = 145
+local gmod_version_required = 145
 
 if VERSION < gmod_version_required then
 	error("SB CORE: Your gmod is out of date: found version ", VERSION, "required ", gmod_version_required)
@@ -293,14 +293,14 @@ function CAF2.Notice(message, title)
 	dfpopup:SetDraggable(false)
 	dfpopup:SetTitle(title)
 	local lbl = vgui.Create("DLabel", dfpopup)
-	lbl:SetPos(10, 25)
-	lbl:SetText(message)
-	lbl:SizeToContents()
-	dfpopup:SetSize(lbl:GetWide() + 4, lbl:GetTall() + 25)
-	dfpopup:Center()
-	dfpopup:MakePopup()
-
-	return true
+	lbl:SetPos(10, 25);
+	lbl:SetText(message);
+	lbl:SizeToContents();
+	
+	dfpopup:SetSize(lbl:GetWide() + 19, lbl:GetTall() + 35);
+	dfpopup:Center();
+	dfpopup:MakePopup();
+	return true;
 end
 
 local function GetClientMenu(contentpanel)
@@ -312,9 +312,33 @@ local function GetClientMenu(contentpanel)
 	local lblTitle = vgui.Create("DLabel", panel)
 	lblTitle:SetText(CAF2.GetLangVar("Clientside CAF Options"))
 	lblTitle:SizeToContents()
-	lblTitle:SetPos(x, y)
-	y = y + 35
-	x = x - lblTitle:GetWide() - 5
+	lblTitle:SetPos(x, y);
+	
+	y = y + 20;
+	-- Language Selection
+	local lbl = vgui.Create("DLabel", panel)
+	lbl:SetText(CAF2.GetLangVar("Language")..":");
+	lbl:SizeToContents()
+	lbl:SetPos(x, y);
+	
+	x = x + lbl:GetWide() + 2;
+	
+	local selection = vgui.Create("DComboBox", panel)
+	selection:SetPos(x, y)
+	for k, v in pairs(CAF.LANGUAGE) do
+		selection:AddChoice(k) 
+	end
+	function selection:OnSelect(index, value, data) 
+		CAF2.currentlanguage = value
+		CAF2.SaveVar("CAF_LANGUAGE", value)
+		CAF2.Notice(CAF2.GetLangVar("Some Language Changes will only Show after a map reload!"))
+	end
+	selection:SetWide(150)
+
+	y = y + 15
+	x = x - lbl:GetWide() - 5
+	--Other options here
+	
 	panel:SetSize(contentpanel:GetWide(), y + 10)
 	return panel
 end
@@ -419,6 +443,9 @@ end
 
 local function GetStatusPanel(frame)
 	local panel = vgui.Create("DPanel", frame)
+	panel.Paint = function(pnl, w, h)
+		draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 0))
+	end
 	panel:StretchToParent(6, 36, 6, 6)
 	local List = vgui.Create("DPanelList", panel)
 	List:EnableHorizontal(false)
@@ -561,18 +588,26 @@ local function GetAboutPanel(frame)
 	mylist:SetMultiSelect(false)
 	mylist:SetPos(1, 1)
 	mylist:SetSize(panel:GetWide() - 2, panel:GetTall() - 2)
-	local colum = mylist:AddColumn("")
-	colum:SetFixedWidth(5)
 	local colum1 = mylist:AddColumn("About")
 	colum1:SetFixedWidth(mylist:GetWide() - 5)
 	mylist.SortByColumn = function() end
 	----------
 	--Text--
 	----------
-	mylist:AddLine("", "Custom Addon Framework")
-	mylist:AddLine("", "More info to be added")
-	mylist:AddLine("", "")
-	mylist:AddLine("", "Made By SnakeSVx")
+	mylist:AddLine(Custom Addon Framework" )
+	mylist:AddLine( "More info to be added" )
+	mylist:AddLine( "" )
+	mylist:AddLine( "Made by the Spacebuild Development Team" )
+	mylist:AddLine( "Official website: https://github.com/spacebuild" )
+	mylist:AddLine( "" )
+	mylist:AddLine( "Spacebuild Enhancement Pack:" )
+	mylist:AddLine( "https://github.com/spacebuild/sbep" )
+	mylist:AddLine( "" )
+	mylist:AddLine( "All Contributors:" )
+	mylist:AddLine( "https://github.com/thrimbor/sbep/issues/1" )
+	mylist:AddLine( "" )
+	mylist:AddLine( "Menu fixed by Aperture Development" )
+	mylist:AddLine( "Aperture Development Website: https://www.Aperture-Development.de" )
 	--
 
 	return panel
@@ -602,9 +637,15 @@ function CAF2.OpenMainMenu()
 	MainFrame:Center()
 	local ContentPanel = vgui.Create("DPropertySheet", MainFrame)
 	ContentPanel:Dock(FILL)
-	ContentPanel:AddSheet(CAF.GetLangVar("Installed Addons"), GetStatusPanel(ContentPanel), "icon16/application.png", true, true)
-	ContentPanel:AddSheet(CAF.GetLangVar("Info and Help"), GetHelpPanel(ContentPanel), "icon16/box.png", true, true)
+	--[[
+		Comment: We need this function for "panel:StretchToParent" to work. Otherwise the panels wont be visible as they have the wrong size.
 
+		https://wiki.garrysmod.com/page/Panel/Dock
+	]]
+	ContentPanel:InvalidateParent(true)
+
+	ContentPanel:AddSheet( CAF.GetLangVar("Installed Addons"), GetStatusPanel(ContentPanel), "icon16/application.png", true, true )
+	ContentPanel:AddSheet( CAF.GetLangVar("Info and Help"), GetHelpPanel(ContentPanel), "icon16/box.png", true, true )
 	if LocalPlayer():IsAdmin() then
 		ContentPanel:AddSheet(CAF.GetLangVar("Server Settings"), GetServerSettingsPanel(ContentPanel), "icon16/wrench.png", true, true)
 	end

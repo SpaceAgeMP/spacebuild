@@ -1,23 +1,29 @@
-﻿local PANEL = {}
+local PANEL = {}
 
 function PANEL:Init()
-	self.Name = vgui.Create("DLabel", self)
-	self.Name:SetPos(72, 5)
-	self.Version = vgui.Create("DLabel", self)
-	self.Version:SetPos(72, 22)
-	self.Status = vgui.Create("DLabel", self)
-	self.Status:SetPos(72, 39)
-	self.Button = vgui.Create("DButton", self)
-	self.Button:SetPos(72, 56)
-	self:SetText("Show More")
+
+    self.Name = vgui.Create("DLabel", self)
+    self.Name:SetPos(72, 25)
+
+    self.Version = vgui.Create("DLabel", self)
+    self.Version:SetPos(72, 42)
+
+    self.Status = vgui.Create("DLabel", self)
+    self.Status:SetPos(72, 59)
+
+    self.Button = vgui.Create("DButton", self)
+    self.Button:SetPos(72, 76);
+
+    self:SetText("Show More");
 end
 
-function PANEL:PerformLayout(w)
-	self.Name:SetSize(w - 60, 15)
-	self.Status:SetSize(w - 60, 15)
-	self.Version:SetSize(w - 60, 15)
-	self.Button:SetSize(w - 120, 15)
-	self:SetTall(72)
+function PANEL:PerformLayout()
+    local w, h = self:GetWide(), self:GetTall()
+    self.Name:SetSize(w - 60, 15)
+    self.Status:SetSize(w - 60, 15)
+    self.Version:SetSize(w - 60, 15)
+    self.Button:SetSize(w - 120, 15)
+    self:SetTall(92)
 end
 
 function PANEL:Setup(name, addon)
@@ -67,10 +73,11 @@ function PANEL:Setup(name, addon)
 end
 
 function PANEL:Paint(w, h)
-	if not self.Material then return end
-	surface.SetDrawColor(255, 255, 255, 255)
-	surface.SetMaterial(self.Material)
-	surface.DrawTexturedRect(4, 4, 56, 56)
+
+    if (not self.Material) then return end
+    surface.SetDrawColor(255, 255, 255, 255)
+    surface.SetMaterial(self.Material)
+    surface.DrawTexturedRect(4, 24, 56, 56)
 end
 
 function PANEL:OnMousePressed(mcode)
