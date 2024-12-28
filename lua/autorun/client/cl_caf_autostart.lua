@@ -673,11 +673,13 @@ local function BuildMenu(Panel)
 	})
 end
 
+--[[
 local function CreateMenu()
 	spawnmenu.AddToolMenuOption("Custom Addon Framework", "Custom Addon Framework", "MainInfoMenu", "Main Info Menu", "", "", BuildMenu, {})
 end
 
 hook.Add("PopulateToolMenu", "Caf_OpenMenu_AddMenu", CreateMenu)
+]]
 
 function CAF2.POPUP(msg, location, color, displaytime)
 	if msg then
