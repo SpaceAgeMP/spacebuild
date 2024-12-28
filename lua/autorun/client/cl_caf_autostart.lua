@@ -26,9 +26,9 @@ local Addons = {}
 CAF3.Addons = Addons
 --Derma stuff
 local MainInfoMenuData = nil
---local MainStatusMenuData = nil;
---local TopFrame = nil;
---local TopFrameHasText = false;
+--local MainStatusMenuData = nil
+--local TopFrame = nil
+--local TopFrameHasText = false
 --local TopLabel = nil
 --End Derma stuff
 local addonlevel = {}
@@ -89,7 +89,7 @@ end
 function CAF2.ConstructAddon(len, client)
 	local name = net.ReadString()
 	OnAddonConstruct(name)
-	--RunConsoleCommand("Main_CAF_Menu");
+	--RunConsoleCommand("Main_CAF_Menu")
 end
 
 net.Receive("CAF_Addon_Construct", CAF2.ConstructAddon)
@@ -293,14 +293,14 @@ function CAF2.Notice(message, title)
 	dfpopup:SetDraggable(false)
 	dfpopup:SetTitle(title)
 	local lbl = vgui.Create("DLabel", dfpopup)
-	lbl:SetPos(10, 25);
-	lbl:SetText(message);
-	lbl:SizeToContents();
+	lbl:SetPos(10, 25)
+	lbl:SetText(message)
+	lbl:SizeToContents()
 	
-	dfpopup:SetSize(lbl:GetWide() + 19, lbl:GetTall() + 35);
-	dfpopup:Center();
-	dfpopup:MakePopup();
-	return true;
+	dfpopup:SetSize(lbl:GetWide() + 19, lbl:GetTall() + 35)
+	dfpopup:Center()
+	dfpopup:MakePopup()
+	return true
 end
 
 local function GetClientMenu(contentpanel)
@@ -312,16 +312,16 @@ local function GetClientMenu(contentpanel)
 	local lblTitle = vgui.Create("DLabel", panel)
 	lblTitle:SetText(CAF2.GetLangVar("Clientside CAF Options"))
 	lblTitle:SizeToContents()
-	lblTitle:SetPos(x, y);
+	lblTitle:SetPos(x, y)
 	
-	y = y + 20;
+	y = y + 20
 	-- Language Selection
 	local lbl = vgui.Create("DLabel", panel)
-	lbl:SetText(CAF2.GetLangVar("Language")..":");
+	lbl:SetText(CAF2.GetLangVar("Language")..":")
 	lbl:SizeToContents()
-	lbl:SetPos(x, y);
+	lbl:SetPos(x, y)
 	
-	x = x + lbl:GetWide() + 2;
+	x = x + lbl:GetWide() + 2
 	
 	local selection = vgui.Create("DComboBox", panel)
 	selection:SetPos(x, y)
@@ -466,7 +466,7 @@ local function GetStatusPanel(frame)
 		if addon.GetDescription then
 			descriptiontxt = addon.GetDescription()
 			--else
-			--	descriptiontxt = {CAF.GetLangVar("No Description")};
+			--	descriptiontxt = {CAF.GetLangVar("No Description")}
 		end
 
 		local cat = vgui.Create("DCAFCollapsibleCategory")
@@ -594,20 +594,20 @@ local function GetAboutPanel(frame)
 	----------
 	--Text--
 	----------
-	mylist:AddLine(Custom Addon Framework" )
-	mylist:AddLine( "More info to be added" )
-	mylist:AddLine( "" )
-	mylist:AddLine( "Made by the Spacebuild Development Team" )
-	mylist:AddLine( "Official website: https://github.com/spacebuild" )
-	mylist:AddLine( "" )
-	mylist:AddLine( "Spacebuild Enhancement Pack:" )
-	mylist:AddLine( "https://github.com/spacebuild/sbep" )
-	mylist:AddLine( "" )
-	mylist:AddLine( "All Contributors:" )
-	mylist:AddLine( "https://github.com/thrimbor/sbep/issues/1" )
-	mylist:AddLine( "" )
-	mylist:AddLine( "Menu fixed by Aperture Development" )
-	mylist:AddLine( "Aperture Development Website: https://www.Aperture-Development.de" )
+	mylist:AddLine("Custom Addon Framework")
+	mylist:AddLine("More info to be added")
+	mylist:AddLine("")
+	mylist:AddLine("Made by the Spacebuild Development Team")
+	mylist:AddLine("Official website: https://github.com/spacebuild")
+	mylist:AddLine("")
+	mylist:AddLine("Spacebuild Enhancement Pack:")
+	mylist:AddLine("https://github.com/spacebuild/sbep")
+	mylist:AddLine("")
+	mylist:AddLine("All Contributors:")
+	mylist:AddLine("https://github.com/thrimbor/sbep/issues/1")
+	mylist:AddLine("")
+	mylist:AddLine("Menu fixed by Aperture Development")
+	mylist:AddLine("Aperture Development Website: https://www.Aperture-Development.de")
 	--
 
 	return panel
