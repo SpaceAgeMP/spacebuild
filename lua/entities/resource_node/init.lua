@@ -8,7 +8,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self.netid = CAF.GetAddon("Resource Distribution").CreateNetwork(self)
 	self:SetNWInt("netid", self.netid)
-	self:SetNWInt("overlaymode", 2)
+	self:SetNWInt("overlaymode", 1)
 	self.range = self.range or 512
 	self:SetNWInt("range", self.range)
 end
