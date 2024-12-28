@@ -15,8 +15,8 @@ function PLY:AddHint(txt, typ, len)
 
     net.Start("Player_AddHint")
         net.WriteString(txt)
-        net.WriteInt(typ or NOTIFY_GENERIC, 32)
-        net.WriteInt(len or 5, 32)
+        net.WriteInt(typ or NOTIFY_GENERIC, 8)
+        net.WriteInt(len or 5, 8)
     net.Send(self)
 end
 
