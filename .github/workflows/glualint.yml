@@ -10,7 +10,7 @@ jobs:
     - name: Use Node.js 12
       uses: actions/setup-node@v7
       with:
-        node-version: 24
+        node-version: 26
     - name: npm for Lua lint
       run: |
         export PATH=$PATH:/tmp/bin
